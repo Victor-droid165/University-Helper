@@ -1,14 +1,10 @@
 module Main where
 
 import Lib
+import ScreenCleaner
 import System.Console.ANSI
 import Control.Concurrent
 import Data.Char (toLower)
-
-screenCleaner :: IO ()
-screenCleaner = do
-    clearScreen
-    threadDelay 1000000
 
 inicio :: IO ()
 inicio = do

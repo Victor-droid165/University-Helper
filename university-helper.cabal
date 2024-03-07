@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      ScreenCleaner
   other-modules:
       Paths_university_helper
   autogen-modules:
