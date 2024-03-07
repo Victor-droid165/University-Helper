@@ -1,9 +1,9 @@
-module Authentication  
+module Authentication
     (   login,
         register
     ) where
 
-import ScreenCleaner (screenCleaner)
+import Util ( screenCleaner )
 
 register :: IO ()
 register = do

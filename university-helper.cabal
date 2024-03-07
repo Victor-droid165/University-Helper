@@ -26,9 +26,7 @@ source-repository head
 library
   exposed-modules:
       Authentication
-      Interface
-      Lib
-      ScreenCleaner
+      Util
   other-modules:
       Paths_university_helper
   autogen-modules:

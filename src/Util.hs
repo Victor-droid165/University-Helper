@@ -1,5 +1,5 @@
-module ScreenCleaner    
-    ( screenCleaner
+module Util
+    ( screenCleaner,
     ) where
 
 import Control.Concurrent
