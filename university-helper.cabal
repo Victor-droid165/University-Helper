@@ -25,6 +25,8 @@ source-repository head
 
 library
   exposed-modules:
+      Authentication
+      Interface
       Lib
       ScreenCleaner
   other-modules:
