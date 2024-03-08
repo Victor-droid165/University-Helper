@@ -2,38 +2,36 @@ module Main
     ( main
     ) where
 
-import Util ( screenCleaner )
-import Control.Concurrent ( threadDelay )
-import Authentication ( login, register )
+import Util.ScreenCleaner ( screenCleaner )
+import TerminalUI.User ( userLogin, userRegister )
 
 invalidOption :: IO ()
 invalidOption = do
-        mapM_ putStrLn ["Opção Inválida. Tente Novamente.",
-                        "Se deseja escolher a opção '[X] - Opção', digite: X\n"]
+    mapM_ putStrLn ["Opção Inválida. Tente Novamente.",
+                    "Se deseja escolher a opção '[X] - Opção', digite: X\n"]
 
-frontPage :: IO ()
-frontPage = do
+optionInterface :: IO ()
+optionInterface = do
 
-    mapM_ putStrLn ["Bem Vindos ao UNIVERSITY HELPER !",
+    mapM_ putStrLn ["Bem Vindo ao UNIVERSITY HELPER !",
                     "Selecione o que deseja realizar:",
                     "[1] CADASTRAR",
                     "[2] ENTRAR\n",
-                    "Digite o NÚMERO correspondente a sua opção:\n"]
-
+                    "Digite o NÚMERO correspondente a sua opção:"]
     option <- getLine
     let chosenOption = head option
     screenCleaner
-    choose chosenOption
+    chooseOption chosenOption
 
-choose :: Char -> IO ()
-choose choice
-    | choice == '1' = register
-    | choice == '2' = login
+chooseOption :: Char -> IO ()
+chooseOption choice
+    | choice == '1' = userRegister
+    | choice == '2' = userLogin
     | otherwise = do
         invalidOption
-        frontPage
+        optionInterface
 
 main :: IO ()
 main = do
     screenCleaner
-    frontPage
+    optionInterface
