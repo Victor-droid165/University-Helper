@@ -19,12 +19,11 @@ frontPage = do
                     "[1] CADASTRAR",
                     "[2] ENTRAR\n",
                     "Digite o NÚMERO correspondente a sua opção:\n"]
-    
 
     option <- getLine
-    let choseOption = head option
+    let chosenOption = head option
     screenCleaner
-    choose choseOption
+    choose chosenOption
 
 choose :: Char -> IO ()
 choose choice
@@ -33,7 +32,6 @@ choose choice
     | otherwise = do
         invalidOption
         frontPage
-
 
 main :: IO ()
 main = do
