@@ -25,7 +25,11 @@ source-repository head
 
 library
   exposed-modules:
-      Controllers.UserController
+      Controllers.Users.AdministratorController
+      Controllers.Users.StudentController
+      Controllers.Users.TeacherController
+      Controllers.Users.UserController
+      Models.User
       TerminalUI.Users.Administrator
       TerminalUI.Users.Student
       TerminalUI.Users.Teacher

@@ -1,9 +1,9 @@
-module TerminalUI.Users.Teacher
+module Controllers.Users.TeacherController
     ( teacherOptions
     ) where
 
 import Models.User
 
-teacherOptions :: User -> IO ()
-teacherOptions user = do
+teacherOptions :: IO ()
+teacherOptions = do
     putStrLn "Welcome to the Teacher session!"

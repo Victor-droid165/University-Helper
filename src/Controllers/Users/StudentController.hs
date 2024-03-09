@@ -1,9 +1,9 @@
-module TerminalUI.Users.Student
+module Controllers.Users.StudentController
     ( studentOptions
     ) where
 
 import Models.User
 
-studentOptions :: User -> IO ()
-studentOptions user = do
+studentOptions :: IO ()
+studentOptions = do
     putStrLn "Welcome to the Student Session!"

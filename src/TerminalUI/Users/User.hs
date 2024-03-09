@@ -1,11 +1,16 @@
 module TerminalUI.Users.User
-    (   userLogin,
-        userRegister
+    ( loginUI
+    , registerUI
+    , typeUserName
+    , typeUniversity
+    , typeEnrollment
+    , typeUserEmail
+    , typeUserPassword
+    , invalidOption
     ) where
 
 import Util.ScreenCleaner ( screenCleaner )
 import Control.Concurrent ( threadDelay )
-import Controllers.UserController ( userRegister )
 
 invalidOption :: IO ()
 invalidOption = do
@@ -63,10 +68,10 @@ typeUserPassword textToShow = do
     password <- getLine
     return password
 
-registerUI :: IO ()
-userRegister = do
+registerUI :: IO (String, String, String, String, String,String)
+registerUI = do
     screenCleaner
-    mapM_ putStrLn ["Bom saber que deseja se cadastrar no nosso sistema!",
+    mapM_ putStrLn ["Bom saber que deseja utilizar nosso sistema!",
                     "Vamos agora solicitar algumas informações para que você possa ser efetivado no sistema\n"]
 
     userType <- selectAccountType
@@ -77,17 +82,17 @@ userRegister = do
     screenCleaner
     userEnrollment <- typeEnrollment
     screenCleaner
-    userEmail <- typeUserEmail [ "Agora informe-nos o e-mail do usuário",
-                                 "Digite o E-MAIL da pessoa que utilizará o sistema:"]
+    userEmail <- typeUserEmail ["Agora informe-nos o e-mail do usuário",
+                                "Digite o E-MAIL da pessoa que utilizará o sistema:"]
 
     userPassword <- typeUserPassword ["Digite a SENHA que a pessoa utilizará para o login:"]
     screenCleaner
-    userRegister userType userName userUniversity userEnrollment userEmail userPassword
+    return (userType, userName, userUniversity, userEnrollment, userEmail, userPassword)
 
-loginUI :: IO ()
-userLogin = do
+loginUI :: IO (String, String)
+loginUI = do
     screenCleaner
     putStrLn "Bem Vindo ao Login !"
     userEmail <- typeUserEmail ["E-mail:"]
     userPassword <- typeUserPassword ["Senha:"]
-    putStrLn "Bem Vindo ao Login !"
+    return (userEmail, userPassword)
