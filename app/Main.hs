@@ -3,7 +3,7 @@ module Main
     ) where
 
 import Util.ScreenCleaner ( screenCleaner )
-import TerminalUI.User ( userLogin, userRegister )
+import TerminalUI.Users.User ( registerUI, loginUI )
 
 invalidOption :: IO ()
 invalidOption = do
@@ -25,8 +25,8 @@ optionInterface = do
 
 chooseOption :: Char -> IO ()
 chooseOption choice
-    | choice == '1' = userRegister
-    | choice == '2' = userLogin
+    | choice == '1' = registerUI
+    | choice == '2' = loginUI
     | otherwise = do
         invalidOption
         optionInterface

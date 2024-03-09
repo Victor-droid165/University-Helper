@@ -1,9 +1,10 @@
 module Controllers.UserController    
-    ( main
+    ( userRegister
     ) where
 
 import Data.Maybe (mapMaybe)
 import Data.Foldable (find)
+
 data User = User
     { userType :: String
     , userName :: String
@@ -11,7 +12,7 @@ data User = User
     , userEnrollment :: String
     , userEmail :: String
     , userPassword :: String
-    } deriving (Show)
+    } deriving (Show, Read)
 
 findUser :: String -> IO (Maybe User)
 findUser enrollment = do
@@ -20,25 +21,18 @@ findUser enrollment = do
     return $ find (\user -> userEnrollment user == enrollment) users
     
 userToString :: User -> String
-userToString user =
-    userType user ++ " " ++
-    userName user ++ " " ++
-    userUniversity user ++ " " ++
-    userEnrollment user ++ " " ++
-    userEmail user ++ " " ++
-    userPassword user ++ "\n"
+userToString = show
 
 stringToUser :: String -> Maybe User
-stringToUser line
-    | True = Just $ User userType userName userUniversity userEnrollment userEmail userPassword
-    where
-        [userType, userName, userUniversity, userEnrollment, userEmail, userPassword] = words line
+stringToUser line = case reads line of
+    [(user, "")] -> Just user
+    _            -> Nothing
 
 writeUsersToFile :: FilePath -> User -> IO ()
-writeUsersToFile filePath user = appendFile filePath (userToString user)
+writeUsersToFile filePath user = appendFile filePath (userToString user ++ "\n")
 
-main :: String -> String -> String -> String -> String -> String -> IO()
-main userType userName userUniversity userEnrollment userEmail userPassword = do
+userRegister :: String -> String -> String -> String -> String -> String -> IO()
+userRegister userType userName userUniversity userEnrollment userEmail userPassword = do
     let newUser = User { userType = userType
                        , userName = userName
                        , userUniversity = userUniversity
@@ -48,7 +42,7 @@ main userType userName userUniversity userEnrollment userEmail userPassword = do
 
     writeUsersToFile "data/users.txt" newUser
 
-    --only for test the "findUser" function
+    --only for testing the "findUser" function
     maybeUser <- findUser userEnrollment
     print maybeUser
     case maybeUser of

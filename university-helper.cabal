@@ -26,7 +26,10 @@ source-repository head
 library
   exposed-modules:
       Controllers.UserController
-      TerminalUI.User
+      TerminalUI.Users.Administrator
+      TerminalUI.Users.Student
+      TerminalUI.Users.Teacher
+      TerminalUI.Users.User
       Util.ScreenCleaner
   other-modules:
       Paths_university_helper

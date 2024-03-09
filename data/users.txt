@@ -1,3 +1,4 @@
-professor 1 1 1 1 1
-aluno 1 1 1 1 1
-professor 1 1 1 1 1
+User {userType = "professor", userName = "11", userUniversity = "11", userEnrollment = "11", userEmail = "1", userPassword = "1"}
+User {userType = "professor", userName = "1", userUniversity = "1", userEnrollment = "1", userEmail = "1", userPassword = "1"}
+User {userType = "aluno", userName = "Kayky", userUniversity = "Ufcg", userEnrollment = "1221", userEmail = "@@", userPassword = "1221"}
+User {userType = "professor", userName = "11", userUniversity = "11", userEnrollment = "11", userEmail = "@@", userPassword = "12212"}

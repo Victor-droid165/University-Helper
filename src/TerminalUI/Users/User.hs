@@ -1,11 +1,11 @@
-module TerminalUI.User
+module TerminalUI.Users.User
     (   userLogin,
         userRegister
     ) where
 
 import Util.ScreenCleaner ( screenCleaner )
 import Control.Concurrent ( threadDelay )
-import Controllers.UserController ( main )
+import Controllers.UserController ( userRegister )
 
 invalidOption :: IO ()
 invalidOption = do
@@ -22,79 +22,72 @@ chooseOption choice
 
 selectAccountType :: IO String
 selectAccountType = do
-    screenCleaner
     mapM_ putStrLn ["Qual o tipo de conta você gostaria de cadastrar no nosso sistema?",
                     "[1] PROFESSOR",
                     "[2] ALUNO",
                     "Digite o NÚMERO correspondente a sua opção:"]
     option <- getLine
     let chosenOption = head option
-    screenCleaner
     chooseOption chosenOption
 
 typeUserName :: IO String
 typeUserName = do
-    screenCleaner
     mapM_ putStrLn ["Agora precisamos saber qual o nome do usuário que você irá cadastrar",
                     "Digite o NOME da pessoa que usará o sistema:"]
     username <- getLine
-    screenCleaner
     return username
 
 typeUniversity :: IO String
 typeUniversity = do
-    screenCleaner
     mapM_ putStrLn ["A qual universidade o usuário faz parte?",
                     "Digite o NOME da universidade que constará no sistema:"]
     university <- getLine
-    screenCleaner
     return university
 
 typeEnrollment :: IO String
 typeEnrollment = do
-    screenCleaner
     mapM_ putStrLn ["Agora precisamos saber qual a matrícula do usuário",
                     "Digite o numero de MATRÍCULA da pessoa que usará o sistema:"]
     enrollment <- getLine
-    screenCleaner
     return enrollment
 
-typeUserEmail :: IO String
-typeUserEmail = do
-    screenCleaner
-    mapM_ putStrLn ["Agora informe-nos o e-mail do usuário",
-                    "Digite o E-MAIL da pessoa que usará o sistema:"]
+typeUserEmail :: [String] -> IO String
+typeUserEmail textToShow = do
+    mapM_ putStrLn textToShow
     email <- getLine
-    screenCleaner
     return email
 
-typeUserPassword :: IO String
-typeUserPassword = do
-    screenCleaner
-    mapM_ putStrLn ["Maravilha, finalmente chegamos ao último passo do cadastro!",
-                    "Precisamos que você digite uma senha para esse usuário(cuidado para não esquecer)",
-                    "Digite a SENHA que o usuário utilizará para o login:"]
+typeUserPassword :: [String] -> IO String
+typeUserPassword textToShow = do
+    mapM_ putStrLn textToShow
     password <- getLine
-    screenCleaner
     return password
 
-userRegister :: IO ()
+registerUI :: IO ()
 userRegister = do
     screenCleaner
     mapM_ putStrLn ["Bom saber que deseja se cadastrar no nosso sistema!",
                     "Vamos agora solicitar algumas informações para que você possa ser efetivado no sistema\n"]
-    threadDelay 2000000
 
     userType <- selectAccountType
+    screenCleaner
     userName <- typeUserName
+    screenCleaner
     userUniversity <- typeUniversity
+    screenCleaner
     userEnrollment <- typeEnrollment
-    userEmail <- typeUserEmail
-    userPassword <- typeUserPassword
+    screenCleaner
+    userEmail <- typeUserEmail [ "Agora informe-nos o e-mail do usuário",
+                                 "Digite o E-MAIL da pessoa que utilizará o sistema:"]
 
-    main userType userName userUniversity userEnrollment userEmail userPassword
+    userPassword <- typeUserPassword ["Digite a SENHA que a pessoa utilizará para o login:"]
+    screenCleaner
+    userRegister userType userName userUniversity userEnrollment userEmail userPassword
 
-userLogin :: IO ()
+loginUI :: IO ()
 userLogin = do
     screenCleaner
+    putStrLn "Bem Vindo ao Login !"
+    userEmail <- typeUserEmail ["E-mail:"]
+    userPassword <- typeUserPassword ["Senha:"]
     putStrLn "Bem Vindo ao Login !"
