@@ -2,20 +2,22 @@ module Controllers.UserController
     ( main
     ) where
 
+import Data.Maybe (mapMaybe)
+import Data.Foldable (find)
 data User = User
     { userType :: String
     , userName :: String
-    , userEmail :: String
     , userUniversity :: String
     , userEnrollment :: String
+    , userEmail :: String
     , userPassword :: String
     } deriving (Show)
 
-findUser :: String -> Maybe User
-findUser enrollment = do 
+findUser :: String -> IO (Maybe User)
+findUser enrollment = do
     content <- readFile "data/users.txt"
-    let linesOfContent = lines content
-    mapM_ (print . stringToUser) linesOfContent
+    let users = mapMaybe stringToUser (lines content)
+    return $ find (\user -> userEnrollment user == enrollment) users
     
 userToString :: User -> String
 userToString user =
@@ -35,7 +37,7 @@ stringToUser line
 writeUsersToFile :: FilePath -> User -> IO ()
 writeUsersToFile filePath user = appendFile filePath (userToString user)
 
-main :: String -> String -> String -> String -> String -> String -> IO ()
+main :: String -> String -> String -> String -> String -> String -> IO()
 main userType userName userUniversity userEnrollment userEmail userPassword = do
     let newUser = User { userType = userType
                        , userName = userName
@@ -46,9 +48,9 @@ main userType userName userUniversity userEnrollment userEmail userPassword = do
 
     writeUsersToFile "data/users.txt" newUser
 
-    let retorno = stringToUser (userToString newUser)
-    case retorno of
+    --only for test the "findUser" function
+    maybeUser <- findUser userEnrollment
+    print maybeUser
+    case maybeUser of
         Just user -> print user
-        Nothing   -> putStrLn "Erro ao processar usuário"
-
-    findUser
+        Nothing   -> putStrLn "User not found"
