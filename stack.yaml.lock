@@ -3,10 +3,17 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: validation-selective-0.2.0.0@sha256:e1ab5482dede8bf676d729a09109c7c5f798363b9d458e4197a27afb8b48fdd3,3907
+    pantry-tree:
+      sha256: c5f1ddcb6a721cdb12cdec1e12af3ad7dcc936745e3fd53e5dd09b4a12b83bd5
+      size: 697
+  original:
+    hackage: validation-selective-0.2.0.0
 snapshots:
 - completed:
+    sha256: 2fdd7d3e54540062ef75ca0a73ca3a804c527dbf8a4cadafabf340e66ac4af40
     size: 712469
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/22/11.yaml
-    sha256: 2fdd7d3e54540062ef75ca0a73ca3a804c527dbf8a4cadafabf340e66ac4af40
   original: lts-22.11

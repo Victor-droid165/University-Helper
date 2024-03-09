@@ -28,7 +28,7 @@ userLogin = do
 
     (userEmail, userPassword) <- loginUI
 
-    maybeUser <- findUser userEmail userPassword
+    maybeUser <- authenticateUser userEmail userPassword
     case maybeUser of
         Just user -> do
             writeUserOnFile "data/session.txt" user

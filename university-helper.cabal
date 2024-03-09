@@ -35,6 +35,7 @@ library
       TerminalUI.Users.Teacher
       TerminalUI.Users.User
       Util.ScreenCleaner
+      Util.Validate
   other-modules:
       Paths_university_helper
   autogen-modules:

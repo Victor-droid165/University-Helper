@@ -1,6 +1,6 @@
 module Models.User
     ( User(..)
-    , findUser
+    , authenticateUser
     , userToString
     , stringToUser
     , writeUserOnFile
@@ -18,8 +18,8 @@ data User = User
     , userPassword :: String
     } deriving (Show, Read)
 
-findUser :: String -> String -> IO (Maybe User)
-findUser email password = do
+authenticateUser :: String -> String -> IO (Maybe User)
+authenticateUser email password = do
     content <- readFile "data/users.txt"
     let users = mapMaybe stringToUser (lines content)
     return $ find (\user -> userEmail user == email && userPassword user == password) users
