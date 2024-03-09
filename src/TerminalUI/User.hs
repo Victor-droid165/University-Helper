@@ -41,6 +41,24 @@ typeUserName = do
     screenCleaner
     return username
 
+typeUniversity :: IO String
+typeUniversity = do
+    screenCleaner
+    mapM_ putStrLn ["A qual universidade o usuário faz parte?",
+                    "Digite o NOME da universidade que constará no sistema:"]
+    university <- getLine
+    screenCleaner
+    return university
+
+typeEnrollment :: IO String
+typeEnrollment = do
+    screenCleaner
+    mapM_ putStrLn ["Agora precisamos saber qual a matrícula do usuário",
+                    "Digite o numero de MATRÍCULA da pessoa que usará o sistema:"]
+    enrollment <- getLine
+    screenCleaner
+    return enrollment
+
 typeUserEmail :: IO String
 typeUserEmail = do
     screenCleaner
@@ -55,7 +73,7 @@ typeUserPassword = do
     screenCleaner
     mapM_ putStrLn ["Maravilha, finalmente chegamos ao último passo do cadastro!",
                     "Precisamos que você digite uma senha para esse usuário(cuidado para não esquecer)",
-                    "Digite a SENHA que o usuário utilizará para o login:\n"]
+                    "Digite a SENHA que o usuário utilizará para o login:"]
     password <- getLine
     screenCleaner
     return password
@@ -68,20 +86,13 @@ userRegister = do
     threadDelay 2000000
 
     userType <- selectAccountType
-    putStrLn userType
-
     userName <- typeUserName
-    putStrLn userName
-
+    userUniversity <- typeUniversity
+    userEnrollment <- typeEnrollment
     userEmail <- typeUserEmail
-    putStrLn userEmail
-
     userPassword <- typeUserPassword
-    putStrLn userPassword
 
-    main userType userName userEmail userPassword
-
-
+    main userType userName userUniversity userEnrollment userEmail userPassword
 
 userLogin :: IO ()
 userLogin = do
