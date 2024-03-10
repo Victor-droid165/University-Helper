@@ -1,4 +1,12 @@
-module Notebooks where
+module Notebooks
+  ( Notebook (..),
+    NormalNotebook (..),
+    MentalNotebook (..),
+    NotebookFields (..),
+    createNotebook,
+    NotebookCommonInfo (..)
+  )
+where
 
 import qualified Data.HashMap.Strict as HashMap
 import Notes
@@ -19,24 +27,21 @@ data NotebookCommonInfo = NotebookCommonInfo
 
 data Notebook
   = Normal NormalNotebook
-  | Mental MentalNotebook
+  | Special MentalNotebook
   deriving (Show)
 
-data NormalNotebook = Conventional ConventionalNotebook | Chronological ChronologicalNotebook deriving (Show)
-
-data ConventionalNotebook = ConventionalNotebook
-  { cnInfo :: NotebookCommonInfo,
-    pagesCount :: Int,
-    schoolSubjects :: [Subject],
-    cnMaxPageLength :: Int
-  }
-  deriving (Show)
-
-data ChronologicalNotebook = ChronologicalNotebook
-  { chnInfo :: NotebookCommonInfo,
-    pages :: Maybe [Page],
-    chnMaxPageLength :: Maybe Int
-  }
+data NormalNotebook
+  = ConventionalNotebook
+      { cnInfo :: NotebookCommonInfo,
+        pagesCount :: Int,
+        schoolSubjects :: [Subject],
+        cnMaxPageLength :: Int
+      }
+  | ChronologicalNotebook
+      { chnInfo :: NotebookCommonInfo,
+        pages :: Maybe [Page],
+        chnMaxPageLength :: Maybe Int
+      }
   deriving (Show)
 
 data MentalNotebook = MentalNotebook
@@ -44,3 +49,18 @@ data MentalNotebook = MentalNotebook
     keywordMap :: HashMap.HashMap String (Either NormalNotebook Note)
   }
   deriving (Show)
+
+data NotebookFields
+  = ConventionalNotebookFields NotebookCommonInfo Int [Subject] Int
+  | ChronologicalNotebookFields NotebookCommonInfo (Maybe [Page]) (Maybe Int)
+  | MentalNotebookFields NotebookCommonInfo
+  deriving (Show)
+
+
+createNotebook :: NotebookFields -> Notebook
+createNotebook (ConventionalNotebookFields info pagesCount' schoolSubjects' cnMaxPageLength') =
+  Normal $ ConventionalNotebook info pagesCount' schoolSubjects' cnMaxPageLength'
+createNotebook (ChronologicalNotebookFields info pages' chnMaxPageLength') =
+  Normal $ ChronologicalNotebook info pages' chnMaxPageLength'
+createNotebook (MentalNotebookFields info) =
+  Special $ MentalNotebook info HashMap.empty
