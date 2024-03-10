@@ -4,6 +4,7 @@ module Models.User
     , userToString
     , stringToUser
     , writeUserOnFile
+    , showUser
     ) where
 
 import Data.Maybe (mapMaybe)
@@ -34,3 +35,16 @@ stringToUser line = case reads line of
 
 writeUserOnFile :: FilePath -> User -> IO ()
 writeUserOnFile filePath user = appendFile filePath (userToString user ++ "\n")
+
+userTypeToString :: User -> String
+userTypeToString user   | userType user == "teacher" = "Professor"
+                        | userType user == "student" = "Aluno"
+                        | userType user == "administrator" = "Administrador"
+                        | otherwise = "NotValidType"
+
+showUser :: User -> IO ()
+showUser user = do
+    mapM_ putStr [userName user, " - ", userEnrollment user, " (", userTypeToString user, ")\n",
+                    userUniversity user, "\n",
+                    userEmail user, "\n"]
+    

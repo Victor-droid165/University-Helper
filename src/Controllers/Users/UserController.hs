@@ -19,9 +19,12 @@ userRegister = do
                        , userEmail = userEmail
                        , userPassword = userPassword }
 
-    writeUserOnFile "data/users.txt" newUser
-    putStrLn "Usuário registrado com sucesso!"
+    toValidate newUser
+    showUser newUser
 
+toValidate :: User -> IO()
+toValidate user | userType user == "teacher" = writeUserOnFile "data/toValidate.txt" user >> putStrLn "Usuário aguardando validação!"
+                | otherwise = writeUserOnFile "data/users.txt" user >> putStrLn "Usuário registrado com sucesso!"
 
 userLogin :: IO ()
 userLogin = do
