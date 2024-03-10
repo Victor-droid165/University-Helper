@@ -23,9 +23,5 @@ createNote noteType' noteId' visibility' title' subject' = do
     return $ Note noteType' noteId' visibility' currentLocalTime currentLocalTime title' subject'
 
 generateId :: NoteType -> Int -> String
-generateId noteType' num
-    | noteType' == Reminder = "REM-" ++ show num
-    | noteType' == StickyNote = "SNS-" ++ show num
-    | noteType' == PlainText = "PLT-" ++ show num
-    | noteType' == Warning = "WAR-" ++ show num
-    | otherwise = error "Invalid note type"
+generateId noteType' num = prefix noteType' ++ idSeparator ++ show num
+    where idSeparator = "-"
