@@ -10,7 +10,7 @@ module TerminalUI.Users.User
     ) where
 
 import Util.ScreenCleaner ( screenCleaner )
-import Util.Validate (userNameValidation, Validation(..), Error(..))
+import Util.Validate (userNameValidation, Validation(..))
 import System.Console.ANSI (clearScreen)
 
 invalidOption :: IO ()

@@ -17,7 +17,7 @@ data Error =
 type FormValidation = Validation [Error]
 
 userNameValidation :: String -> FormValidation String
-userNameValidation name = notEmpty name
+userNameValidation name = validateAll [notEmpty, notNum] name
 
 notEmpty :: String -> FormValidation String
 notEmpty "" = Failure [EmptyField]
@@ -31,5 +31,9 @@ notNum str
 isChar :: [Char] -> Bool
 isChar str = all isAlpha str
 
-
-
+validateAll :: [String -> FormValidation String] -> String -> FormValidation String
+validateAll validations str = foldl aggregate (Success str) validations
+  where
+    aggregate :: FormValidation String -> (String -> FormValidation String) -> FormValidation String
+    aggregate (Failure errs) _ = Failure errs
+    aggregate (Success _) validation = validation str
