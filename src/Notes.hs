@@ -1,4 +1,4 @@
-module Notes where
+module Notes (Note) where
 
 import Types
 

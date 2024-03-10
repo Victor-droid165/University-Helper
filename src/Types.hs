@@ -1,7 +1,8 @@
 module Types ( 
     NoteType(..),
     Visibility(..),
-    prefix
+    prefix,
+    NotebookType(..)
     ) where
 
 import Data.Time.LocalTime
@@ -15,3 +16,5 @@ prefix Reminder     = "REM"
 prefix StickyNote   = "SNS"
 prefix PlainText    = "PLT"
 prefix Warning      = "WAR"
+
+data NotebookType = Conventional | Chronological | Mental deriving (Show, Eq)
