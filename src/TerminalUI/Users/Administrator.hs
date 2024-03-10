@@ -11,10 +11,13 @@ userRegister :: IO (String, String, String, String, String, String)
 userRegister = do
     userName <- typeUserName
     screenCleaner
+
     userUniversity <- typeUniversity
     screenCleaner
+
     userEnrollment <- typeEnrollment
     screenCleaner
+
     userEmail <- typeUserEmail [ "Agora informe-nos o e-mail do usuário",
                                  "Digite o E-MAIL da pessoa que utilizará o sistema:"]
 

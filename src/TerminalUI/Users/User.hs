@@ -10,7 +10,8 @@ module TerminalUI.Users.User
     ) where
 
 import Util.ScreenCleaner ( screenCleaner )
-import Control.Concurrent ( threadDelay )
+import Util.Validate (userNameValidation, Validation(..))
+import System.Console.ANSI (clearScreen)
 
 invalidOption :: IO ()
 invalidOption = do
@@ -40,7 +41,10 @@ typeUserName = do
     mapM_ putStrLn ["Agora precisamos saber qual o nome do usuário que você irá cadastrar",
                     "Digite o NOME da pessoa que usará o sistema:"]
     username <- getLine
-    return username
+    -- error treatment 
+    case userNameValidation username of
+        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserName
+        Success _ -> return username
 
 typeUniversity :: IO String
 typeUniversity = do
@@ -76,17 +80,22 @@ registerUI = do
 
     userType <- selectAccountType
     screenCleaner
-    userName <- typeUserName
+ 
+    userName <- typeUserName    
     screenCleaner
+
     userUniversity <- typeUniversity
     screenCleaner
+
     userEnrollment <- typeEnrollment
     screenCleaner
+
     userEmail <- typeUserEmail ["Agora informe-nos o e-mail do usuário",
                                 "Digite o E-MAIL da pessoa que utilizará o sistema:"]
 
     userPassword <- typeUserPassword ["Digite a SENHA que a pessoa utilizará para o login:"]
     screenCleaner
+
     return (userType, userName, userUniversity, userEnrollment, userEmail, userPassword)
 
 loginUI :: IO (String, String)
