@@ -28,6 +28,7 @@ userRegister = do
 
 selectAction :: IO Char 
 selectAction = do
+    screenCleaner
     mapM_ putStrLn ["Qual tipo de operação você gostaria de realizar no momento?",
                     "[1] CADASTRAR USUÁRIO",
                     "[2] REMOVER USUÁRIO DO SISTEMA",
