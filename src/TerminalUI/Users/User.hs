@@ -19,8 +19,8 @@ invalidOption = do
 
 chooseOption :: Char -> IO String
 chooseOption choice
-    | choice == '1' = return "professor"
-    | choice == '2' = return "aluno"
+    | choice == '1' = return "teacher"
+    | choice == '2' = return "student"
     | otherwise = do
         invalidOption
         selectAccountType

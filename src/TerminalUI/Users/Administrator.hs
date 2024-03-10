@@ -20,7 +20,7 @@ userRegister = do
 
     userPassword <- typeUserPassword ["Digite a SENHA que a pessoa utilizará para o login:"]
     screenCleaner
-    let userType = "administrador"
+    let userType = "administrator"
     return (userType, userName, userUniversity, userEnrollment, userEmail, userPassword)
 
 selectAction :: IO Char 

@@ -33,8 +33,8 @@ userLogin = do
         Just user -> do
             writeUserOnFile "data/session.txt" user
             case userType user of
-                "administrador" -> administratorOptions
-                "aluno" -> studentOptions
-                "professor" -> teacherOptions
+                "administrator" -> administratorOptions
+                "student" -> studentOptions
+                "teacher" -> teacherOptions
             putStrLn "Logged in successfully!"
         Nothing -> putStrLn "Invalid email or password."
