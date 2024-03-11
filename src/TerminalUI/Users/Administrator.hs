@@ -34,6 +34,7 @@ selectAction = do
                     "[2] REMOVER USUÁRIO DO SISTEMA",
                     "[3] ATUALIZAR INFORMAÇÕES DE UM USUÁRIO",
                     "[4] VALIDAR CADASTROS",
+                    "[.] sair",
                     "Digite o NÚMERO correspondente a sua opção:"]
     option <- getLine
     let chosenOption = head option

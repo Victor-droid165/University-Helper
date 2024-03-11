@@ -1,9 +1,11 @@
 module Util.ScreenCleaner
-    ( screenCleaner,
-    ) where
+    (   screenCleaner
+        , quitIO
+   ) where
 
 import Control.Concurrent ( threadDelay )
 import System.Console.ANSI
+import Data.Char (toLower)
 
 
 screenCleaner :: IO ()
@@ -12,3 +14,15 @@ screenCleaner = do
     threadDelay 0
     clearScreen
 
+quitIO :: IO () -> IO ()
+quitIO func = do
+    mapM_ putStrLn ["Deseja deslogar e sair do programa?",
+                    "[SIM]",
+                    "[NÃO]"]
+    input <- getLine
+    let lowerInput = map toLower input
+    quitOpt func lowerInput
+
+quitOpt :: IO () -> String -> IO ()
+quitOpt _ "sim" = screenCleaner >> putStrLn "Obrigado por utilizar University Helper! Até a próxima!" >> writeFile "data/session.txt" ""
+quitOpt func _  = screenCleaner >> func

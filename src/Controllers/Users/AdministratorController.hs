@@ -8,7 +8,7 @@ import TerminalUI.Users.Administrator (userRegister, selectAction)
 import Data.Maybe (mapMaybe)
 import System.Directory
 import Data.Foldable (find)
-import Util.ScreenCleaner (screenCleaner)
+import Util.ScreenCleaner (screenCleaner, quitIO)
 
 chooseOption :: Char -> IO ()
 chooseOption choice
@@ -16,6 +16,7 @@ chooseOption choice
     | choice == '2' = removeUser
     | choice == '3' = updateUser
     | choice == '4' = validateUser
+    | choice == '.' = quitIO administratorOptions
     | otherwise = do
         invalidOption
         administratorOptions
@@ -33,6 +34,7 @@ userRegisterADMIN = do
 
     writeUserOnFile "data/users.txt" newUser
     putStrLn "Usuário registrado com sucesso!"
+    administratorOptions
 
 updateUser :: IO ()
 updateUser = do
@@ -101,6 +103,7 @@ validateUser = do
     screenCleaner
     putStrLn "O seguinte usuário foi validado com sucesso: "
     showUser placeHolderUser
+    administratorOptions
 
 getUser :: String -> [User] -> User
 getUser _ [] = User {}
@@ -115,6 +118,7 @@ removeUser = do
     let newUserList = remove enroll userList
     removeFile "data/users.txt"
     mapM_ (writeUserOnFile "data/users.txt") newUserList
+    administratorOptions
 
 remove :: String -> [User] -> [User]
 remove _ [] = []

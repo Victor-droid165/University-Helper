@@ -2,7 +2,7 @@ module Main
     ( main
     ) where
 
-import Util.ScreenCleaner ( screenCleaner )
+import Util.ScreenCleaner ( screenCleaner, quitIO )
 import Controllers.Users.UserController ( userRegister, userLogin )
 
 invalidOption :: IO ()
@@ -16,7 +16,8 @@ optionInterface = do
     mapM_ putStrLn ["Bem Vindo ao UNIVERSITY HELPER !",
                     "Selecione o que deseja realizar:",
                     "[1] CADASTRAR",
-                    "[2] ENTRAR\n",
+                    "[2] ENTRAR",
+                    "[.] sair\n",
                     "Digite o NÚMERO correspondente a sua opção:"]
     option <- getLine
     let chosenOption = head option
@@ -27,6 +28,7 @@ chooseOption :: Char -> IO ()
 chooseOption choice
     | choice == '1' = userRegister
     | choice == '2' = userLogin
+    | choice == '.' = quitIO optionInterface
     | otherwise = do
         invalidOption
         optionInterface
