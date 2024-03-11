@@ -11,3 +11,4 @@ screenCleaner = do
     -- threadDelay 1000000
     threadDelay 0
     clearScreen
+

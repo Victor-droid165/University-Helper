@@ -5,6 +5,7 @@ module Models.User
     , stringToUser
     , writeUserOnFile
     , showUser
+    , setType
     ) where
 
 import Data.Maybe (mapMaybe)
@@ -17,7 +18,12 @@ data User = User
     , userEnrollment :: String
     , userEmail :: String
     , userPassword :: String
-    } deriving (Show, Read)
+    } deriving (Show, Read, Eq)
+
+newtype UserEnrollment = UserEnrollment User
+instance Eq UserEnrollment where
+    (UserEnrollment user1) == (UserEnrollment user2) = userEnrollment user1 == userEnrollment user2
+
 
 authenticateUser :: String -> String -> IO (Maybe User)
 authenticateUser email password = do
@@ -40,7 +46,10 @@ userTypeToString :: User -> String
 userTypeToString user   | userType user == "teacher" = "Professor"
                         | userType user == "student" = "Aluno"
                         | userType user == "administrator" = "Administrador"
-                        | otherwise = "NotValidType"
+                        | otherwise = "NotAValidType"
+
+setType :: String -> User -> User 
+setType str user = user { userType = str } 
 
 showUser :: User -> IO ()
 showUser user = do

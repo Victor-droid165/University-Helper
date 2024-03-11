@@ -1,2 +1,2 @@
 User {userType = "administrator", userName = "1", userUniversity = "1", userEnrollment = "1", userEmail = "22", userPassword = "22"}
-
+User {userType = "administrator", userName = "ola", userUniversity = "lau", userEnrollment = "23", userEmail = "23", userPassword = "23"}

@@ -45,6 +45,7 @@ typeUserName = do
     case userNameValidation username of
         Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserName
         Success _ -> return username
+    -- todo 
 
 typeUniversity :: IO String
 typeUniversity = do

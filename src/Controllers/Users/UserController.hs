@@ -28,7 +28,6 @@ toValidate user | userType user == "teacher" = writeUserOnFile "data/toValidate.
 
 userLogin :: IO ()
 userLogin = do
-
     (userEmail, userPassword) <- loginUI
 
     maybeUser <- authenticateUser userEmail userPassword

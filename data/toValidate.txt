@@ -1,1 +1,1 @@
-User {userType = "teacher", userName = "professorLindo", userUniversity = "melhor", userEnrollment = "10", userEmail = "10", userPassword = "10"}
+User {userType = "teacher", userName = "Joao", userUniversity = "ufcg", userEnrollment = "50", userEmail = "@gmail.com", userPassword = "08"}
