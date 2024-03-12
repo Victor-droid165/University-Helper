@@ -1,21 +1,29 @@
-name:                university-helper
+name:                University-Helper
 version:             0.1.0.0
-github:              "githubuser/university-helper"
+github:              "Victor-droid165/University-Helper"
 license:             BSD-3-Clause
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2024 Author name here"
+author:              "Victor Rodrigues"
+maintainer:          "victor.emanuel.barbosa.rodrigues@ccc.ufcg.edu.br"
+copyright:           "2024 Victor Rodrigues"
 
 extra-source-files:
 - README.md
 - CHANGELOG.md
 
-description:         Please see the README on GitHub at <https://github.com/githubuser/university-helper#readme>
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/Victor-droid165/University-Helper#readme>
 
 dependencies:
 - base >= 4.7 && < 5
 - ansi-terminal
 - directory
+- time
 
 ghc-options:
 - -Wall
@@ -32,7 +40,7 @@ library:
   source-dirs: src
 
 executables:
-  university-helper-exe:
+  University-Helper-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -40,10 +48,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - university-helper
+    - University-Helper
 
 tests:
-  university-helper-test:
+  University-Helper-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -51,4 +59,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - university-helper
+    - University-Helper

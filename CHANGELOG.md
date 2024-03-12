@@ -1,4 +1,4 @@
-# Changelog for `university-helper`
+# Changelog for `University-Helper`
 
 All notable changes to this project will be documented in this file.
 
