@@ -1,6 +1,7 @@
 module Util.ScreenCleaner
     (   screenCleaner
         , quitIO
+        , forceQuit
    ) where
 
 import Control.Concurrent ( threadDelay )
@@ -22,6 +23,10 @@ quitIO func = do
     input <- getLine
     let lowerInput = map toLower input
     quitOpt func lowerInput
+
+forceQuit :: IO () -> IO ()
+forceQuit func = do
+    quitOpt func "sim"
 
 quitOpt :: IO () -> String -> IO ()
 quitOpt _ "sim" = screenCleaner >> putStrLn "Obrigado por utilizar University Helper! Até a próxima!" >> writeFile "data/session.txt" ""

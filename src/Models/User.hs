@@ -6,6 +6,7 @@ module Models.User
     , writeUserOnFile
     , showUser
     , setType
+    , removeUser
     ) where
 
 import Data.Maybe (mapMaybe)
@@ -56,4 +57,8 @@ showUser user = do
     mapM_ putStr [userName user, " - ", userEnrollment user, " (", userTypeToString user, ")\n",
                     userUniversity user, "\n",
                     userEmail user, "\n"]
-    
+
+removeUser :: String -> [User] -> [User]
+removeUser _ [] = []
+removeUser enroll (u:userList)    | enroll == userEnrollment u = removeUser enroll userList
+                              | otherwise = u : removeUser enroll userList

@@ -13,7 +13,7 @@ import Util.ScreenCleaner (screenCleaner, quitIO)
 chooseOption :: Char -> IO ()
 chooseOption choice
     | choice == '1' = userRegisterADMIN
-    | choice == '2' = removeUser
+    | choice == '2' = userRemove
     | choice == '3' = updateUser
     | choice == '4' = validateUser
     | choice == '.' = quitIO administratorOptions
@@ -83,7 +83,6 @@ swapUser old new (u:userL)  | old == u = new : swapUser old new userL
                             | otherwise = u : swapUser old new userL
 
 
-
 validateUser :: IO ()
 validateUser = do
     screenCleaner
@@ -94,7 +93,7 @@ validateUser = do
     enroll <- getLine
     --
     let placeHolderUser = getUser enroll userList
-    let newValidateList = remove enroll userList
+    let newValidateList = removeUser enroll userList
     removeFile "data/toValidate.txt"
     mapM_ (writeUserOnFile "data/toValidate.txt") newValidateList
     writeUserOnFile "data/users.txt" placeHolderUser
@@ -105,25 +104,23 @@ validateUser = do
     showUser placeHolderUser
     administratorOptions
 
+
 getUser :: String -> [User] -> User
 getUser _ [] = User {}
 getUser enroll (u:userList)   | enroll == userEnrollment u = u
                               | otherwise = getUser enroll userList
 
-removeUser :: IO()
-removeUser = do
+
+userRemove :: IO()
+userRemove = do
     enroll <- typeEnrollment
     content <- readFile "data/users.txt"
     let userList = mapMaybe stringToUser (lines content)
-    let newUserList = remove enroll userList
+    let newUserList = removeUser enroll userList
     removeFile "data/users.txt"
     mapM_ (writeUserOnFile "data/users.txt") newUserList
     administratorOptions
 
-remove :: String -> [User] -> [User]
-remove _ [] = []
-remove enroll (u:userList)    | enroll == userEnrollment u = remove enroll userList
-                              | otherwise = u : remove enroll userList
 
 administratorOptions :: IO ()
 administratorOptions = do
