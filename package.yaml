@@ -24,6 +24,8 @@ dependencies:
 - ansi-terminal
 - directory
 - time
+- email-validate
+- bytestring
 
 ghc-options:
 - -Wall
