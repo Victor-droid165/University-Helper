@@ -1,5 +1,3 @@
-CREATE database plpdatabase;
-
 -- Create the users table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
