@@ -22,6 +22,9 @@ description:         Please see the README on GitHub at <https://github.com/Vict
 dependencies:
 - base >= 4.7 && < 5
 - time
+- yaml
+- postgresql-simple
+- bytestring
 
 ghc-options:
 - -Wall
