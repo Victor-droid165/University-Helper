@@ -8,7 +8,7 @@ import TerminalUI.Users.Administrator (userRegister, selectAction)
 import Data.Maybe (mapMaybe)
 import System.Directory
 import Data.Foldable (find)
-import Util.ScreenCleaner (screenCleaner, quitIO)
+import Util.ScreenCleaner (screenCleaner, quitIO, forceQuit)
 
 chooseOption :: Char -> IO ()
 chooseOption choice
@@ -113,13 +113,36 @@ getUser enroll (u:userList)   | enroll == userEnrollment u = u
 
 userRemove :: IO()
 userRemove = do
-    enroll <- typeEnrollment
+    enroll <- typeEnrollment ["Agora precisamos saber qual a matrícula do usuário",
+                    "Digite o numero de MATRÍCULA da pessoa que você removerá do sistema(isso pode incluir você mesmo):"]
+    content <- readFile "data/users.txt"
+
+    loggedUser <- readFile "data/session.txt"
+    let currentUser = stringToUser (head(lines loggedUser))
+    let userLoggedEnrollment = maybe "" userEnrollment currentUser
+
+    let userList = mapMaybe stringToUser (lines content)
+
+    if enroll == userLoggedEnrollment then autoRemove else do
+        let newUserList = removeUser enroll userList
+        removeFile "data/users.txt"
+        mapM_ (writeUserOnFile "data/users.txt") newUserList
+        administratorOptions
+
+
+autoRemove :: IO()
+autoRemove = do
+    loggedUser <- readFile "data/session.txt"
+    let userToRemove = stringToUser (head(lines loggedUser))
+    let enrollment = maybe "" userEnrollment userToRemove
+
     content <- readFile "data/users.txt"
     let userList = mapMaybe stringToUser (lines content)
-    let newUserList = removeUser enroll userList
+    let newUserList = removeUser enrollment userList
+
     removeFile "data/users.txt"
     mapM_ (writeUserOnFile "data/users.txt") newUserList
-    administratorOptions
+    forceQuit administratorOptions
 
 
 administratorOptions :: IO ()

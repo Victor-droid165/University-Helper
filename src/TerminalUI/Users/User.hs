@@ -10,7 +10,7 @@ module TerminalUI.Users.User
     ) where
 
 import Util.ScreenCleaner ( screenCleaner )
-import Util.Validate (userNameValidation, userEmailValidation, Validation(..), userPasswordValidation, userEnrollmentValidation, userUniversityValidation)
+import Util.Validate (userNameValidation, userRegisterEmailValidation, userLoginEmailValidation, Validation(..), userPasswordValidation, userEnrollmentValidation, userUniversityValidation)
 import System.Console.ANSI (clearScreen)
 import Control.Monad (forM)
 import Models.User (User(..), stringToUser)
@@ -59,29 +59,36 @@ typeUniversity = do
         Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUniversity
         Success _ -> return university
 
-typeEnrollment :: IO String
-typeEnrollment = do
-    mapM_ putStrLn ["Agora precisamos saber qual a matrícula do usuário",
-                    "Digite o numero de MATRÍCULA da pessoa que usará o sistema:"]
+typeEnrollment :: [String] -> IO String
+typeEnrollment textToShow = do
+    mapM_ putStrLn textToShow
     enrollment <- getLine
     case userEnrollmentValidation enrollment of
-        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeEnrollment
+        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeEnrollment textToShow
         Success _ -> return enrollment
 
-typeUserEmail :: [String] -> IO String
-typeUserEmail textToShow = do
+typeUserEmail :: [String] -> String -> IO String
+typeUserEmail textToShow "login" = do
     mapM_ putStrLn textToShow
     email <- getLine
-    case userEmailValidation email of
-        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserEmail textToShow
+    case userLoginEmailValidation email of
+        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserEmail textToShow "login"
+        Success _ -> return email
+
+typeUserEmail textToShow "register" = do
+    mapM_ putStrLn textToShow
+    email <- getLine
+    case userRegisterEmailValidation email of
+        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserEmail textToShow "register"
         Success _ -> do
             content1 <- readFile "data/users.txt"
             content2 <- readFile "data/toValidate.txt"
             let list = mapMaybe stringToUser (lines (content1 ++ content2))
             validEmails <- forM list (\user -> return (userEmail user))
             if email `elem` validEmails
-                then clearScreen >> putStrLn "Email já cadastrado. Tente Novamente" >> typeUserEmail textToShow
+                then clearScreen >> putStrLn "Email já cadastrado. Tente Novamente" >> typeUserEmail textToShow "register"
                 else return email
+
 
 typeUserPassword :: [String] -> IO String
 typeUserPassword textToShow = do
@@ -106,11 +113,11 @@ registerUI = do
     userUniversity <- typeUniversity
     screenCleaner
 
-    userEnrollment <- typeEnrollment
+    userEnrollment <- typeEnrollment ["Agora precisamos saber qual a matrícula do usuário",
+                    "Digite o numero de MATRÍCULA da pessoa que usará o sistema:"]
     screenCleaner
 
-    userEmail <- typeUserEmail ["Agora informe-nos o e-mail do usuário",
-                                "Digite o E-MAIL da pessoa que utilizará o sistema:"]
+    userEmail <- typeUserEmail ["Agora informe-nos o e-mail do usuário", "Digite o E-MAIL da pessoa que utilizará o sistema:"] "register"
 
     userPassword <- typeUserPassword ["Digite a SENHA que a pessoa utilizará para o login:"]
     screenCleaner
@@ -121,6 +128,6 @@ loginUI :: IO (String, String)
 loginUI = do
     screenCleaner
     putStrLn "Bem Vindo ao Login !"
-    userEmail <- typeUserEmail ["E-mail:"]
+    userEmail <- typeUserEmail ["E-mail:"] "login"
     userPassword <- typeUserPassword ["Senha:"]
     return (userEmail, userPassword)

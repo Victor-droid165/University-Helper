@@ -61,7 +61,7 @@ updateEmailPassword :: User -> IO()
 updateEmailPassword user = do
     screenCleaner
     newEmail <- typeUserEmail ["Como esse é um email padrão, será necessário atualiza-lo",
-                                "Digite um NOVO E-MAIL que constará no sistema:"]
+                                "Digite um NOVO E-MAIL que constará no sistema:"] "register"
     newPassword <- typeUserPassword ["Como essa é uma senha padrão, será necessário atualizá-la",
                                 "Digite uma NOVA SENHA que constará no sistema:"]
     

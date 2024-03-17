@@ -44,11 +44,12 @@ userRegister = do
     userUniversity <- typeUniversity
     screenCleaner
 
-    userEnrollment <- typeEnrollment
+    userEnrollment <- typeEnrollment ["Agora precisamos saber qual a matrícula do usuário",
+                    "Digite o numero de MATRÍCULA da pessoa que usará o sistema:"]
     screenCleaner
 
     userEmail <- typeUserEmail [ "Agora informe-nos o e-mail do usuário",
-                                 "Digite o E-MAIL da pessoa que utilizará o sistema:"]
+                                 "Digite o E-MAIL da pessoa que utilizará o sistema:"] "register"
 
     userPassword <- typeUserPassword ["Digite a SENHA que a pessoa utilizará para o login:"]
     screenCleaner

@@ -1,7 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Util.Validate (
     userNameValidation,
-    userEmailValidation,
+    userRegisterEmailValidation,
+    userLoginEmailValidation,
     userPasswordValidation,
     userEnrollmentValidation,
     userUniversityValidation,
@@ -38,8 +39,11 @@ validateAll validations str = foldl aggregate (Success str) validations
 userNameValidation :: String -> FormValidation String
 userNameValidation name = validateAll [notEmpty, notNum] name
 
-userEmailValidation :: String -> FormValidation String
-userEmailValidation email = validateAll [validateAdminEmail, notEmpty, validateEmail] email
+userRegisterEmailValidation :: String -> FormValidation String
+userRegisterEmailValidation email = validateAll [notEmpty, validateEmail, validateAdminEmail] email
+
+userLoginEmailValidation :: String -> FormValidation String
+userLoginEmailValidation email = validateAll [notEmpty, validateEmail] email
 
 userPasswordValidation :: String -> FormValidation String
 userPasswordValidation password = validateAll [minLength, notEmpty] password
