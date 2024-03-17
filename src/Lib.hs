@@ -7,7 +7,8 @@ module Lib
       handleValidation,
       handleMaybe,
       stringToData,
-      writeDataOnFile
+      writeDataOnFile,
+      selectOption
     ) where
 
 -- Remember to import here
@@ -51,3 +52,44 @@ writeDataOnFile filePath data' = appendFile filePath (show data' ++ "\n")
 handleMaybe :: Maybe a -> b -> (a -> b) -> b
 handleMaybe (Just value) _ function = function value
 handleMaybe _ defaultValue _ = defaultValue
+
+selectOption :: [String] -> IO String
+selectOption options = do
+  displayOptions options
+  choice <- getUserChoice
+  handleChoice choice options
+
+displayOptions :: [String] -> IO ()
+displayOptions options =
+  displayOptionsHelper numberedOptions
+  where
+    displayOptionsHelper :: [(Int, String)] -> IO ()
+
+    displayOptionsHelper [] = return ()
+    displayOptionsHelper ((index, option) : xs) = do
+      putStrLn $ "[" ++ show index ++ "] " ++ option
+      displayOptionsHelper xs
+
+    numberedOptions = zip [1 ..] options
+
+getUserChoice :: IO String
+getUserChoice = do
+  putStr "Digite o NUMERO correspondente a sua opcao: "
+  hFlush stdout
+  getLine
+
+handleChoice :: String -> [String] -> IO String
+handleChoice choice options
+  | Just index <- readMaybe choice :: Maybe Int,
+    isValidIndex index options =
+      return (options !! (index - 1))
+  | otherwise = retryChoice options
+
+isValidIndex :: Int -> [a] -> Bool
+isValidIndex index options = index >= 1 && index <= length options
+
+retryChoice :: [String] -> IO String
+retryChoice options = do
+  putStrLn "Opcao Invalida. Tente Novamente."
+  putStrLn "Se deseja escolher a opcao '[X] - Opcao', digite: X"
+  selectOption options
