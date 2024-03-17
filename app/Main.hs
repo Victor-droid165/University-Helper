@@ -33,6 +33,7 @@ chooseOption choice
         invalidOption
         optionInterface
 
+
 main :: IO ()
 main = do
     screenCleaner

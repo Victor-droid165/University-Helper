@@ -42,7 +42,8 @@ packages:
 extra-deps:
 - validation-selective-0.2.0.0
 #
-# extra-deps: []
+extra-deps:
+  - validation-selective-0.2.0.0
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
