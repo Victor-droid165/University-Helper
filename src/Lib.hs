@@ -5,10 +5,14 @@ module Lib
       getParsedInput,
       getParsedValidInput,
       handleValidation,
-      handleMaybe
+      handleMaybe,
+      stringToData,
+      writeDataOnFile
     ) where
 
 -- Remember to import here
+import System.IO
+import Text.Read (readMaybe)
 
 getInput :: Maybe String -> IO String
 getInput maybePrompt = do
@@ -37,6 +41,12 @@ handleValidation (Failure err) _ actionIfFailure = do
     putStrLn $ "Erro: " ++ show err
     actionIfFailure
 handleValidation _ actionIfSuccess _ = do actionIfSuccess
+
+stringToData :: Read a => String -> Maybe a
+stringToData str = readMaybe str
+
+writeDataOnFile :: Show a => FilePath -> a -> IO ()
+writeDataOnFile filePath data' = appendFile filePath (show data' ++ "\n")
 
 handleMaybe :: Maybe a -> b -> (a -> b) -> b
 handleMaybe (Just value) _ function = function value
