@@ -25,6 +25,8 @@ dependencies:
 - yaml
 - postgresql-simple
 - bytestring
+- directory
+- filepath
 
 ghc-options:
 - -Wall

@@ -1,11 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module DBConfig
-  ( DBConfig(..)
-  , loadDBConfig
-  ) where
+module DBConfig (
+  DBConfig(..)
+) where
 
-import Data.Yaml (decodeFileThrow, FromJSON(..), (.:), withObject)
+import Data.Yaml (FromJSON(..), (.:), withObject)
 
 data DBConfig = DBConfig
   { dbHost :: String
@@ -23,8 +22,3 @@ instance FromJSON DBConfig where
     user <- obj .: "db_user"
     password <- obj .: "db_password"
     return $ DBConfig host port name user password
-
-loadDBConfig :: FilePath -> IO (Maybe DBConfig)
-loadDBConfig filePath = do
-  config <- decodeFileThrow filePath
-  return $ Just config
