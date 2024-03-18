@@ -10,10 +10,12 @@ module Lib
 where
 
 -- Remember to import here
-import Util.Validate (FormValidation, handleValidation)
+import Util.Validate (FormValidation)
 import Util.ScreenCleaner ( screenCleaner, quitIO )
 import System.IO
 import Text.Read (readMaybe)
+import Util.Validate hiding (handleValidation) 
+import Util.ScreenCleaner (screenCleaner)
 
 getInput :: Maybe String -> IO String
 getInput maybePrompt = do
@@ -25,6 +27,18 @@ getValidInput :: Maybe String -> (String -> FormValidation String) -> IO String
 getValidInput maybePrompt validationFunc = do
   value <- getInput maybePrompt
   handleValidation (validationFunc value) (return value) (getValidInput maybePrompt validationFunc)
+
+getParsedValidInput :: (Read a) => Maybe String -> (String -> FormValidation String) -> IO a
+getParsedValidInput maybePrompt validationFunc = do
+  value <- getValidInput maybePrompt validationFunc
+  return $ read value
+
+handleValidation :: FormValidation String -> IO String -> IO String -> IO String
+handleValidation (Failure err) _ actionIfFailure = do
+  screenCleaner
+  putStrLn $ "Erro: " ++ show err
+  actionIfFailure
+handleValidation _ actionIfSuccess _ = do actionIfSuccess
 
 stringToData :: (Read a) => String -> Maybe a
 stringToData str = readMaybe str

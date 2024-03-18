@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module TerminalUI.Users.User
     ( loginUI
     , registerUI
@@ -10,11 +11,12 @@ module TerminalUI.Users.User
     ) where
 
 import Util.ScreenCleaner ( screenCleaner )
-import Util.Validate (userNameValidation, userRegisterEmailValidation, userLoginEmailValidation, Validation(..), userPasswordValidation, userEnrollmentValidation, userUniversityValidation)
+import Util.Validate (userNameValidation, userRegisterEmailValidation, userLoginEmailValidation, Validation(..), userPasswordValidation, userEnrollmentValidation, userUniversityValidation, belongsToList)
 import System.Console.ANSI (clearScreen)
 import Control.Monad (forM)
 import Models.User (User(..), stringToUser)
 import Data.Maybe (mapMaybe)
+import Lib (handleValidation)
 
 
 invalidOption :: IO ()
@@ -46,57 +48,45 @@ typeUserName = do
                     "Digite o NOME da pessoa que usará o sistema:"]
     username <- getLine
     -- error treatment 
-    case userNameValidation username of
-        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserName
-        Success _ -> return username
+    handleValidation (userNameValidation username) (return username) typeUserName
 
 typeUniversity :: IO String
 typeUniversity = do
     mapM_ putStrLn ["A qual universidade o usuário faz parte?",
-                    "Digite o NOME da universidade que constará no sistema:"]
+                    "Digite o NOME da universidade que constará no sistema:"] 
     university <- getLine
-    case userUniversityValidation university of
-        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUniversity
-        Success _ -> return university
+    handleValidation (userUniversityValidation university) (return university) typeUniversity
 
 typeEnrollment :: [String] -> IO String
 typeEnrollment textToShow = do
     mapM_ putStrLn textToShow
     enrollment <- getLine
-    case userEnrollmentValidation enrollment of
-        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeEnrollment textToShow
-        Success _ -> return enrollment
+    handleValidation (userEnrollmentValidation enrollment) (return enrollment) (typeEnrollment textToShow)
 
 typeUserEmail :: [String] -> String -> IO String
 typeUserEmail textToShow "login" = do
     mapM_ putStrLn textToShow
     email <- getLine
-    case userLoginEmailValidation email of
-        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserEmail textToShow "login"
-        Success _ -> return email
-
+    handleValidation (userLoginEmailValidation email) (return email) (typeUserEmail textToShow "login")
+    
 typeUserEmail textToShow "register" = do
     mapM_ putStrLn textToShow
     email <- getLine
-    case userRegisterEmailValidation email of
-        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserEmail textToShow "register"
-        Success _ -> do
-            content1 <- readFile "data/users.txt"
-            content2 <- readFile "data/toValidate.txt"
-            let list = mapMaybe stringToUser (lines (content1 ++ content2))
-            validEmails <- forM list (\user -> return (userEmail user))
-            if email `elem` validEmails
-                then clearScreen >> putStrLn "Email já cadastrado. Tente Novamente" >> typeUserEmail textToShow "register"
-                else return email
+    handleValidation (userRegisterEmailValidation email) (continue email) (typeUserEmail textToShow "register")
+        where continue email = do
+                content1 <- readFile "data/users.txt"
+                content2 <- readFile "data/toValidate.txt"
+                let list = mapMaybe stringToUser (lines (content1 ++ content2))
+                validEmails <- forM list (\user -> return (userEmail user))
+                handleValidation (belongsToList validEmails email) (return email) (typeUserEmail textToShow "register")
+
 
 
 typeUserPassword :: [String] -> IO String
 typeUserPassword textToShow = do
     mapM_ putStrLn textToShow
     password <- getLine
-    case userPasswordValidation password of
-        Failure err -> clearScreen >> putStrLn ("Error: " ++ show err) >> typeUserPassword textToShow
-        Success _ -> return password
+    handleValidation (userPasswordValidation password) (return password) (typeUserPassword textToShow)
 
 registerUI :: IO (String, String, String, String, String,String)
 registerUI = do

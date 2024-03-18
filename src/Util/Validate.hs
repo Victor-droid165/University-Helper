@@ -6,6 +6,7 @@ module Util.Validate (
     userPasswordValidation,
     userEnrollmentValidation,
     userUniversityValidation,
+    belongsToList,
     FormValidation(..),
     Validation(..),
     Error(..),
@@ -25,6 +26,7 @@ data Error =
   | NotMinLength
   | NotAValidEmail
   | NotAValidEnroll
+  | AlreadyRegistered
   deriving Show
 
 type FormValidation = Validation [Error]
@@ -86,7 +88,7 @@ enrollValidation enroll  | head enroll == '1' && (enrollValidation2 (tail enroll
                          | otherwise = Failure [NotAValidEnroll]
 
 enrollValidation2 :: String -> Bool
-enrollValidation2 enroll  | stringToInt (take 4 enroll) > 1950 && stringToInt (take 4 enroll) < 2025 && enrollValidation3 (drop 4 enroll) = True
+enrollValidation2 enroll  | stringToInt (take 4 enroll) >= 1950 && stringToInt (take 4 enroll) < 2025 && enrollValidation3 (drop 4 enroll) = True
                           | otherwise = False
 
 enrollValidation3 :: String -> Bool
@@ -102,6 +104,10 @@ enrollValidation4 enroll  | length enroll == 4 = True
 validateEmail :: String -> FormValidation String
 validateEmail email | not  (isValid (B.pack email)) = Failure[NotAValidEmail]
                     | otherwise = Success email
+
+belongsToList :: [String] -> String -> FormValidation String
+belongsToList list element  | element `elem` list =  Failure [AlreadyRegistered]
+                            | otherwise = Success element
 
 stringToInt :: String -> Int
 stringToInt str = read str
