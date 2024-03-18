@@ -9,8 +9,7 @@ import Lib (selectOption)
 import Models.User
 import System.Directory
 import TerminalUI.Users.Student (displayActionSelection)
-import TerminalUI.Users.User (invalidOption, registerUI, typeEnrollment)
-import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
+import Util.ScreenCleaner (forceQuit, quitIO)
 
 autoRemove :: IO ()
 autoRemove = do

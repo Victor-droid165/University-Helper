@@ -3,7 +3,7 @@ module Controllers.Users.TeacherController
     ) where
 
 import Models.User
-import TerminalUI.Users.User (registerUI, invalidOption, typeEnrollment)
+import TerminalUI.Users.User (registerUI, typeEnrollment)
 import TerminalUI.Users.Teacher (displayActionSelection)
 import Data.Maybe (mapMaybe)
 import System.Directory

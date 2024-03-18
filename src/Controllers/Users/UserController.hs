@@ -16,15 +16,15 @@ import Util.ScreenCleaner (screenCleaner)
 
 userRegister :: IO ()
 userRegister = do
-  (userType, userName, userUniversity, userEnrollment, userEmail, userPassword) <- registerUI
+  (userType', userName', userUniversity', userEnrollment', userEmail', userPassword') <- registerUI
   let newUser =
         User
-          { userType = userType,
-            userName = userName,
-            userUniversity = userUniversity,
-            userEnrollment = userEnrollment,
-            userEmail = userEmail,
-            userPassword = userPassword
+          { userType = userType',
+            userName = userName',
+            userUniversity = userUniversity',
+            userEnrollment = userEnrollment',
+            userEmail = userEmail',
+            userPassword = userPassword'
           }
 
   toValidate newUser
@@ -75,6 +75,7 @@ updateEmailPassword user = do
           [ "Como esse é um email padrão, será necessário atualiza-lo",
             "Digite um NOVO E-MAIL que constará no sistema:"
           ]
+          "\n"
       )
       "register"
   newPassword <-
@@ -83,6 +84,7 @@ updateEmailPassword user = do
         [ "Como essa é uma senha padrão, será necessário atualizá-la",
           "Digite uma NOVA SENHA que constará no sistema:"
         ]
+        "\n"
 
   let updatedUser = user {userEmail = newEmail, userPassword = newPassword}
   updateUser updatedUser
@@ -90,16 +92,22 @@ updateEmailPassword user = do
 
 userLogin :: IO ()
 userLogin = do
-  (userEmail, userPassword) <- loginUI
-
-  maybeUser <- authenticateUser userEmail userPassword
-  case maybeUser of
-    Just user
-      | userEmail == "everton@admin.ufcg.edu.br" && userPassword == "senhasegura" -> updateEmailPassword user
-      | otherwise -> do
+  (userEmail', userPassword') <- loginUI
+  maybeUser <- authenticateUser userEmail' userPassword'
+  handleUser maybeUser userEmail' userPassword'
+  where
+    handleUser :: Maybe User -> String -> String -> IO ()
+    handleUser (Just user) userEmail' userPassword'
+      | userEmail' == "everton@admin.ufcg.edu.br" && userPassword' == "senhasegura" =
+          updateEmailPassword user
+      | otherwise = do
           writeUserOnFile "data/session.txt" user
-          case userType user of
-            "administrator" -> administratorOptions
-            "student" -> studentOptions
-            "teacher" -> teacherOptions
-    Nothing -> putStrLn "Invalid email or password."
+          handleRegularUser user
+    handleUser Nothing _ _ = putStrLn "Invalid email or password."
+
+    handleRegularUser :: User -> IO ()
+    handleRegularUser user
+      | userType user == "administrator" = administratorOptions
+      | userType user == "student" = studentOptions
+      | userType user == "teacher" = teacherOptions
+      | otherwise = putStrLn "Invalid email or password."

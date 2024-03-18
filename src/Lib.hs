@@ -7,6 +7,12 @@ module Lib
     writeDataOnFile,
     selectOption,
     joinStringArray,
+    emailInputPrompts,
+    passwordInputPrompt,
+    userNameInputPrompts,
+    universityInputPrompts,
+    userEnrollmentInputPrompts,
+    printWelcomeMessages,
   )
 where
 
@@ -51,7 +57,7 @@ handleMaybe :: Maybe a -> b -> (a -> b) -> b
 handleMaybe (Just value) _ function = function value
 handleMaybe _ defaultValue _ = defaultValue
 
-selectOption :: [(String, IO ())] -> IO ()
+selectOption :: [(String, IO a)] -> IO a
 selectOption options = do
   let optionsPrompts = map fst options
   displayOptions optionsPrompts
@@ -78,7 +84,7 @@ getUserChoice = do
   hFlush stdout
   getLine
 
-handleChoice :: String -> [(String, IO ())] -> IO ()
+handleChoice :: String -> [(String, IO a)] -> IO a
 handleChoice "." options = snd (options !! ((length options) - 1))
 handleChoice choice options
   | Just index <- readMaybe choice :: Maybe Int,
@@ -89,7 +95,7 @@ handleChoice choice options
 isValidIndex :: Int -> Int -> Int -> Bool
 isValidIndex index minIndex maxIndex = index >= minIndex && index <= maxIndex
 
-retryChoice :: [(String, IO ())] -> IO ()
+retryChoice :: [(String, IO a)] -> IO a
 retryChoice options = do
   putStrLn "Opcao Invalida. Tente Novamente."
   putStrLn "Se deseja escolher a opcao '[X] - Opcao', digite: X"
@@ -99,3 +105,33 @@ joinStringArray :: [String] -> String -> String
 joinStringArray [] _ = ""
 joinStringArray [x] _ = x
 joinStringArray (x : xs) joiner = x ++ joiner ++ joinStringArray xs joiner
+
+emailInputPrompts :: [String]
+emailInputPrompts = ["Agora informe-nos o e-mail do usuario", "Digite o E-MAIL da pessoa que utilizara o sistema: "]
+
+passwordInputPrompt :: String
+passwordInputPrompt = "Digite a SENHA que a pessoa utilizara para o login: "
+
+userNameInputPrompts :: [String]
+userNameInputPrompts =
+  [ "Agora precisamos saber qual o nome do usuario que você ira cadastrar",
+    "Digite o NOME da pessoa que usara o sistema: "
+  ]
+
+universityInputPrompts :: [String]
+universityInputPrompts =
+  [ "A qual universidade o usuario faz parte?",
+    "Digite o NOME da universidade que constara no sistema: "
+  ]
+
+printWelcomeMessages :: IO ()
+printWelcomeMessages = do
+  screenCleaner
+  putStrLn "Bom saber que deseja utilizar nosso sistema!"
+  putStrLn "Vamos agora solicitar algumas informacoes para que voce possa ser efetivado no sistema\n"
+
+userEnrollmentInputPrompts :: [String]
+userEnrollmentInputPrompts =
+  [ "Agora precisamos saber qual a matricula do usuario",
+    "Digite o numero de MATRICULA da pessoa que usara o sistema: "
+  ]

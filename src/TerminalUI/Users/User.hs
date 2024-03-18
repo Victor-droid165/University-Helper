@@ -8,67 +8,32 @@ module TerminalUI.Users.User
     typeEnrollment,
     typeUserEmail,
     typeUserPassword,
-    invalidOption,
   )
 where
 
-import Control.Monad (forM)
-import Data.Maybe (mapMaybe)
-import Lib (getValidInput, handleValidation, joinStringArray)
+import Data.Maybe (catMaybes)
+import Lib
+  ( emailInputPrompts,
+    getInput,
+    getValidInput,
+    handleValidation,
+    joinStringArray,
+    passwordInputPrompt,
+    selectOption,
+    universityInputPrompts,
+    userEnrollmentInputPrompts,
+    userNameInputPrompts,
+  )
 import Models.User (User (..), stringToUser)
 import System.Console.ANSI (clearScreen)
 import Util.ScreenCleaner (screenCleaner)
 import Util.Validate (Validation (..), belongsToList, userEnrollmentValidation, userLoginEmailValidation, userNameValidation, userPasswordValidation, userRegisterEmailValidation, userUniversityValidation)
 
-invalidOption :: IO ()
-invalidOption = do
-  mapM_
-    putStrLn
-    [ "Opção Inválida. Tente Novamente.",
-      "Se deseja escolher a opção '[X] - Opção', digite: X\n"
-    ]
+typeUserName :: String -> IO String
+typeUserName textToShow = getValidInput (Just textToShow) userNameValidation
 
-chooseOption :: Char -> IO String
-chooseOption choice
-  | choice == '1' = return "teacher"
-  | choice == '2' = return "student"
-  | otherwise = do
-      invalidOption
-      selectAccountType
-
-selectAccountType :: IO String
-selectAccountType = do
-  mapM_
-    putStrLn
-    [ "Qual o tipo de conta você gostaria de cadastrar no nosso sistema?",
-      "[1] PROFESSOR",
-      "[2] ALUNO",
-      "Digite o NÚMERO correspondente a sua opção:"
-    ]
-  option <- getLine
-  let chosenOption = head option
-  chooseOption chosenOption
-
-typeUserName :: IO String
-typeUserName = do
-  mapM_
-    putStrLn
-    [ "Agora precisamos saber qual o nome do usuário que você irá cadastrar",
-      "Digite o NOME da pessoa que usará o sistema:"
-    ]
-  username <- getLine
-  -- error treatment
-  handleValidation (userNameValidation username) (return username) typeUserName
-
-typeUniversity :: IO String
-typeUniversity = do
-  mapM_
-    putStrLn
-    [ "A qual universidade o usuário faz parte?",
-      "Digite o NOME da universidade que constará no sistema:"
-    ]
-  university <- getLine
-  handleValidation (userUniversityValidation university) (return university) typeUniversity
+typeUniversity :: String -> IO String
+typeUniversity textToShow = getValidInput (Just textToShow) userUniversityValidation
 
 typeEnrollment :: String -> IO String
 typeEnrollment textToShow = getValidInput (Just textToShow) userEnrollmentValidation
@@ -76,15 +41,14 @@ typeEnrollment textToShow = getValidInput (Just textToShow) userEnrollmentValida
 typeUserEmail :: String -> String -> IO String
 typeUserEmail textToShow "login" = getValidInput (Just textToShow) userLoginEmailValidation
 typeUserEmail textToShow "register" = do
-  putStrLn textToShow
-  email <- getLine
+  email <- getInput (Just textToShow)
   handleValidation (userRegisterEmailValidation email) (continue email) (typeUserEmail textToShow "register")
   where
     continue email = do
       content1 <- readFile "data/users.txt"
       content2 <- readFile "data/toValidate.txt"
-      let list = mapMaybe stringToUser (lines (content1 ++ content2))
-      validEmails <- forM list (\user -> return (userEmail user))
+      let usersList = [stringToUser line | line <- lines (content1 ++ content2)]
+          validEmails = [userEmail user | user <- catMaybes usersList]
       handleValidation (belongsToList validEmails email) (return email) (typeUserEmail textToShow "register")
 
 typeUserPassword :: String -> IO String
@@ -92,33 +56,21 @@ typeUserPassword textToShow = getValidInput (Just textToShow) userPasswordValida
 
 registerUI :: IO (String, String, String, String, String, String)
 registerUI = do
-  screenCleaner
-  mapM_
-    putStrLn
-    [ "Bom saber que deseja utilizar nosso sistema!",
-      "Vamos agora solicitar algumas informações para que você possa ser efetivado no sistema\n"
-    ]
-
-  userType <- selectAccountType
+  userType <- selectOption $ zip ["PROFESSOR", "ALUNO"] [return "teacher", return "student"]
   screenCleaner
 
-  userName <- typeUserName
+  userName <- typeUserName $ joinStringArray userNameInputPrompts "\n"
   screenCleaner
 
-  userUniversity <- typeUniversity
+  userUniversity <- typeUniversity $ joinStringArray universityInputPrompts "\n"
   screenCleaner
 
-  userEnrollment <-
-    typeEnrollment $
-      joinStringArray
-        [ "Agora precisamos saber qual a matrícula do usuário",
-          "Digite o numero de MATRÍCULA da pessoa que usará o sistema:"
-        ]
+  userEnrollment <- typeEnrollment $ joinStringArray userEnrollmentInputPrompts "\n"
   screenCleaner
 
-  userEmail <- typeUserEmail (joinStringArray ["Agora informe-nos o e-mail do usuário", "Digite o E-MAIL da pessoa que utilizará o sistema:"]) "register"
+  userEmail <- typeUserEmail (joinStringArray emailInputPrompts "\n") "register"
 
-  userPassword <- typeUserPassword "Digite a SENHA que a pessoa utilizará para o login: "
+  userPassword <- typeUserPassword passwordInputPrompt
   screenCleaner
 
   return (userType, userName, userUniversity, userEnrollment, userEmail, userPassword)

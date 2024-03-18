@@ -9,7 +9,7 @@ import Lib (joinStringArray, selectOption)
 import Models.User
 import System.Directory
 import TerminalUI.Users.Administrator (displayActionSelection, userRegister)
-import TerminalUI.Users.User (invalidOption, registerUI, typeEnrollment)
+import TerminalUI.Users.User (registerUI, typeEnrollment)
 import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
 
 userRegisterADMIN :: IO ()
@@ -38,7 +38,7 @@ updateUser = do
   let user = getUser enroll userList
 
   screenCleaner
-  newType <- selectType user
+  newType <- selectOption $ zip ["ADMINISTRADOR", "PROFESSOR", "ALUNO"] [return "administrator", return "teacher", return "student"]
   let newUser = setType newType user
   let newUserL = swapUser user newUser userList
   removeFile "data/users.txt"
@@ -48,28 +48,6 @@ updateUser = do
   putStrLn "O seguinte usuário foi atualizado com sucesso: "
   displayUser newUser
   administratorOptions
-
-updateOpt :: Char -> User -> IO String
-updateOpt choice user
-  | choice == '1' = return "administrator"
-  | choice == '2' = return "teacher"
-  | choice == '3' = return "student"
-  | otherwise = do
-      invalidOption
-      selectType user
-
-selectType :: User -> IO String
-selectType user = do
-  mapM_
-    putStrLn
-    [ "Defina um novo tipo para " ++ userName user ++ ":",
-      "[1] - Administrador",
-      "[2] - Professor",
-      "[3] - Aluno"
-    ]
-  option <- getLine
-  let chosenOption = head option
-  updateOpt chosenOption user
 
 swapUser :: User -> User -> [User] -> [User]
 swapUser _ _ [] = []
@@ -112,6 +90,7 @@ userRemove = do
         [ "Agora precisamos saber qual a matrícula do usuário",
           "Digite o numero de MATRÍCULA da pessoa que você removerá do sistema(isso pode incluir você mesmo):"
         ]
+        "\n"
   content <- readFile "data/users.txt"
 
   loggedUser <- readFile "data/session.txt"
