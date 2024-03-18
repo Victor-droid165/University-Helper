@@ -7,6 +7,7 @@ where
 import Models.User
 import TerminalUI.Users.User (typeEnrollment, typeUniversity, typeUserEmail, typeUserName, typeUserPassword)
 import Util.ScreenCleaner (screenCleaner)
+import Lib (joinStringArray)
 
 invalidOption :: IO ()
 invalidOption = do
@@ -52,20 +53,23 @@ userRegister = do
   screenCleaner
 
   userEnrollment <-
-    typeEnrollment
-      [ "Agora precisamos saber qual a matrícula do usuário",
-        "Digite o numero de MATRÍCULA da pessoa que usará o sistema:"
-      ]
+    typeEnrollment $
+      joinStringArray
+        [ "Agora precisamos saber qual a matrícula do usuário",
+          "Digite o numero de MATRÍCULA da pessoa que usará o sistema:"
+        ]
   screenCleaner
 
   userEmail <-
     typeUserEmail
-      [ "Agora informe-nos o e-mail do usuário",
-        "Digite o E-MAIL da pessoa que utilizará o sistema:"
-      ]
+      ( joinStringArray
+          [ "Agora informe-nos o e-mail do usuário",
+            "Digite o E-MAIL da pessoa que utilizará o sistema:"
+          ]
+      )
       "register"
 
-  userPassword <- typeUserPassword ["Digite a SENHA que a pessoa utilizará para o login:"]
+  userPassword <- typeUserPassword "Digite a SENHA que a pessoa utilizará para o login:"
   screenCleaner
 
   return (userType, userName, userUniversity, userEnrollment, userEmail, userPassword)

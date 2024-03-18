@@ -6,16 +6,17 @@ module Lib
     stringToData,
     writeDataOnFile,
     selectOption,
+    joinStringArray,
   )
 where
 
 -- Remember to import here
-import Util.Validate (FormValidation)
-import Util.ScreenCleaner ( screenCleaner, quitIO )
+
 import System.IO
 import Text.Read (readMaybe)
-import Util.Validate hiding (handleValidation) 
-import Util.ScreenCleaner (screenCleaner)
+import Util.ScreenCleaner (quitIO, screenCleaner)
+import Util.Validate (FormValidation)
+import Util.Validate hiding (handleValidation)
 
 getInput :: Maybe String -> IO String
 getInput maybePrompt = do
@@ -93,3 +94,8 @@ retryChoice options = do
   putStrLn "Opcao Invalida. Tente Novamente."
   putStrLn "Se deseja escolher a opcao '[X] - Opcao', digite: X"
   selectOption options
+
+joinStringArray :: [String] -> String -> String
+joinStringArray [] _ = ""
+joinStringArray [x] _ = x
+joinStringArray (x : xs) joiner = x ++ joiner ++ joinStringArray xs joiner

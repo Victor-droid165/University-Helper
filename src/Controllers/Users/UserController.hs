@@ -8,6 +8,7 @@ import Controllers.Users.AdministratorController (administratorOptions)
 import Controllers.Users.StudentController (studentOptions)
 import Controllers.Users.TeacherController (teacherOptions)
 import Data.Maybe (mapMaybe)
+import Lib (joinStringArray)
 import Models.User
 import System.Directory (removeFile)
 import TerminalUI.Users.User (loginUI, registerUI, typeUserEmail, typeUserPassword)
@@ -70,15 +71,18 @@ updateEmailPassword user = do
   screenCleaner
   newEmail <-
     typeUserEmail
-      [ "Como esse é um email padrão, será necessário atualiza-lo",
-        "Digite um NOVO E-MAIL que constará no sistema:"
-      ]
+      ( joinStringArray
+          [ "Como esse é um email padrão, será necessário atualiza-lo",
+            "Digite um NOVO E-MAIL que constará no sistema:"
+          ]
+      )
       "register"
   newPassword <-
-    typeUserPassword
-      [ "Como essa é uma senha padrão, será necessário atualizá-la",
-        "Digite uma NOVA SENHA que constará no sistema:"
-      ]
+    typeUserPassword $
+      joinStringArray
+        [ "Como essa é uma senha padrão, será necessário atualizá-la",
+          "Digite uma NOVA SENHA que constará no sistema:"
+        ]
 
   let updatedUser = user {userEmail = newEmail, userPassword = newPassword}
   updateUser updatedUser
