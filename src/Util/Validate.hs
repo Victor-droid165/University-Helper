@@ -9,10 +9,12 @@ module Util.Validate (
     FormValidation(..),
     Validation(..),
     Error(..),
+    handleValidation
 ) where
 import Data.Char (isAlpha, isSpace)
 import Text.Email.Validate 
 import qualified Data.ByteString.Char8 as B
+import Util.ScreenCleaner (screenCleaner)
 
 data Validation err a = Failure err | Success a
   deriving Show
@@ -103,3 +105,12 @@ validateEmail email | not  (isValid (B.pack email)) = Failure[NotAValidEmail]
 
 stringToInt :: String -> Int
 stringToInt str = read str
+
+-- validation handlers
+
+handleValidation :: FormValidation String -> IO String -> IO String -> IO String
+handleValidation (Failure err) _ actionIfFailure = do
+  screenCleaner
+  putStrLn $ "Erro: " ++ show err
+  actionIfFailure
+handleValidation _ actionIfSuccess _ = do actionIfSuccess

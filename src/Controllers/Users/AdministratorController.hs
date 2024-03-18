@@ -54,7 +54,7 @@ updateUser = do
 
     screenCleaner
     putStrLn "O seguinte usuário foi atualizado com sucesso: "
-    showUser newUser
+    displayUser newUser
     administratorOptions
 
         
@@ -88,7 +88,7 @@ validateUser = do
     screenCleaner
     content <- readFile "data/toValidate.txt"
     let userList = mapMaybe stringToUser (lines content)
-    mapM_ showUser userList
+    mapM_ displayUser userList
     putStrLn "Digite a matrícula do usuário que deseja validar: "
     enroll <- getLine
     --
@@ -101,7 +101,7 @@ validateUser = do
     --
     screenCleaner
     putStrLn "O seguinte usuário foi validado com sucesso: "
-    showUser placeHolderUser
+    displayUser placeHolderUser
     administratorOptions
 
 

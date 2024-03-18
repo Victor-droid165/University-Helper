@@ -24,7 +24,7 @@ userRegister = do
                        , userPassword = userPassword }
 
     toValidate newUser
-    showUser newUser
+    displayUser newUser
 
 toValidate :: User -> IO()
 toValidate user | userType user == "teacher" = writeUserOnFile "data/toValidate.txt" user >> putStrLn "Usuário aguardando validação!"
@@ -43,7 +43,7 @@ updateUser user = do
 
     screenCleaner
     putStrLn "O seguinte usuário foi atualizado com sucesso: "
-    showUser user
+    displayUser user
     administratorOptions
 
 swapUser :: User -> User -> [User] -> [User]

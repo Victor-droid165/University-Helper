@@ -1,8 +1,6 @@
 module Lib
   ( getInput,
     getValidInput,
-    getParsedInput,
-    getParsedValidInput,
     handleValidation,
     handleMaybe,
     stringToData,
@@ -12,6 +10,8 @@ module Lib
 where
 
 -- Remember to import here
+import Util.Validate (FormValidation, handleValidation)
+import Util.ScreenCleaner ( screenCleaner, quitIO )
 import System.IO
 import Text.Read (readMaybe)
 
@@ -21,27 +21,10 @@ getInput maybePrompt = do
   hFlush stdout
   getLine
 
-getParsedInput :: (Read a) => Maybe String -> IO a
-getParsedInput maybePrompt = do
-  value <- getInput maybePrompt
-  return $ read value
-
 getValidInput :: Maybe String -> (String -> FormValidation String) -> IO String
 getValidInput maybePrompt validationFunc = do
   value <- getInput maybePrompt
   handleValidation (validationFunc value) (return value) (getValidInput maybePrompt validationFunc)
-
-getParsedValidInput :: (Read a) => Maybe String -> (String -> FormValidation String) -> IO a
-getParsedValidInput maybePrompt validationFunc = do
-  value <- getValidInput maybePrompt validationFunc
-  return $ read value
-
-handleValidation :: FormValidation String -> IO String -> IO String -> IO String
-handleValidation (Failure err) _ actionIfFailure = do
-  clearScreen
-  putStrLn $ "Erro: " ++ show err
-  actionIfFailure
-handleValidation _ actionIfSuccess _ = do actionIfSuccess
 
 stringToData :: (Read a) => String -> Maybe a
 stringToData str = readMaybe str
@@ -58,6 +41,7 @@ selectOption options = do
   let optionsPrompts = map fst options
   displayOptions optionsPrompts
   choice <- getUserChoice
+  screenCleaner
   handleChoice choice options
 
 displayOptions :: [String] -> IO ()
