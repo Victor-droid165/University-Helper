@@ -21,9 +21,11 @@ description:         Please see the README on GitHub at <https://github.com/Vict
 
 dependencies:
 - base >= 4.7 && < 5
+- ansi-terminal
+- directory
 - time
 - email-validate
-- ansi-terminal
+- bytestring
 
 ghc-options:
 - -Wall
