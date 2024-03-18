@@ -4,19 +4,12 @@ module Controllers.Users.TeacherController
 
 import Models.User
 import TerminalUI.Users.User (registerUI, invalidOption, typeEnrollment)
-import TerminalUI.Users.Teacher (selectAction)
+import TerminalUI.Users.Teacher (displayActionSelection)
 import Data.Maybe (mapMaybe)
 import System.Directory
 import Data.Foldable (find)
 import Util.ScreenCleaner (screenCleaner, quitIO, forceQuit)
-
-chooseOption :: Char -> IO ()
-chooseOption choice
-    | choice == '1' = autoRemove
-    | choice == '.' = quitIO teacherOptions
-    | otherwise = do
-        invalidOption
-        teacherOptions
+import Lib (selectOption)
 
 autoRemove :: IO()
 autoRemove = do
@@ -34,5 +27,5 @@ autoRemove = do
 
 teacherOptions :: IO ()
 teacherOptions = do
-    choice <- selectAction
-    chooseOption choice
+    actionPrompts <- displayActionSelection
+    selectOption $ zip actionPrompts [autoRemove, quitIO teacherOptions]

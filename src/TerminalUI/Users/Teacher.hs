@@ -1,17 +1,19 @@
 module TerminalUI.Users.Teacher
-    ( selectAction
-    ) where
+  ( displayActionSelection,
+  )
+where
 
 import Models.User
-import Util.ScreenCleaner ( screenCleaner )
+import Util.ScreenCleaner (screenCleaner)
 
-selectAction :: IO Char 
-selectAction = do
-    screenCleaner
-    mapM_ putStrLn ["Qual tipo de operação você gostaria de realizar no momento?",
-                    "[1] REMOVER SUA CONTA",
-                    "[.] sair",
-                    "Digite o NÚMERO correspondente a sua opção:"]
-    option <- getLine
-    let chosenOption = head option
-    return chosenOption
+actions :: [String]
+actions =
+  [ "REMOVER SUA CONTA",
+    "SAIR"
+  ]
+
+displayActionSelection :: IO [String]
+displayActionSelection = do
+  screenCleaner
+  putStrLn "Qual tipo de operacao voce gostaria de realizar no momento?"
+  return actions

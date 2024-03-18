@@ -4,22 +4,12 @@ module Controllers.Users.AdministratorController
 
 import Models.User
 import TerminalUI.Users.User (registerUI, invalidOption, typeEnrollment)
-import TerminalUI.Users.Administrator (userRegister, selectAction)
+import TerminalUI.Users.Administrator (userRegister, displayActionSelection)
 import Data.Maybe (mapMaybe)
 import System.Directory
 import Data.Foldable (find)
 import Util.ScreenCleaner (screenCleaner, quitIO, forceQuit)
-
-chooseOption :: Char -> IO ()
-chooseOption choice
-    | choice == '1' = userRegisterADMIN
-    | choice == '2' = userRemove
-    | choice == '3' = updateUser
-    | choice == '4' = validateUser
-    | choice == '.' = quitIO administratorOptions
-    | otherwise = do
-        invalidOption
-        administratorOptions
+import Lib (selectOption)
 
 userRegisterADMIN :: IO ()
 userRegisterADMIN = do
@@ -147,5 +137,5 @@ autoRemove = do
 
 administratorOptions :: IO ()
 administratorOptions = do
-    choice <- selectAction
-    chooseOption choice
+    actionPrompts <- displayActionSelection
+    selectOption $ zip actionPrompts [userRegisterADMIN, userRemove, updateUser, validateUser, quitIO administratorOptions]
