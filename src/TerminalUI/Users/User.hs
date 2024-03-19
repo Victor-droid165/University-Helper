@@ -13,21 +13,22 @@ where
 
 import Data.Maybe (catMaybes)
 import Lib
-  ( emailInputPrompts,
-    getInput,
+  ( getInput,
     getValidInput,
     handleValidation,
     joinStringArray,
-    passwordInputPrompt,
     selectOption,
+  )
+import Models.User (User (..), stringToUser)
+import Util.Constants
+  ( emailInputPrompts,
+    passwordInputPrompt,
     universityInputPrompts,
     userEnrollmentInputPrompts,
     userNameInputPrompts,
   )
-import Models.User (User (..), stringToUser)
-import System.Console.ANSI (clearScreen)
 import Util.ScreenCleaner (screenCleaner)
-import Util.Validate (Validation (..), belongsToList, userEnrollmentValidation, userLoginEmailValidation, userNameValidation, userPasswordValidation, userRegisterEmailValidation, userUniversityValidation)
+import Util.Validate (belongsToList, userEnrollmentValidation, userLoginEmailValidation, userNameValidation, userPasswordValidation, userRegisterEmailValidation, userUniversityValidation)
 
 typeUserName :: String -> IO String
 typeUserName textToShow = getValidInput (Just textToShow) userNameValidation
@@ -56,29 +57,29 @@ typeUserPassword textToShow = getValidInput (Just textToShow) userPasswordValida
 
 registerUI :: IO (String, String, String, String, String, String)
 registerUI = do
-  userType <- selectOption $ zip ["PROFESSOR", "ALUNO"] [return "teacher", return "student"]
+  userType' <- selectOption $ zip ["PROFESSOR", "ALUNO"] [return "teacher", return "student"]
   screenCleaner
 
-  userName <- typeUserName $ joinStringArray userNameInputPrompts "\n"
+  userName' <- typeUserName $ joinStringArray userNameInputPrompts "\n"
   screenCleaner
 
-  userUniversity <- typeUniversity $ joinStringArray universityInputPrompts "\n"
+  userUniversity' <- typeUniversity $ joinStringArray universityInputPrompts "\n"
   screenCleaner
 
-  userEnrollment <- typeEnrollment $ joinStringArray userEnrollmentInputPrompts "\n"
+  userEnrollment' <- typeEnrollment $ joinStringArray userEnrollmentInputPrompts "\n"
   screenCleaner
 
-  userEmail <- typeUserEmail (joinStringArray emailInputPrompts "\n") "register"
+  userEmail' <- typeUserEmail (joinStringArray emailInputPrompts "\n") "register"
 
-  userPassword <- typeUserPassword passwordInputPrompt
+  userPassword' <- typeUserPassword passwordInputPrompt
   screenCleaner
 
-  return (userType, userName, userUniversity, userEnrollment, userEmail, userPassword)
+  return (userType', userName', userUniversity', userEnrollment', userEmail', userPassword')
 
 loginUI :: IO (String, String)
 loginUI = do
   screenCleaner
   putStrLn "Bem Vindo ao Login !"
-  userEmail <- typeUserEmail "E-mail: " "login"
-  userPassword <- typeUserPassword "Senha: "
-  return (userEmail, userPassword)
+  userEmail' <- typeUserEmail "E-mail: " "login"
+  userPassword' <- typeUserPassword "Senha: "
+  return (userEmail', userPassword')

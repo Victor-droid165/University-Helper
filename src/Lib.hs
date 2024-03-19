@@ -7,22 +7,17 @@ module Lib
     writeDataOnFile,
     selectOption,
     joinStringArray,
-    emailInputPrompts,
-    passwordInputPrompt,
-    userNameInputPrompts,
-    universityInputPrompts,
-    userEnrollmentInputPrompts,
     printWelcomeMessages,
+    displayActionSelectionMessage,
   )
 where
 
 -- Remember to import here
 
-import System.IO
+import System.IO ( stdout, hFlush )
 import Text.Read (readMaybe)
-import Util.ScreenCleaner (quitIO, screenCleaner)
-import Util.Validate (FormValidation)
-import Util.Validate hiding (handleValidation)
+import Util.ScreenCleaner (screenCleaner)
+import Util.Validate ( FormValidation, Validation(Failure) )
 
 getInput :: Maybe String -> IO String
 getInput maybePrompt = do
@@ -35,11 +30,6 @@ getValidInput maybePrompt validationFunc = do
   value <- getInput maybePrompt
   handleValidation (validationFunc value) (return value) (getValidInput maybePrompt validationFunc)
 
-getParsedValidInput :: (Read a) => Maybe String -> (String -> FormValidation String) -> IO a
-getParsedValidInput maybePrompt validationFunc = do
-  value <- getValidInput maybePrompt validationFunc
-  return $ read value
-
 handleValidation :: FormValidation String -> IO String -> IO String -> IO String
 handleValidation (Failure err) _ actionIfFailure = do
   screenCleaner
@@ -48,7 +38,7 @@ handleValidation (Failure err) _ actionIfFailure = do
 handleValidation _ actionIfSuccess _ = do actionIfSuccess
 
 stringToData :: (Read a) => String -> Maybe a
-stringToData str = readMaybe str
+stringToData = readMaybe
 
 writeDataOnFile :: (Show a) => FilePath -> a -> IO ()
 writeDataOnFile filePath data' = appendFile filePath (show data' ++ "\n")
@@ -85,7 +75,7 @@ getUserChoice = do
   getLine
 
 handleChoice :: String -> [(String, IO a)] -> IO a
-handleChoice "." options = snd (options !! ((length options) - 1))
+handleChoice "." options = snd (options !! (length options - 1))
 handleChoice choice options
   | Just index <- readMaybe choice :: Maybe Int,
     isValidIndex index 1 (length options) =
@@ -106,32 +96,13 @@ joinStringArray [] _ = ""
 joinStringArray [x] _ = x
 joinStringArray (x : xs) joiner = x ++ joiner ++ joinStringArray xs joiner
 
-emailInputPrompts :: [String]
-emailInputPrompts = ["Agora informe-nos o e-mail do usuario", "Digite o E-MAIL da pessoa que utilizara o sistema: "]
-
-passwordInputPrompt :: String
-passwordInputPrompt = "Digite a SENHA que a pessoa utilizara para o login: "
-
-userNameInputPrompts :: [String]
-userNameInputPrompts =
-  [ "Agora precisamos saber qual o nome do usuario que você ira cadastrar",
-    "Digite o NOME da pessoa que usara o sistema: "
-  ]
-
-universityInputPrompts :: [String]
-universityInputPrompts =
-  [ "A qual universidade o usuario faz parte?",
-    "Digite o NOME da universidade que constara no sistema: "
-  ]
-
 printWelcomeMessages :: IO ()
 printWelcomeMessages = do
   screenCleaner
   putStrLn "Bom saber que deseja utilizar nosso sistema!"
   putStrLn "Vamos agora solicitar algumas informacoes para que voce possa ser efetivado no sistema\n"
 
-userEnrollmentInputPrompts :: [String]
-userEnrollmentInputPrompts =
-  [ "Agora precisamos saber qual a matricula do usuario",
-    "Digite o numero de MATRICULA da pessoa que usara o sistema: "
-  ]
+displayActionSelectionMessage :: IO ()
+displayActionSelectionMessage = do
+  screenCleaner
+  putStrLn "Qual tipo de operacao voce gostaria de realizar no momento?"

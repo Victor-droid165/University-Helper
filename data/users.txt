@@ -1,1 +1,3 @@
 User {userType = "administrator", userName = "Admin", userUniversity = "UniversityHelper", userEnrollment = "1195010000", userEmail = "everton@admin.ufcg.edu.br", userPassword = "12345678"}
+User {userType = "student", userName = "victor", userUniversity = "vi", userEnrollment = "1202211125", userEmail = "victor@gmail.com", userPassword = "1234567890"}
+User {userType = "student", userName = "master", userUniversity = "university", userEnrollment = "1202311427", userEmail = "master@gmail.com", userPassword = "master123"}
