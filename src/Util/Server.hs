@@ -1,6 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Util.Server (
   serveOn
@@ -9,7 +11,6 @@ module Util.Server (
 import Models.User 
 import GHC.Generics
 import Data.Aeson
-import Data.Time.Calendar
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
@@ -18,29 +19,33 @@ import Network.HTTP.Types (hContentType)
 import Controllers.Users.UserController (getUsers)
 import Control.Monad.IO.Class (liftIO)
 
-type UserAPI1 = "users" :> Get '[JSON] [User]
+
+type API = "users" :> Get '[JSON] [User]
+              :<|> "register" :> ReqBody '[JSON] User :> Post '[JSON] NoContent
 
 instance ToJSON User
-
-users1 :: IO [User]
-users1 = getUsers
-
-userAPI :: Proxy UserAPI1
-userAPI = Proxy
+instance FromJSON User
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
 -- not yet a webserver.
-app1 :: Application
-app1 = corsMiddleware $ serve userAPI server1
+app :: (HasServer (api01 :: *) '[]) => Proxy api01 -> Server api01 -> Application
+app api ser = corsMiddleware $ serve api ser
   where
     corsMiddleware = cors (const $ Just simpleCorsResourcePolicy { corsRequestHeaders = [hContentType] })
 
-server1 :: Server UserAPI1
-server1 = getUsersHandler
+userAPI :: Proxy API
+userAPI = Proxy
 
-getUsersHandler :: Handler [User]
-getUsersHandler = liftIO users1
+superServer :: Server API
+superServer =   users
+                :<|> register
+
+users :: Handler [User]
+users = liftIO getUsers
+
+register :: User -> Handler NoContent
+register user = liftIO (writeUserOnFile "data/users.txt" user) >> return NoContent
 
 serveOn :: IO ()
-serveOn = run 8081 app1
+serveOn = run 8081 (app userAPI superServer)

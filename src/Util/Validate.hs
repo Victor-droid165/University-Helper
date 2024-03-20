@@ -120,3 +120,7 @@ handleValidation (Failure err) _ actionIfFailure = do
   putStrLn $ "Erro: " ++ show err
   actionIfFailure
 handleValidation _ actionIfSuccess _ = do actionIfSuccess
+
+handleValidationServer :: FormValidation String -> String
+handleValidationServer (Failure err) = "Erro " ++ show err
+handleValidationServer _ = "Success"
