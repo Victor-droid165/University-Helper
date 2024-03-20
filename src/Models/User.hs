@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 module Models.User
   ( User (..),
     authenticateUser,
@@ -16,6 +17,7 @@ import Lib
   ( stringToData,
     writeDataOnFile,
   )
+import GHC.Generics (Generic)
 
 data User = User
   { userType :: String,
@@ -25,7 +27,7 @@ data User = User
     userEmail :: String,
     userPassword :: String
   }
-  deriving (Show, Read, Eq)
+  deriving (Show, Read, Eq, Generic)
 
 newtype UserEnrollment = UserEnrollment User
 

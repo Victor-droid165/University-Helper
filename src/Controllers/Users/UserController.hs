@@ -1,6 +1,7 @@
 module Controllers.Users.UserController
   ( userRegister,
     userLogin,
+    getUsers
   )
 where
 
@@ -58,6 +59,11 @@ swapUser _ _ [] = []
 swapUser old new (u : userL)
   | old == u = new : swapUser old new userL
   | otherwise = u : swapUser old new userL
+
+getUsers :: IO [User]
+getUsers = do
+  content <- readFile "data/users.txt"
+  return (mapMaybe stringToUser (lines content))
 
 getUser :: String -> [User] -> User
 getUser _ [] = User {}

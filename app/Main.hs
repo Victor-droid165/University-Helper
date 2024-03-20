@@ -6,6 +6,7 @@ where
 import Controllers.Users.UserController (userLogin, userRegister)
 import Lib (selectOption)
 import Util.ScreenCleaner (quitIO, screenCleaner)
+import Util.Server (serveOn)
 
 optionInterface :: IO ()
 optionInterface = do
@@ -15,4 +16,5 @@ optionInterface = do
 main :: IO ()
 main = do
   screenCleaner
+  serveOn
   optionInterface

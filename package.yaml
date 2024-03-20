@@ -26,6 +26,14 @@ dependencies:
 - time
 - email-validate
 - bytestring
+- aeson
+- servant
+- servant-server
+- time
+- wai
+- wai-cors
+- warp
+- http-types
 
 ghc-options:
 - -Wall
