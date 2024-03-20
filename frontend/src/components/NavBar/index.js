@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./style.module.css";
 import Logo from "../../assets/logo.png";
 
-const NavBar = () => {
-
+const NavBar = ({ data }) => {
   return (
     <div className={styles.box}>
       <Link to="/" className={styles.headerLogo}>
@@ -12,24 +11,13 @@ const NavBar = () => {
       </Link>
       <nav className={styles.header}>
         <ul className={styles.tabs}>
-          <li className={styles.tab}>
-            <Link to="/" className={styles.customLink}>Home</Link>
-          </li>
-          <li className={styles.tab}>
-            <Link to="/login" className={styles.customLink}>Login</Link>
-          </li>
-          <li className={styles.tab}>
-            <Link to="/register" className={styles.customLink}>Register</Link>
-          </li>
-          <li className={styles.tab}>
-            <a
-                target="_blank"
-                href="https://chat.openai.com/"
-                className={styles.customLink}
-            >
-                Help
-            </a>
-          </li>
+          {data.map((item, index) => (
+            <li key={index} className={styles.tab}>
+              <Link to={item.link} className={styles.customLink}>
+                {item.name}
+              </Link>
+            </li>
+          ))}
         </ul>
       </nav>
     </div>
