@@ -28,8 +28,8 @@ data MyData = MyData { value :: String} deriving (Generic, FromJSON)
 type API =    "users" :> Get '[JSON] [User]
               :<|> "register" :> ReqBody '[JSON] User :> Post '[JSON] NoContent
               :<|> "userName" :> ReqBody '[JSON] MyData :> Post '[JSON] String
-              :<|> "userEmail" :> ReqBody '[JSON] MyData :> Post '[JSON] String
               :<|> "userUniversity" :> ReqBody '[JSON] MyData :> Post '[JSON] String
+              :<|> "userEmail" :> ReqBody '[JSON] MyData :> Post '[JSON] String
               :<|> "userEnrollment" :> ReqBody '[JSON] MyData :> Post '[JSON] String
               :<|> "userPassword" :> ReqBody '[JSON] MyData :> Post '[JSON] String
 
@@ -50,9 +50,9 @@ userAPI = Proxy
 superServer :: Server API
 superServer =   users
                 :<|> register
-                :<|> userEmail
                 :<|> userName
                 :<|> userUniversity
+                :<|> userEmail
                 :<|> userEnrollment
                 :<|> userPassword
 

@@ -123,5 +123,5 @@ handleValidation (Failure err) _ actionIfFailure = do
 handleValidation _ actionIfSuccess _ = do actionIfSuccess
 
 handleValidationServer :: FormValidation String -> String
-handleValidationServer (Failure err) = "Erro " ++ show err
+handleValidationServer (Failure err) = "Error: " ++ show err
 handleValidationServer _ = "Success"

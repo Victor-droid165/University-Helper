@@ -17,8 +17,17 @@ const User = () => {
         userUniversity: '',
         userEnrollment: '',
         userEmail: '',
-        userPassword: ''
-    }); 
+        userPassword: '',
+    });
+
+    const [errors, setErrors] = useState ({
+      userNameError: '',
+      userUniversityError: '',
+      userEmailError: '',
+      userTypeError: 'Success',
+      userEnrollmentError: '',
+      userPasswordError: '',
+    });
 
     const handleChange = (e) => {
       setUser({
@@ -26,16 +35,13 @@ const User = () => {
         [e.target.name]: e.target.value
       });
     };
-    
-    const [errors, setErrors] = useState({});
-  
+      
     const handleSubmit = (e) => {
       e.preventDefault();
-      let validationErrors = {};
     
       for (let field in user) {
         if (field === "userType") continue;
-        
+
         fetch('http://localhost:8081/' + field, {
           method: 'POST',
           headers: {
@@ -45,18 +51,49 @@ const User = () => {
           
         })
         .then(response => response.json())
-        .then(data => {
-            validationErrors[field] = data.message;
-            validationErrors[field] = "deu ruim, lascou";
-            console.log(data.message);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-          validationErrors[field] = "An error occurred while validating this field.";
+        .then((json) => {
+            console.log(json);
+            setErrors(prevErrors => ({
+              ...prevErrors,
+              [field + 'Error']: (json === 'Success') ? '' : json,
+            }))
         });
       }
-    
-      setErrors(validationErrors);
+
+      let register = true;
+      for (let errorCheck in errors) {
+        if (errors[errorCheck] !== '' && errors[errorCheck] !== 'Success') {
+          register = false;
+          break;
+        }
+      }
+
+      if (register === true) {
+          fetch('http://localhost:8081/register', {
+          method: 'Post',
+          headers: {
+          'Content-Type': 'application/json',
+          },
+            body: JSON.stringify(user),
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Success:', data);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+
+        setErrors ({
+          userNameError: '',
+          userUniversityError: '',
+          userEmailError: '',
+          userTypeError: 'Success',
+          userEnrollmentError: '',
+          userPasswordError: '',
+        });
+
+      }
     };
   
     return (
@@ -73,6 +110,10 @@ const User = () => {
         <TextField
           label="Nome"
           name="userName"
+
+          error = {Boolean(errors.userNameError)}
+          helperText={errors.userNameError}
+
           value={user.userName}
           onChange={handleChange}
           fullWidth
@@ -82,6 +123,10 @@ const User = () => {
         <TextField
           label="Universidade"
           name="userUniversity"
+
+          error = {Boolean(errors.userUniversityError)}
+          helperText = {errors.userUniversityError}
+
           value={user.userUniversity}
           onChange={handleChange}
           fullWidth
@@ -91,6 +136,10 @@ const User = () => {
         <TextField
           label="Email"
           name="userEmail"
+
+          error = {Boolean(errors.userEmailError)}
+          helperText = {errors.userEmailError}
+
           value={user.userEmail}
           onChange={handleChange}
           fullWidth
@@ -111,6 +160,10 @@ const User = () => {
         <TextField
           label="Matricula"
           name="userEnrollment"
+
+          error = {Boolean(errors.userEnrollmentError)}
+          helperText = {errors.userEnrollmentError}
+
           value={user.userEnrollment}
           onChange={handleChange}
           fullWidth
@@ -120,6 +173,10 @@ const User = () => {
         <TextField
           label="Senha"
           name="userPassword"
+
+          error = {Boolean(errors.userPasswordError)}
+          helperText = {errors.userPasswordError}
+
           value={user.userPassword}
           onChange={handleChange}
           fullWidth
