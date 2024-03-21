@@ -34,6 +34,8 @@ const User = () => {
       let validationErrors = {};
     
       for (let field in user) {
+        if (field === "userType") continue;
+        
         fetch('http://localhost:8081/' + field, {
           method: 'POST',
           headers: {
@@ -78,7 +80,7 @@ const User = () => {
         />
 
         <TextField
-          label="University"
+          label="Universidade"
           name="userUniversity"
           value={user.userUniversity}
           onChange={handleChange}

@@ -9,7 +9,7 @@ module Util.Server (
   serveOn
 ) where
 
-import Models.User hiding (userEmail) 
+import Models.User hiding (userPassword, userEnrollment, userUniversity, userName, userEmail) 
 import GHC.Generics
 import Data.Aeson
 import Network.Wai
@@ -20,14 +20,18 @@ import Network.HTTP.Types (hContentType)
 import Controllers.Users.UserController (getUsers)
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson (encode, object, (.=))
-import Util.Validate (userNameValidation, handleValidationServer, userRegisterEmailValidation)
+import Util.Validate (userNameValidation, handleValidationServer, userRegisterEmailValidation, userUniversityValidation, userEnrollmentValidation, userPasswordValidation)
 
 
 data MyData = MyData { value :: String} deriving (Generic, FromJSON)
 
 type API =    "users" :> Get '[JSON] [User]
               :<|> "register" :> ReqBody '[JSON] User :> Post '[JSON] NoContent
+              :<|> "userName" :> ReqBody '[JSON] MyData :> Post '[JSON] String
               :<|> "userEmail" :> ReqBody '[JSON] MyData :> Post '[JSON] String
+              :<|> "userUniversity" :> ReqBody '[JSON] MyData :> Post '[JSON] String
+              :<|> "userEnrollment" :> ReqBody '[JSON] MyData :> Post '[JSON] String
+              :<|> "userPassword" :> ReqBody '[JSON] MyData :> Post '[JSON] String
 
 instance ToJSON User
 instance FromJSON User
@@ -47,9 +51,25 @@ superServer :: Server API
 superServer =   users
                 :<|> register
                 :<|> userEmail
+                :<|> userName
+                :<|> userUniversity
+                :<|> userEnrollment
+                :<|> userPassword
 
 userEmail :: MyData -> Handler String
 userEmail myData = return $ handleValidationServer (userRegisterEmailValidation (value myData))
+
+userName :: MyData -> Handler String
+userName myData = return $ handleValidationServer (userNameValidation (value myData))
+
+userUniversity :: MyData -> Handler String
+userUniversity myData = return $ handleValidationServer (userUniversityValidation (value myData))
+
+userEnrollment :: MyData -> Handler String
+userEnrollment myData = return $ handleValidationServer (userEnrollmentValidation (value myData))
+
+userPassword :: MyData -> Handler String
+userPassword myData = return $ handleValidationServer (userPasswordValidation (value myData))
 
 users :: Handler [User]
 users = liftIO getUsers
