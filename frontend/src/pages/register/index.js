@@ -61,14 +61,21 @@ const User = () => {
   
     return (
       <Box component="form" onSubmit={handleSubmit} sx={{
-        width: '50%',
+        width: '35%',
         height: '70%',
         position: 'absolute',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
         display: 'flex',
+        alignItems: 'center', // Alinha os itens verticalmente ao centro
+        justifyContent: 'center', // Alinha os itens horizontalmente ao centro
         flexDirection: 'column',
+        backgroundColor: 'white', // Adiciona fundo branco
+        border: '1px solid rgba(0, 0, 0, 0.1)', // Adiciona uma borda com sombra
+        borderRadius: '8px', // Adiciona um arredondamento de borda
+        padding: '20px', // Adiciona um preenchimento interno
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Adiciona uma sombra
       }}>
         <TextField
           label="Nome"
@@ -76,7 +83,7 @@ const User = () => {
           value={user.userName}
           onChange={handleChange}
           fullWidth
-          sx={{ marginTop: "5%", marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+          sx={{ marginBottom: '4%', width: "80%" }} // Adicione a propriedade sx diretamente no TextField
         />
 
         <TextField
@@ -85,7 +92,7 @@ const User = () => {
           value={user.userUniversity}
           onChange={handleChange}
           fullWidth
-          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+          sx={{ marginBottom: '4%', width: "80%"}} // Adicione a propriedade sx diretamente no TextField
         />
 
         <TextField
@@ -94,7 +101,7 @@ const User = () => {
           value={user.userEmail}
           onChange={handleChange}
           fullWidth
-          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+          sx={{ marginBottom: '4%', width: "80%" }} // Adicione a propriedade sx diretamente no TextField
         />
         <Select
           label="Tipo de Usuário"
@@ -102,7 +109,7 @@ const User = () => {
           value={user.userType}
           onChange={handleChange}
           fullWidth
-          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no Select
+          sx={{ marginBottom: '4%', width: "80%" }} // Adicione a propriedade sx diretamente no Select
         >
           <MenuItem value="student">Aluno</MenuItem>
           <MenuItem value="professor">Professor</MenuItem>
@@ -114,7 +121,7 @@ const User = () => {
           value={user.userEnrollment}
           onChange={handleChange}
           fullWidth
-          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+          sx={{ marginBottom: '4%', width: "80%" }} // Adicione a propriedade sx diretamente no TextField
         />
         
         <TextField
@@ -123,9 +130,9 @@ const User = () => {
           value={user.userPassword}
           onChange={handleChange}
           fullWidth
-          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+          sx={{ marginBottom: '4%', width: "80%" }} // Adicione a propriedade sx diretamente no TextField
         />
-        <Button variant="contained" color="primary" type="submit" sx={{ width: "80%",  marginLeft: "10%" }}>Registrar</Button>
+        <Button variant="contained" color="primary" type="submit" sx={{ width: "80%" }}>Cadastrar</Button>
       </Box>
     );
 };
