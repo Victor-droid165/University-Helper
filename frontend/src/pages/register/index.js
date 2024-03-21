@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import Page from "../../components/Page"
+import Page from "../../components/Page";
+import { TextField, Box, Button, Select, MenuItem } from '@mui/material';
 
 function Register() {
     return (
@@ -10,18 +11,8 @@ function Register() {
 }
 
 const User = () => {
-    // const [form, setForm] = useState({
-    //  userType
-    //   email: '',
-    //   enrollment: '',
-    //   name: '',
-    //   password: '',
-    //   userType: '',
-    //   university: ''
-    // });
-  
-    const [user, setForm] = useState({
-        userType: '',
+    const [user, setUser] = useState({
+        userType: 'student',
         userName: '',
         userUniversity: '',
         userEnrollment: '',
@@ -30,7 +21,7 @@ const User = () => {
     }); 
 
     const handleChange = (e) => {
-      setForm({
+      setUser({
         ...user,
         [e.target.name]: e.target.value
       });
@@ -43,7 +34,6 @@ const User = () => {
       let validationErrors = {};
     
       for (let field in user) {
-
         fetch('http://localhost:8081/' + field, {
           method: 'POST',
           headers: {
@@ -54,7 +44,6 @@ const User = () => {
         })
         .then(response => response.json())
         .then(data => {
-          // only test, I'll need to put extra things to check what's being returned by the API
             validationErrors[field] = data.message;
             validationErrors[field] = "deu ruim, lascou";
             console.log(data.message);
@@ -69,38 +58,74 @@ const User = () => {
     };
   
     return (
-      <form onSubmit={handleSubmit}>
-        <label>
-          Tipo de Usuário:
-          <select name="userType" onChange={handleChange}>
-            <option value="professor">Professor</option>
-            <option value="student">Aluno</option>
-          </select>
-        </label>
-        <label>
-          Nome:
-          <input type="text" name="userName" onChange={handleChange} />
-        </label>
-        <label>
-          University:
-          <input type="text" name="userUniversity" onChange={handleChange} />
-        </label>
-        <label>
-          Email:
-          <input type="text" name="userEmail" onChange={handleChange} />
-          {errors.email && <p>{errors.email}</p>}
-        </label>
-        <label>
-          Matrícula:
-          <input type="text" name="userEnrollment" onChange={handleChange} />
-        </label>
-        <label>
-          Senha:
-          <input type="text" name="userPassword" onChange={handleChange} />
-        </label>
-        <button type="submit">Registrar</button>
-      </form>
+      <Box component="form" onSubmit={handleSubmit} sx={{
+        width: '50%',
+        height: '70%',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+        <TextField
+          label="Nome"
+          name="userName"
+          value={user.userName}
+          onChange={handleChange}
+          fullWidth
+          sx={{ marginTop: "5%", marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+        />
+
+        <TextField
+          label="University"
+          name="userUniversity"
+          value={user.userUniversity}
+          onChange={handleChange}
+          fullWidth
+          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+        />
+
+        <TextField
+          label="Email"
+          name="userEmail"
+          value={user.userEmail}
+          onChange={handleChange}
+          fullWidth
+          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+        />
+        <Select
+          label="Tipo de Usuário"
+          name="userType"
+          value={user.userType}
+          onChange={handleChange}
+          fullWidth
+          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no Select
+        >
+          <MenuItem value="student">Aluno</MenuItem>
+          <MenuItem value="professor">Professor</MenuItem>
+        </Select> 
+
+        <TextField
+          label="Matricula"
+          name="userEnrollment"
+          value={user.userEnrollment}
+          onChange={handleChange}
+          fullWidth
+          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+        />
+        
+        <TextField
+          label="Senha"
+          name="userPassword"
+          value={user.userPassword}
+          onChange={handleChange}
+          fullWidth
+          sx={{ marginBottom: '4%', width: "80%",  marginLeft: "10%" }} // Adicione a propriedade sx diretamente no TextField
+        />
+        <Button variant="contained" color="primary" type="submit" sx={{ width: "80%",  marginLeft: "10%" }}>Registrar</Button>
+      </Box>
     );
-  };
+};
 
 export default Register;
