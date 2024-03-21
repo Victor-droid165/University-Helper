@@ -7,6 +7,7 @@ module Util.Validate (
     userEnrollmentValidation,
     userUniversityValidation,
     belongsToList,
+    handleValidationServer,
     FormValidation(..),
     Validation(..),
     Error(..),

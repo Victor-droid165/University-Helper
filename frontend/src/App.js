@@ -10,39 +10,39 @@ function App() {
 
   // Criação de usuário 
 
-  const user = {
-    userType: "student",
-    userName: "João",
-    userUniversity: "ufcg",
-    userEnrollment: "1202210000",
-    userEmail: "joao@gmail.com",
-    userPassword: "12345678"
-  };
+  // const user = {
+  //   userType: "student",
+  //   userName: "João",
+  //   userUniversity: "ufcg",
+  //   userEnrollment: "1202210000",
+  //   userEmail: "joao@gmail.com",
+  //   userPassword: "12345678"
+  // };
 
-  fetch('http://localhost:8081/register', {
-    method: 'Post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(user),
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Success:', data);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
+  // fetch('http://localhost:8081/register', {
+  //   method: 'Post',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify(user),
+  // })
+  // .then(response => response.json())
+  // .then(data => {
+  //   console.log('Success:', data);
+  // })
+  // .catch((error) => {
+  //   console.error('Error:', error);
+  // });
 
-  // return (
-  //   <BrowserRouter>
-  //       <Routes>
-  //           <Route path="/" element={<Home />} />
-  //           <Route path="/login" element={<Login />} />
-  //           <Route path="/register" element={<Register />} />
-  //       </Routes>
-  //   </BrowserRouter>
-  // );
+  return (
+    <BrowserRouter>
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+        </Routes>
+    </BrowserRouter>
+  );
 
   // const [data, setData] = useState([]);
 

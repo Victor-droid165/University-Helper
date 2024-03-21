@@ -3,12 +3,13 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE DeriveAnyClass #-}
 
 module Util.Server (
   serveOn
 ) where
 
-import Models.User 
+import Models.User hiding (userEmail) 
 import GHC.Generics
 import Data.Aeson
 import Network.Wai
@@ -18,10 +19,15 @@ import Network.Wai.Middleware.Cors
 import Network.HTTP.Types (hContentType)
 import Controllers.Users.UserController (getUsers)
 import Control.Monad.IO.Class (liftIO)
+import Data.Aeson (encode, object, (.=))
+import Util.Validate (userNameValidation, handleValidationServer, userRegisterEmailValidation)
 
 
-type API = "users" :> Get '[JSON] [User]
+data MyData = MyData { value :: String} deriving (Generic, FromJSON)
+
+type API =    "users" :> Get '[JSON] [User]
               :<|> "register" :> ReqBody '[JSON] User :> Post '[JSON] NoContent
+              :<|> "userEmail" :> ReqBody '[JSON] MyData :> Post '[JSON] String
 
 instance ToJSON User
 instance FromJSON User
@@ -40,6 +46,10 @@ userAPI = Proxy
 superServer :: Server API
 superServer =   users
                 :<|> register
+                :<|> userEmail
+
+userEmail :: MyData -> Handler String
+userEmail myData = return $ handleValidationServer (userRegisterEmailValidation (value myData))
 
 users :: Handler [User]
 users = liftIO getUsers
