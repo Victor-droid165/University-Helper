@@ -23,6 +23,7 @@ import Control.Monad.IO.Class (liftIO)
 import Util.Validate (userNameValidation, handleValidationServer, userRegisterEmailValidation, userUniversityValidation, userEnrollmentValidation, userPasswordValidation, belongsToList)
 import Data.Maybe (mapMaybe)
 import Control.Monad (forM)
+import Util.ScreenCleaner (start)
 
 
 data MyData = MyData { value :: String} deriving (Generic, FromJSON)
@@ -104,4 +105,4 @@ register user | userType user == "student" = liftIO (writeUserOnFile "data/users
               | otherwise = return NoContent
 
 serveOn :: IO ()
-serveOn = run 8081 (app userAPI superServer)
+serveOn = start >> run 8081 (app userAPI superServer)

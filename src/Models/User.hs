@@ -82,6 +82,7 @@ verifyLoginIO :: String -> String -> IO Bool
 verifyLoginIO email password = do
   userL <- getUserList
   let user = getUserByEmail email userL
+  writeUserOnFile "data/session.txt" user
   return (userPassword user == password)
 
 removeUser :: String -> [User] -> [User]
