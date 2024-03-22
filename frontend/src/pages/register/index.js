@@ -12,6 +12,7 @@ function Register() {
 }
 
 const User = () => {
+
     const [user, setUser] = useState({
         userType: 'student',
         userName: '',
@@ -39,7 +40,7 @@ const User = () => {
       
     const handleSubmit = (e) => {
       e.preventDefault();
-    
+      
       for (let field in user) {
         if (field === "userType") continue;
 
@@ -53,22 +54,19 @@ const User = () => {
         })
         .then(response => response.json())
         .then((json) => {
+            console.log("aqui");
             console.log(json);
             setErrors(prevErrors => ({
               ...prevErrors,
               [field + 'Error']: (json === 'Success') ? '' : json,
             }))
+            if (json === 'Success') {
+              errors[field+'Error'] = '';
+            } else {
+              errors[field+'Error'] = json;
+            }
         });
       }
-
-      let register = true;
-      for (let errorCheck in errors) {
-        if (errors[errorCheck] !== '' || errors[errorCheck] !== 'Success') {
-          register = false;
-          break;
-        }
-      }
-
       
       fetch('http://localhost:8081/isRegistered', {
           method: 'Post',
@@ -79,7 +77,18 @@ const User = () => {
           })
           .then(response => response.json())
           .then((json) => {
-            if (json === 'Success' && register === true) {
+            var register = true
+            for (let errorCheck in errors) {
+              console.log(errors[errorCheck]);
+              
+              if (errors[errorCheck] !== '' && errors[errorCheck] !== 'Success') {
+                console.log(errorCheck)
+                register = false;
+                break;
+              } 
+            }
+            
+            if (json === 'Success' && register) {
 
               fetch('http://localhost:8081/register', {
                 method: 'Post',
@@ -88,6 +97,7 @@ const User = () => {
                 },
                   body: JSON.stringify(user),
                 })
+
                 .then(response => response.json())
                 .then(data => {
                   console.log('Success:', data);
@@ -104,14 +114,7 @@ const User = () => {
             
           })
 
-      setErrors ({
-        userNameError: '',
-        userUniversityError: '',
-        userEmailError: '',
-        userTypeError: 'Success',
-        userEnrollmentError: '',
-        userPasswordError: '',
-      });
+
     };
   
     return (
