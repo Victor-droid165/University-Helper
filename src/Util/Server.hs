@@ -9,7 +9,8 @@ module Util.Server (
   serveOn
 ) where
 
-import Models.User hiding (userPassword, userEnrollment, userUniversity, userName, userEmail) 
+import Models.User
+    ( User(userEmail, userType), writeUserOnFile, stringToUser )
 import GHC.Generics
 import Data.Aeson
 import Network.Wai
@@ -20,7 +21,10 @@ import Network.HTTP.Types (hContentType)
 import Controllers.Users.UserController (getUsers)
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson (encode, object, (.=))
-import Util.Validate (userNameValidation, handleValidationServer, userRegisterEmailValidation, userUniversityValidation, userEnrollmentValidation, userPasswordValidation)
+import Util.Validate (userNameValidation, handleValidationServer, userRegisterEmailValidation, userUniversityValidation, userEnrollmentValidation, userPasswordValidation, belongsToList)
+import Data.Maybe (mapMaybe)
+import Control.Monad (forM)
+import TerminalUI.Users.User (typeUserEmail)
 
 
 data MyData = MyData { value :: String} deriving (Generic, FromJSON)
@@ -32,6 +36,7 @@ type API =    "users" :> Get '[JSON] [User]
               :<|> "userEmail" :> ReqBody '[JSON] MyData :> Post '[JSON] String
               :<|> "userEnrollment" :> ReqBody '[JSON] MyData :> Post '[JSON] String
               :<|> "userPassword" :> ReqBody '[JSON] MyData :> Post '[JSON] String
+              :<|> "isRegistered" :> ReqBody '[JSON] MyData :> Post '[JSON] String
 
 instance ToJSON User
 instance FromJSON User
@@ -52,12 +57,29 @@ superServer =   users
                 :<|> register
                 :<|> userName
                 :<|> userUniversity
-                :<|> userEmail
+                :<|> userEmailVali
                 :<|> userEnrollment
                 :<|> userPassword
+                :<|> isRegistered
 
-userEmail :: MyData -> Handler String
-userEmail myData = return $ handleValidationServer (userRegisterEmailValidation (value myData))
+isRegistered :: MyData -> Handler String
+isRegistered email = do
+    result <- liftIO $ verify (value email)
+    if result == "Success" 
+        then return $ "Success"
+        else return $ "Failure"
+  where 
+    verify email = do
+        content1 <- readFile "data/users.txt"
+        content2 <- readFile "data/toValidate.txt"
+        let list = mapMaybe stringToUser (lines (content1 ++ content2))
+        validEmails <- forM list (\user -> return (userEmail user))
+        return $ handleValidationServer (belongsToList validEmails email)
+
+
+
+userEmailVali :: MyData -> Handler String
+userEmailVali myData = return $ handleValidationServer (userRegisterEmailValidation (value myData))
 
 userName :: MyData -> Handler String
 userName myData = return $ handleValidationServer (userNameValidation (value myData))
@@ -75,7 +97,9 @@ users :: Handler [User]
 users = liftIO getUsers
 
 register :: User -> Handler NoContent
-register user = liftIO (writeUserOnFile "data/users.txt" user) >> return NoContent
+register user | userType user == "student" = liftIO (writeUserOnFile "data/users.txt" user) >> return NoContent
+              | userType user == "teacher" = liftIO (writeUserOnFile "data/toValidate.txt" user) >> return NoContent
+              | otherwise = return NoContent
 
 serveOn :: IO ()
 serveOn = run 8081 (app userAPI superServer)

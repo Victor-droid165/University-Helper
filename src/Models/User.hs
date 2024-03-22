@@ -8,6 +8,7 @@ module Models.User
     displayUser,
     setType,
     removeUser,
+    
   )
 where
 

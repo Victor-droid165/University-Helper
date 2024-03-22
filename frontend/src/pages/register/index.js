@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom/client';
 import Page from "../../components/Page";
 import { TextField, Box, Button, Select, MenuItem } from '@mui/material';
 
@@ -68,32 +69,50 @@ const User = () => {
         }
       }
 
-      if (register === true) {
-          fetch('http://localhost:8081/register', {
+      
+      fetch('http://localhost:8081/isRegistered', {
           method: 'Post',
           headers: {
           'Content-Type': 'application/json',
           },
-            body: JSON.stringify(user),
+          body: JSON.stringify({ value: user.userEmail })
           })
           .then(response => response.json())
-          .then(data => {
-            console.log('Success:', data);
+          .then((json) => {
+            if (json === 'Success') {
+
+              fetch('http://localhost:8081/register', {
+                method: 'Post',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                  body: JSON.stringify(user),
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log('Success:', data);
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                });
+
+            } else {
+              register = false;
+              const Registered = () => {alert("Usuário já cadastrado no nosso sistema!\nFaça o login");}
+              const root = ReactDOM.createRoot(document.getElementById('root'));
+              root.render(<Registered />);
+            }
+            
           })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
 
-        setErrors ({
-          userNameError: '',
-          userUniversityError: '',
-          userEmailError: '',
-          userTypeError: 'Success',
-          userEnrollmentError: '',
-          userPasswordError: '',
-        });
-
-      }
+      setErrors ({
+        userNameError: '',
+        userUniversityError: '',
+        userEmailError: '',
+        userTypeError: 'Success',
+        userEnrollmentError: '',
+        userPasswordError: '',
+      });
     };
   
     return (
