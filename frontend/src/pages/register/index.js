@@ -54,8 +54,6 @@ const User = () => {
         })
         .then(response => response.json())
         .then((json) => {
-            console.log("aqui");
-            console.log(json);
             setErrors(prevErrors => ({
               ...prevErrors,
               [field + 'Error']: (json === 'Success') ? '' : json,

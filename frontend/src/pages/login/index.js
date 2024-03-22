@@ -11,52 +11,88 @@ function Login() {
 }
 
 const User = () => {
-    const [user, setUser] = useState({
-        userType: 'student',
-        userName: '',
-        userUniversity: '',
-        userEnrollment: '',
-        userEmail: '',
-        userPassword: ''
+    const [logInfo, setLog] = useState({
+        email: '',
+        password: '',
     }); 
 
+    const [errors, setErrors] = useState ({
+      emailError: '',
+      passwordError: '',
+    });
+
     const handleChange = (e) => {
-      setUser({
-        ...user,
+      setLog({
+        ...logInfo,
         [e.target.name]: e.target.value
       });
     };
     
-    const [errors, setErrors] = useState({});
   
     const handleSubmit = (e) => {
       e.preventDefault();
-      let validationErrors = {};
-    
-      for (let field in user) {
-        if (field === "userType") continue;
-        
-        fetch('http://localhost:8081/' + field, {
+
+        fetch('http://localhost:8081/userEmail', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ value: user[field] })
+          body: JSON.stringify({ value: logInfo.email })
           
         })
         .then(response => response.json())
-        .then(data => {
-            validationErrors[field] = data.message;
-            validationErrors[field] = "deu ruim, lascou";
-            console.log(data.message);
+        .then((json) => {
+            setErrors(prevErrors => ({
+              ...prevErrors,
+              emailError: (json === 'Success') ? '' : json,
+            }))
+            if (json === 'Success') {
+              errors.emailError = '';
+            } else {
+              errors.emailError = json;
+            }
+        });
+
+        fetch('http://localhost:8081/userPassword', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ value: logInfo.password })
+          
+        })
+        .then(response => response.json())
+        .then((json) => {
+            setErrors(prevErrors => ({
+              ...prevErrors,
+              passwordError: (json === 'Success') ? '' : json,
+            }))
+            if (json === 'Success') {
+              errors.passwordError = '';
+            } else {
+              errors.passwordError = json;
+            }
+        });
+        
+      if ((errors.emailError === '') && (errors.passwordError === '')) {
+      fetch('http://localhost:8081/userLogin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(logInfo)
+          
+        })
+        .then(response => response.json())
+        .then((json) => {
+            // ADD HERE WHAT'S GOING TO DO AFTER LOGIN
+            console.log(json);
         })
         .catch((error) => {
           console.error('Error:', error);
-          validationErrors[field] = "An error occurred while validating this field.";
         });
       }
     
-      setErrors(validationErrors);
     };
   
     return (
@@ -79,8 +115,12 @@ const User = () => {
       }}>
         <TextField
           label="Email"
-          name="userEmail"
-          value={user.userEmail}
+          name="email"
+          value={logInfo.email}
+          
+          error = {Boolean(errors.emailError)}
+          helperText = {errors.emailError}
+
           onChange={handleChange}
           fullWidth
           sx={{ marginBottom: '4%', width: "80%" }} // Adicione a propriedade sx diretamente no TextField
@@ -88,8 +128,12 @@ const User = () => {
         
         <TextField
           label="Senha"
-          name="userPassword"
-          value={user.userPassword}
+          name="password"
+          value={logInfo.password}
+
+          error = {Boolean(errors.passwordError)}
+          helperText = {errors.passwordError}
+
           onChange={handleChange}
           fullWidth
           sx={{ marginBottom: '4%', width: "80%"}} // Adicione a propriedade sx diretamente no TextField

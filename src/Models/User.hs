@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# OPTIONS_GHC -Wno-missing-fields #-}
 module Models.User
   ( User (..),
     authenticateUser,
@@ -8,7 +9,8 @@ module Models.User
     displayUser,
     setType,
     removeUser,
-    
+    getUserList,
+    verifyLoginIO,
   )
 where
 
@@ -65,6 +67,22 @@ displayUser user = do
   putStrLn $ userName user ++ " - " ++ userEnrollment user ++ " (" ++ userTypeToString user ++ ")"
   putStrLn $ userUniversity user
   putStrLn $ userEmail user
+
+getUserList :: IO [User]
+getUserList = do
+    contents <- readFile "data/users.txt"
+    return $ mapMaybe stringToUser (lines contents)
+
+getUserByEmail :: String -> [User] -> User
+getUserByEmail _ [] = User { userPassword = "" }
+getUserByEmail email (u:userList)    | email == userEmail u = u
+                              | otherwise = getUserByEmail email userList
+
+verifyLoginIO :: String -> String -> IO Bool
+verifyLoginIO email password = do
+  userL <- getUserList
+  let user = getUserByEmail email userL
+  return (userPassword user == password)
 
 removeUser :: String -> [User] -> [User]
 removeUser _ [] = []
