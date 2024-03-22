@@ -63,7 +63,7 @@ const User = () => {
 
       let register = true;
       for (let errorCheck in errors) {
-        if (errors[errorCheck] !== '' && errors[errorCheck] !== 'Success') {
+        if (errors[errorCheck] !== '' || errors[errorCheck] !== 'Success') {
           register = false;
           break;
         }
@@ -79,7 +79,7 @@ const User = () => {
           })
           .then(response => response.json())
           .then((json) => {
-            if (json === 'Success') {
+            if (json === 'Success' && register === true) {
 
               fetch('http://localhost:8081/register', {
                 method: 'Post',
@@ -96,8 +96,7 @@ const User = () => {
                   console.error('Error:', error);
                 });
 
-            } else {
-              register = false;
+            } else if (json === 'Failure') {
               const Registered = () => {alert("Usuário já cadastrado no nosso sistema!\nFaça o login");}
               const root = ReactDOM.createRoot(document.getElementById('root'));
               root.render(<Registered />);
