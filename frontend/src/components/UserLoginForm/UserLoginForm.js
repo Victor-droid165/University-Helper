@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Box, Button } from '@mui/material';
 
 const validateUser = async (userLoginInfo) => {
@@ -17,11 +17,10 @@ const validateUser = async (userLoginInfo) => {
             const errorData = await response.json();
             throw new Error(errorData.message);
         }
-
-        return null;
+        return response.json();
     });
 
-    return await Promise.all(validationPromises);;
+    return await Promise.all(validationPromises);
 }
 
 const UserLoginForm = () => {
@@ -34,6 +33,23 @@ const UserLoginForm = () => {
       emailError: '',
       passwordError: '',
     });
+
+    useEffect(() => {
+        if(errors.length == 0){
+            const response = fetch(`http://localhost:8081/userLogin`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(logInfo)
+            }).then(response => response.json()).then((json) => {
+                console.log(json);
+            }).catch((error) => {
+                console.error('Error: ', error);
+            });
+        }
+        console.log(errors)
+    },[errors])
 
     const handleChange = (e) => {
         setLog({
@@ -49,12 +65,11 @@ const UserLoginForm = () => {
         try {
             const validationResults = await validateUser(logInfo);
             const validationErrors = validationResults.reduce((errors, error, index) => {
-                if (error) {
+                if (error.startsWith('Erro')) {
                     errors[Object.keys(logInfo)[index]] = error;
                 }
                 return errors;
             }, {});
-
             setErrors(validationErrors);
         } catch (error) {
             console.error('Erro:', error);
@@ -67,6 +82,9 @@ const UserLoginForm = () => {
         label="Email"
         name="userEmail"
         value={logInfo.userEmail}
+        
+        error = {Boolean(errors.userEmail)}
+        helperText = {errors.userEmail}
         onChange={handleChange}
         fullWidth
         sx={styles.textField}
@@ -76,6 +94,8 @@ const UserLoginForm = () => {
         label="Senha"
         name="userPassword"
         value={logInfo.userPassword}
+        error = {Boolean(errors.userPassword)}
+        helperText = {errors.userPassword}
         onChange={handleChange}
         fullWidth
         sx={styles.textField}
