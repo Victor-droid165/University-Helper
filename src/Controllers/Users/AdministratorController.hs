@@ -76,8 +76,7 @@ swapUser old new (u:userL)  | old == u = new : swapUser old new userL
 validateUser :: IO ()
 validateUser = do
     screenCleaner
-    content <- readFile "data/toValidate.txt"
-    let userList = mapMaybe stringToUser (lines content)
+    userList <- getUserList
     mapM_ displayUser userList
     putStrLn "Digite a matrícula do usuário que deseja validar: "
     enroll <- getLine

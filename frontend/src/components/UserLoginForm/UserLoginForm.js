@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { TextField, Box, Button } from '@mui/material';
 
-const validateUser = async (user) => {
-    const validationPromises = Object.keys(user).map(async (field) => {
+const validateUser = async (userLoginInfo) => {
+    const validationPromises = Object.keys(userLoginInfo).map(async (field) => {
         if (field === "userType") return null;
 
         const response = await fetch(`http://localhost:8081/${field}`, {
@@ -10,7 +10,7 @@ const validateUser = async (user) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ value: user[field] })
+            body: JSON.stringify({ value: userLoginInfo[field] })
         });
 
         if (!response.ok) {
@@ -25,33 +25,32 @@ const validateUser = async (user) => {
 }
 
 const UserLoginForm = () => {
-    const [user, setUser] = useState({
-        userType: 'student',
-        userName: '',
-        userUniversity: '',
-        userEnrollment: '',
+    const [logInfo, setLog] = useState({
         userEmail: '',
-        userPassword: ''
+        userPassword: '',
+    }); 
+    
+    const [errors, setErrors] = useState ({
+      emailError: '',
+      passwordError: '',
     });
 
-    const [errors, setErrors] = useState({});
-
     const handleChange = (e) => {
-        setUser({
-            ...user,
-            [e.target.name]: e.target.value
+        setLog({
+          ...logInfo,
+          [e.target.name]: e.target.value
         });
-    };
+      };
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const validationResults = await validateUser(user);
+            const validationResults = await validateUser(logInfo);
             const validationErrors = validationResults.reduce((errors, error, index) => {
                 if (error) {
-                    errors[Object.keys(user)[index]] = error;
+                    errors[Object.keys(logInfo)[index]] = error;
                 }
                 return errors;
             }, {});
@@ -67,7 +66,7 @@ const UserLoginForm = () => {
       <TextField
         label="Email"
         name="userEmail"
-        value={user.userEmail}
+        value={logInfo.userEmail}
         onChange={handleChange}
         fullWidth
         sx={styles.textField}
@@ -76,7 +75,7 @@ const UserLoginForm = () => {
       <TextField
         label="Senha"
         name="userPassword"
-        value={user.userPassword}
+        value={logInfo.userPassword}
         onChange={handleChange}
         fullWidth
         sx={styles.textField}

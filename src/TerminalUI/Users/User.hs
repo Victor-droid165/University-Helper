@@ -11,7 +11,7 @@ module TerminalUI.Users.User
     ) where
 
 import Util.ScreenCleaner ( screenCleaner )
-import Util.Validate (userNameValidation, userRegisterEmailValidation, userLoginEmailValidation, Validation(..), userPasswordValidation, userEnrollmentValidation, userUniversityValidation, belongsToList)
+import Util.Validate (userNameValidation, userRegisterEmailValidation, userLoginEmailValidation, userPasswordValidation, userEnrollmentValidation, userUniversityValidation, belongsToList)
 import Control.Monad (forM)
 import Models.User (User(..), stringToUser)
 import Data.Maybe (mapMaybe)

@@ -9,14 +9,14 @@ function Register() {
 }
 
 const User = () => {
-  const [user, setUser] = useState({
-    userType: 'student',
-    userName: '',
-    userUniversity: '',
-    userEnrollment: '',
-    userEmail: '',
-    userPassword: '',
-  });
+    const [user, setUser] = useState({
+        userType: 'student',
+        userName: '',
+        userUniversity: '',
+        userEnrollment: '',
+        userEmail: '',
+        userPassword: '',
+    });
 
   const [errors, setErrors] = useState({
     userNameError: '',
@@ -27,18 +27,18 @@ const User = () => {
     userPasswordError: '',
   });
 
-  const handleChange = (e) => {
-    setUser({
-      ...user,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    for (let field in user) {
-      if (field === "userType") continue;
+    const handleChange = (e) => {
+      setUser({
+        ...user,
+        [e.target.name]: e.target.value
+      });
+    };
+      
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      
+      for (let field in user) {
+        if (field === "userType") continue;
 
       fetch('http://localhost:8081/' + field, {
         method: 'POST',
@@ -50,48 +50,55 @@ const User = () => {
       })
         .then(response => response.json())
         .then((json) => {
-          console.log(json);
-          setErrors(prevErrors => ({
-            ...prevErrors,
-            [field + 'Error']: (json === 'Success') ? '' : json,
-          }))
+            setErrors(prevErrors => ({
+              ...prevErrors,
+              [field + 'Error']: (json === 'Success') ? '' : json,
+            }))
+            if (json === 'Success') {
+              errors[field+'Error'] = '';
+            } else {
+              errors[field+'Error'] = json;
+            }
         });
-    }
-
-    let register = true;
-    for (let errorCheck in errors) {
-      if (errors[errorCheck] !== '' || errors[errorCheck] !== 'Success') {
-        register = false;
-        break;
       }
-    }
-
-
-    fetch('http://localhost:8081/isRegistered', {
-      method: 'Post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ value: user.userEmail })
-    })
-      .then(response => response.json())
-      .then((json) => {
-        if (json === 'Success' && register === true) {
-
-          fetch('http://localhost:8081/register', {
-            method: 'Post',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user),
+      
+      fetch('http://localhost:8081/isRegistered', {
+          method: 'Post',
+          headers: {
+          'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ value: user.userEmail })
           })
-            .then(response => response.json())
-            .then(data => {
-              console.log('Success:', data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
+          .then(response => response.json())
+          .then((json) => {
+            var register = true
+            for (let errorCheck in errors) {
+              console.log(errors[errorCheck]);
+              
+              if (errors[errorCheck] !== '' && errors[errorCheck] !== 'Success') {
+                console.log(errorCheck)
+                register = false;
+                break;
+              } 
+            }
+            
+            if (json === 'Success' && register) {
+
+              fetch('http://localhost:8081/register', {
+                method: 'Post',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                  body: JSON.stringify(user),
+                })
+
+                .then(response => response.json())
+                .then(data => {
+                  console.log('Success:', data);
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                });
 
         } else if (json === 'Failure') {
           const Registered = () => { alert("Usuário já cadastrado no nosso sistema!\nFaça o login"); }
@@ -101,37 +108,30 @@ const User = () => {
 
       })
 
-    setErrors({
-      userNameError: '',
-      userUniversityError: '',
-      userEmailError: '',
-      userTypeError: 'Success',
-      userEnrollmentError: '',
-      userPasswordError: '',
-    });
-  };
 
-  return (
-    <Box component="form" onSubmit={handleSubmit} sx={{
-      width: '35%',
-      height: '70%',
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      display: 'flex',
-      alignItems: 'center', // Alinha os itens verticalmente ao centro
-      justifyContent: 'center', // Alinha os itens horizontalmente ao centro
-      flexDirection: 'column',
-      backgroundColor: 'white', // Adiciona fundo branco
-      border: '1px solid rgba(0, 0, 0, 0.1)', // Adiciona uma borda com sombra
-      borderRadius: '8px', // Adiciona um arredondamento de borda
-      padding: '20px', // Adiciona um preenchimento interno
-      boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Adiciona uma sombra
-    }}>
-      <TextField
-        label="Nome"
-        name="userName"
+    };
+  
+    return (
+      <Box component="form" onSubmit={handleSubmit} sx={{
+        width: '35%',
+        height: '70%',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        display: 'flex',
+        alignItems: 'center', // Alinha os itens verticalmente ao centro
+        justifyContent: 'center', // Alinha os itens horizontalmente ao centro
+        flexDirection: 'column',
+        backgroundColor: 'white', // Adiciona fundo branco
+        border: '1px solid rgba(0, 0, 0, 0.1)', // Adiciona uma borda com sombra
+        borderRadius: '8px', // Adiciona um arredondamento de borda
+        padding: '20px', // Adiciona um preenchimento interno
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Adiciona uma sombra
+      }}>
+        <TextField
+          label="Nome"
+          name="userName"
 
         error={Boolean(errors.userNameError)}
         helperText={errors.userNameError}

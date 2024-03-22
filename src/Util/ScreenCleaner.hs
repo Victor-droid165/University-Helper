@@ -2,6 +2,8 @@ module Util.ScreenCleaner
   ( screenCleaner,
     quitIO,
     forceQuit,
+    quitOpt,
+    start,
   )
 where
 
@@ -39,3 +41,8 @@ quitOpt _ "sim" = do
 quitOpt func _ = do
   screenCleaner
   func
+
+start :: IO ()
+start = do
+  screenCleaner
+  writeFile "data/session.txt" ""
