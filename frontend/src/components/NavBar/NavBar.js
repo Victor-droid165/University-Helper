@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import styles from "./style.module.css";
+import styles from "./NavBar.module.css";
 import Logo from "../../assets/logo.png";
 
 const NavBar = ({ data }) => {
@@ -11,10 +11,10 @@ const NavBar = ({ data }) => {
       </Link>
       <nav className={styles.header}>
         <ul className={styles.tabs}>
-          {data.map((item, index) => (
+          {data.map(({name, link}, index) => (
             <li key={index} className={styles.tab}>
-              <Link to={item.link} className={styles.customLink}>
-                {item.name}
+              <Link to={link} className={styles.customLink}>
+                {name}
               </Link>
             </li>
           ))}

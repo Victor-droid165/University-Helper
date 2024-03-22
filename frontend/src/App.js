@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import Home from "./pages/home/index.js";
-import Login from "./pages/login/index.js";
-import Register from "./pages/register/index.js";
+import React from 'react';
 import './App.css';
 
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import CustomRoutes from './Routes.js';
 
 function App() {
 
@@ -35,13 +32,7 @@ function App() {
   // });
 
   return (
-    <BrowserRouter>
-        <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-        </Routes>
-    </BrowserRouter>
+    <CustomRoutes />
   );
 
   // const [data, setData] = useState([]);
