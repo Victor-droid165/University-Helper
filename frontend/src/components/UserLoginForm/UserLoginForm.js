@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Box, Button } from '@mui/material';
 
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 const validateUser = async (userLoginInfo) => {
     const validationPromises = Object.keys(userLoginInfo).map(async (field) => {
         if (field === "userType") return null;
+        const routeField = "user" + capitalize(field);
 
-        const response = await fetch(`http://localhost:8081/${field}`, {
+        const response = await fetch(`http://localhost:8081/${routeField}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -25,8 +30,8 @@ const validateUser = async (userLoginInfo) => {
 
 const UserLoginForm = () => {
     const [logInfo, setLog] = useState({
-        userEmail: '',
-        userPassword: '',
+        email: '',
+        password: '',
     }); 
     
     const [errors, setErrors] = useState ({
@@ -35,7 +40,8 @@ const UserLoginForm = () => {
     });
 
     useEffect(() => {
-        if(errors.length == 0){
+        if(Object.keys(errors).length === 0){
+            console.log(JSON.stringify(logInfo))
             const response = fetch(`http://localhost:8081/userLogin`, {
                 method: 'POST',
                 headers: {
@@ -48,7 +54,6 @@ const UserLoginForm = () => {
                 console.error('Error: ', error);
             });
         }
-        console.log(errors)
     },[errors])
 
     const handleChange = (e) => {
@@ -80,11 +85,11 @@ const UserLoginForm = () => {
         <Box component="form" onSubmit={handleSubmit} sx={styles.form}>
       <TextField
         label="Email"
-        name="userEmail"
-        value={logInfo.userEmail}
+        name="email"
+        value={logInfo.email}
         
-        error = {Boolean(errors.userEmail)}
-        helperText = {errors.userEmail}
+        error = {Boolean(errors.email)}
+        helperText = {errors.email}
         onChange={handleChange}
         fullWidth
         sx={styles.textField}
@@ -92,10 +97,10 @@ const UserLoginForm = () => {
 
       <TextField
         label="Senha"
-        name="userPassword"
-        value={logInfo.userPassword}
-        error = {Boolean(errors.userPassword)}
-        helperText = {errors.userPassword}
+        name="password"
+        value={logInfo.password}
+        error = {Boolean(errors.password)}
+        helperText = {errors.password}
         onChange={handleChange}
         fullWidth
         sx={styles.textField}
