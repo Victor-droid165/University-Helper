@@ -74,7 +74,13 @@ getUserList = do
     return $ mapMaybe stringToUser (lines contents)
 
 getUserByEmail :: String -> [User] -> User
-getUserByEmail _ [] = User { userPassword = "" }
+getUserByEmail email [] = User  { userType = "",
+    userName = "",
+    userUniversity = "",
+    userEnrollment = "",
+    userEmail = "",
+    userPassword = ""
+  }
 getUserByEmail email (u:userList)    | email == userEmail u = u
                               | otherwise = getUserByEmail email userList
 
@@ -82,8 +88,10 @@ verifyLoginIO :: String -> String -> IO Bool
 verifyLoginIO email password = do
   userL <- getUserList
   let user = getUserByEmail email userL
-  writeUserOnFile "data/session.txt" user
-  return (userPassword user == password)
+  if userPassword user == password
+    then writeUserOnFile "data/session.txt" user >> return True
+  else
+    return False
 
 removeUser :: String -> [User] -> [User]
 removeUser _ [] = []

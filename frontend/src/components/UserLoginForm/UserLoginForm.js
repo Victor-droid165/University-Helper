@@ -10,7 +10,7 @@ function capitalize(str) {
 
 const validateUser = async (userLoginInfo) => {
     const validationPromises = Object.keys(userLoginInfo).map(async (field) => {
-        if (field === "userType") return null;
+
         const routeField = "user" + capitalize(field);
 
         const response = await fetch(`http://localhost:8081/${routeField}`, {
@@ -48,11 +48,12 @@ const UserLoginForm = () => {
             const response = fetch(`http://localhost:8081/userLogin`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(logInfo)
             }).then(response => response.json()).then((json) => {
                 console.log(json);
+
             }).catch((error) => {
                 console.error('Error: ', error);
             });
