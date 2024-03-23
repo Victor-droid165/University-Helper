@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Box, Button } from '@mui/material';
+import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -29,11 +32,11 @@ const validateUser = async (userLoginInfo) => {
 }
 
 const UserLoginForm = () => {
-    const [logInfo, setLog] = useState({
+    const [logInfo, setLogInfo] = useState({
         email: '',
         password: '',
-    }); 
-    
+    });
+
     const [errors, setErrors] = useState ({
       emailError: '',
       passwordError: '',
@@ -57,12 +60,11 @@ const UserLoginForm = () => {
     },[errors])
 
     const handleChange = (e) => {
-        setLog({
+        setLogInfo({
           ...logInfo,
           [e.target.name]: e.target.value
         });
-      };
-
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -71,7 +73,7 @@ const UserLoginForm = () => {
             const validationResults = await validateUser(logInfo);
             const validationErrors = validationResults.reduce((errors, error, index) => {
                 if (error.startsWith('Erro')) {
-                    errors[Object.keys(logInfo)[index]] = error;
+                    errors[Object.keys(logInfo)[index] + 'Error'] = error;
                 }
                 return errors;
             }, {});
@@ -81,62 +83,104 @@ const UserLoginForm = () => {
         }
     };
 
-    return (
-        <Box component="form" onSubmit={handleSubmit} sx={styles.form}>
-      <TextField
-        label="Email"
-        name="email"
-        value={logInfo.email}
-        
-        error = {Boolean(errors.email)}
-        helperText = {errors.email}
-        onChange={handleChange}
-        fullWidth
-        sx={styles.textField}
-      />
+    const styles = {
+        form: {
+            width: 'auto',
+            height: 'auto',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            backgroundColor: 'white',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px',
+            padding: '20px',
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+        },
+        textField: {
+            mt: 1,
+            mb: 1,
+        },
+        button: {
+            mt: 3,
+            mb: 2,
+        },
+    };
 
-      <TextField
-        label="Senha"
-        name="password"
-        value={logInfo.password}
-        error = {Boolean(errors.password)}
-        helperText = {errors.password}
-        onChange={handleChange}
-        fullWidth
-        sx={styles.textField}
-      />
-      <Button variant="contained" color="primary" type="submit" sx={styles.button}>Entrar</Button>
-    </Box>
+    return (
+        <Box sx={styles.form}>
+            <ThemeProvider theme={createTheme()}>
+                <Container component="main" maxWidth="xs">
+                    <CssBaseline />
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                            <LockOutlinedIcon />
+                        </Avatar>
+                        <Typography component="h1" variant="h5">
+                            Sign in
+                        </Typography>
+                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email Address"
+                                name="email"
+                                autoComplete="email"
+                                autoFocus
+                                sx={styles.textField}
+                                value={logInfo.email}
+                                onChange={handleChange}
+                                error={Boolean(errors.emailError)}
+                                helperText={errors.emailError}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                label="Password"
+                                type="password"
+                                id="password"
+                                autoComplete="current-password"
+                                sx={styles.textField}
+                                value={logInfo.password}
+                                onChange={handleChange}
+                                error={Boolean(errors.passwordError)}
+                                helperText={errors.passwordError}
+                            />
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ ...styles.button, mt: 3, mb: 2 }}
+                            >
+                                Sign In
+                            </Button>
+                            <Grid container justifyContent="flex-end">
+                                <Grid item>
+                                    <Link href="/register" variant="body2">
+                                        Don't have an account? Sign Up
+                                    </Link>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Box>
+                </Container>
+            </ThemeProvider>
+        </Box>
     );
 };
 
-const styles = {
-    form: {
-        width: '30%',
-        height: '35%',
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        backgroundColor: 'white',
-        border: '1px solid rgba(0, 0, 0, 0.1)',
-        borderRadius: '8px',
-        padding: '20px',
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-    },
-    textField: {
-        marginBottom: '4%',
-        width: '80%',
-    },
-    button: {
-        width: '80%',
-    },
-};
-
 export default UserLoginForm;
-
-
