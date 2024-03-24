@@ -9,6 +9,7 @@ module Util.Database.DBFunctions
     selectFromTableWhereAppDB,
     selectAllFromTableAppDB,
     selectAllFromTableWhereAppDB,
+    selectAllFromUsersWhereAppDB,
   )
 where
 
@@ -50,7 +51,7 @@ loadYamlFile filePath = do
 loadDBConfig :: IO DBConfig
 loadDBConfig = do
   currentDir <- getCurrentDirectory
-  maybeDbConfig <- loadYamlFile ( "" </> "backend" </> "database" </> "config.yaml")
+  maybeDbConfig <- loadYamlFile ("" </> "backend" </> "database" </> "config.yaml")
   case maybeDbConfig of
     Just dbConfig' -> return dbConfig'
     Nothing -> error "Failed to load database configuration"
@@ -155,6 +156,9 @@ selectFromTableAppDB tableName columns = do
 
 selectAllFromTableWhereAppDB :: (FromRow a, ToField b) => String -> [(String, String, b)] -> IO [a]
 selectAllFromTableWhereAppDB tableName = selectFromTableWhereAppDB tableName ["*"]
+
+selectAllFromUsersWhereAppDB :: (FromRow a, ToField b) => [(String, String, b)] -> IO [a]
+selectAllFromUsersWhereAppDB = selectFromTableWhereAppDB "users" ["*"]
 
 selectFromTableWhereAppDB :: (FromRow a, ToField b) => String -> [String] -> [(String, String, b)] -> IO [a]
 selectFromTableWhereAppDB tableName columns conditions = do
