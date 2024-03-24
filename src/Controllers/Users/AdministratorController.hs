@@ -1,5 +1,7 @@
 module Controllers.Users.AdministratorController
-    ( administratorOptions
+    (   administratorOptions,
+        validateUserAPI,
+        unvalidateUserAPI,
     ) where
 
 import Models.User
@@ -93,6 +95,26 @@ validateUser = do
     displayUser placeHolderUser
     administratorOptions
 
+validateUserAPI :: String -> IO ()
+validateUserAPI enrollment = do
+    contents <- readFile "data/toValidate.txt"
+    let validateList = mapMaybe stringToUser (lines contents)
+    
+    let placeHolderUser = getUser enrollment validateList
+    let newValidateList = removeUser enrollment validateList
+
+    removeFile "data/toValidate.txt" 
+    mapM_ (writeUserOnFile "data/toValidate.txt") newValidateList
+    writeUserOnFile "data/users.txt" placeHolderUser
+
+unvalidateUserAPI :: String -> IO ()
+unvalidateUserAPI enrollment = do 
+    contents <- readFile "data/toValidate.txt"
+    let validateList = mapMaybe stringToUser (lines contents)    
+    let newValidateList = removeUser enrollment validateList
+
+    removeFile "data/toValidate.txt" 
+    mapM_ (writeUserOnFile "data/toValidate.txt") newValidateList
 
 getUser :: String -> [User] -> User
 getUser _ [] = User {}

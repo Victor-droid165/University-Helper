@@ -1,7 +1,8 @@
 module Controllers.Users.UserController
   ( userRegister,
     userLogin,
-    getUsers
+    getUsers,
+    getUser
   )
 where
 
