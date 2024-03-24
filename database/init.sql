@@ -1,3 +1,5 @@
+SET search_path TO "uh_schema";
+
 -- Create the users table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
