@@ -37,7 +37,7 @@ quitOpt :: IO () -> String -> IO ()
 quitOpt _ "sim" = do
   screenCleaner
   putStrLn "Obrigado por utilizar o University Helper! Ate a proxima!"
-  writeFile "data/session.txt" ""
+  writeFile "backend/data/session.txt" ""
 quitOpt func _ = do
   screenCleaner
   func
@@ -45,4 +45,4 @@ quitOpt func _ = do
 start :: IO ()
 start = do
   screenCleaner
-  writeFile "data/session.txt" ""
+  writeFile "backend/data/session.txt" ""

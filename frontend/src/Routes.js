@@ -1,21 +1,24 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 import AppPageLayout from './layouts/AppPageLayout/AppPageLayout';
 import HomePage from './pages/home';
-import RegisterPage from './pages/register';
+import RegisterPage, { registerAction } from './pages/register';
 import LoginPage from './pages/login';
+import { loginAction, logoutAction } from './components/UserLoginForm/UserLoginForm';
 
-const CustomRoutes = () => (
-  <Router>
-    <AppPageLayout>
-      <Routes>
-        <Route index path="/" element={<HomePage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
-    </AppPageLayout>
-  </Router>
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path='/' element={<AppPageLayout />}>
+      <Route index element={<HomePage />} />
+      <Route path="home" element={<HomePage />} />
+      <Route path="register" element={<RegisterPage />} action={registerAction}/>
+      <Route path="login" element={<LoginPage />} action={loginAction}/>
+      <Route path="logout" action={logoutAction}/>
+
+      {/*<Route path='protected' element={<RequireAuthh> <ProtectedComponent></ProtectedComponent></RequireAuth>}/>*/}
+      {/*<Route path='*' element={<NotFoundPage />}/>*/}
+    </Route>
+  )
 );
 
-export default CustomRoutes;
+export default router;

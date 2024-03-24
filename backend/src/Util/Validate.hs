@@ -1,20 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Util.Validate (
     userNameValidation,
-    userRegisterEmailValidation,
-    userLoginEmailValidation,
+    userEmailValidation,
     userPasswordValidation,
     userEnrollmentValidation,
     userUniversityValidation,
     belongsToList,
     handleValidationServer,
-    FormValidation(..),
     Validation(..),
     Error(..),
-    handleValidation
+    handleValidation,
+    FormValidation(..),
 ) where
 import Data.Char (isAlpha, isSpace)
-import Text.Email.Validate 
+import Text.Email.Validate
 import qualified Data.ByteString.Char8 as B
 import Util.ScreenCleaner (screenCleaner)
 
@@ -42,22 +41,19 @@ validateAll validations str = foldl aggregate (Success str) validations
 
 -- select what'll validate for each type
 userNameValidation :: String -> FormValidation String
-userNameValidation name = validateAll [notEmpty, notNum] name
+userNameValidation = validateAll [notEmpty, notNum]
 
-userRegisterEmailValidation :: String -> FormValidation String
-userRegisterEmailValidation email = validateAll [notEmpty, validateEmail, validateAdminEmail] email
-
-userLoginEmailValidation :: String -> FormValidation String
-userLoginEmailValidation email = validateAll [notEmpty, validateEmail] email
+userEmailValidation :: String -> FormValidation String
+userEmailValidation = validateAll [notEmpty, validateEmail]
 
 userPasswordValidation :: String -> FormValidation String
-userPasswordValidation password = validateAll [minLength, notEmpty] password
+userPasswordValidation = validateAll [minLength, notEmpty]
 
 userEnrollmentValidation :: String -> FormValidation String
-userEnrollmentValidation enroll = validateAll [enrollSize, enrollValidation] enroll
+userEnrollmentValidation = validateAll [enrollSize, enrollValidation]
 
 userUniversityValidation :: String -> FormValidation String
-userUniversityValidation university = validateAll [notEmpty, notNum] university
+userUniversityValidation = validateAll [notEmpty, notNum]
 
 -- validate functions
 notEmpty :: String -> FormValidation String
@@ -70,7 +66,7 @@ notNum str
     | otherwise = Failure [NotString]
 
 isChar :: [Char] -> Bool
-isChar str = all (\c -> isAlpha c || isSpace c) str
+isChar = all (\c -> isAlpha c || isSpace c)
 
 validateAdminEmail :: String -> FormValidation String
 validateAdminEmail email  | email == "everton@admin.ufcg.edu.br" = Failure [NotAValidEmail]
@@ -85,7 +81,7 @@ enrollSize enroll   | length enroll == 10 = Success enroll
                     | otherwise = Failure [NotAValidEnroll]
 
 enrollValidation :: String -> FormValidation String
-enrollValidation enroll  | head enroll == '1' && (enrollValidation2 (tail enroll))  = Success enroll
+enrollValidation enroll  | head enroll == '1' && enrollValidation2 (tail enroll)  = Success enroll
                          | otherwise = Failure [NotAValidEnroll]
 
 enrollValidation2 :: String -> Bool
@@ -100,10 +96,10 @@ enrollValidation3 enroll  | head enroll == '1' && enrollValidation4 (tail enroll
 enrollValidation4 :: String -> Bool
 enrollValidation4 enroll  | length enroll == 4 = True
                           | otherwise = False
-              
+
 
 validateEmail :: String -> FormValidation String
-validateEmail email | not  (isValid (B.pack email)) = Failure[NotAValidEmail]
+validateEmail email | not  (isValid (B.pack email)) = Failure [NotAValidEmail]
                     | otherwise = Success email
 
 belongsToList :: [String] -> String -> FormValidation String
@@ -111,7 +107,7 @@ belongsToList list element  | element `elem` list =  Failure [AlreadyRegistered]
                             | otherwise = Success element
 
 stringToInt :: String -> Int
-stringToInt str = read str
+stringToInt = read
 
 -- validation handlers
 

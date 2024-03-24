@@ -17,7 +17,7 @@ where
 import System.IO ( stdout, hFlush )
 import Text.Read (readMaybe)
 import Util.ScreenCleaner (screenCleaner)
-import Util.Validate ( FormValidation, Validation(Failure) )
+import Util.Validate (FormValidation, Validation(..))
 
 getInput :: Maybe String -> IO String
 getInput maybePrompt = do

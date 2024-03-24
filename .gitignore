@@ -1,6 +1,5 @@
 .stack-work/
 .stack-work.yaml
-stack.yaml.lock
 /dist/
 /.hpc/
 /.ghc.environment.*.yaml

@@ -28,7 +28,7 @@ import Util.Constants
     userNameInputPrompts,
   )
 import Util.ScreenCleaner (screenCleaner)
-import Util.Validate (belongsToList, userEnrollmentValidation, userLoginEmailValidation, userNameValidation, userPasswordValidation, userRegisterEmailValidation, userUniversityValidation)
+import Util.Validate (belongsToList, userEmailValidation, userEnrollmentValidation, userNameValidation, userPasswordValidation, userUniversityValidation)
 
 typeUserName :: String -> IO String
 typeUserName textToShow = getValidInput (Just textToShow) userNameValidation
@@ -40,14 +40,14 @@ typeEnrollment :: String -> IO String
 typeEnrollment textToShow = getValidInput (Just textToShow) userEnrollmentValidation
 
 typeUserEmail :: String -> String -> IO String
-typeUserEmail textToShow "login" = getValidInput (Just textToShow) userLoginEmailValidation
+typeUserEmail textToShow "login" = getValidInput (Just textToShow) userEmailValidation
 typeUserEmail textToShow "register" = do
   email <- getInput (Just textToShow)
-  handleValidation (userRegisterEmailValidation email) (continue email) (typeUserEmail textToShow "register")
+  handleValidation (userEmailValidation email) (continue email) (typeUserEmail textToShow "register")
   where
     continue email = do
-      content1 <- readFile "data/users.txt"
-      content2 <- readFile "data/toValidate.txt"
+      content1 <- readFile "backend/data/users.txt"
+      content2 <- readFile "backend/data/toValidate.txt"
       let usersList = [stringToUser line | line <- lines (content1 ++ content2)]
           validEmails = [userEmail user | user <- catMaybes usersList]
       handleValidation (belongsToList validEmails email) (return email) (typeUserEmail textToShow "register")

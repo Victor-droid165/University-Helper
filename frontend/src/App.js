@@ -1,7 +1,9 @@
 import React from 'react';
 import './App.css';
 
-import CustomRoutes from './Routes.js';
+import router from './Routes.js';
+import { RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './auth.js';
 
 function App() {
 
@@ -32,7 +34,9 @@ function App() {
   // });
 
   return (
-    <CustomRoutes />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 
   // const [data, setData] = useState([]);
@@ -50,7 +54,7 @@ function App() {
   //       console.error('Error fetching data:', error);
   //       setData([]);
   //   };
-    
+
   //   };
 
   //   fetchData();

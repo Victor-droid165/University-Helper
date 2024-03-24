@@ -3,22 +3,25 @@ import { Avatar, Button, CssBaseline, TextField, Link, Grid, Box, Typography, Co
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
+import { Form, useActionData, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth';
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-const validateUser = async (userLoginInfo) => {
-    const validationPromises = Object.keys(userLoginInfo).map(async (field) => {
+export const validateUser = async (userInfo) => {
+    const validationPromises = Object.keys(userInfo).map(async (field) => {
+        if(field === 'type') return;
 
-        const routeField = "user" + capitalize(field);
+        const routeField = "api/users/validate" + capitalize(field);
 
         const response = await fetch(`http://localhost:8081/${routeField}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ value: userLoginInfo[field] })
+            body: JSON.stringify({ value: userInfo[field] })
         });
 
         if (!response.ok) {
@@ -37,12 +40,22 @@ const UserLoginForm = () => {
         password: '',
     });
 
-    const [errors, setErrors] = useState ({
-      emailError: '',
-      passwordError: '',
+    const [errors, setErrors] = useState({
+        emailError: '',
+        passwordError: '',
     });
 
     const [alerts, setAlerts] = useState([]);
+    const data = useActionData();
+    const auth = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const redirectPath = location.state?.path || '/';
+
+    useEffect(() => {
+        setErrors(errors);
+    }, [errors]);
 
     useEffect(() => {
         if (alerts.length > 0) {
@@ -60,40 +73,28 @@ const UserLoginForm = () => {
 
     const handleChange = (e) => {
         setLogInfo({
-          ...logInfo,
-          [e.target.name]: e.target.value
+            ...logInfo,
+            [e.target.name]: e.target.value
         });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-    
-        try {
-            const validationResults = await validateUser(logInfo);
-            const validationErrors = validationResults.reduce((errors, error, index) => {
-                if (error.startsWith('Erro')) {
-                    errors[Object.keys(logInfo)[index] + 'Error'] = error;
-                }
-                return errors;
-            }, {});
-            setErrors(validationErrors);
-            if (Object.keys(validationErrors).length === 0) {
-                const response = await fetch(`http://localhost:8081/userLogin`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(logInfo)
-                });
-                const json = await response.json();
-                if (!json) {
-                    showAlert('error', 'Login e/ou senha inválidos');
-                }
+    useEffect(() => {
+        if (data) {
+            if (data.validationErrors)
+                setErrors(data.validationErrors);
+            else if (data.alerts){
+                showAlert(...data.alerts);
+                setErrors({emailError: '', passwordError:''});
             }
-        } catch (error) {
-            console.error('Erro:', error);
+            else if (data.error)
+                console.log(data.error);
+            else {
+                auth.login(data);
+                navigate(redirectPath, { replace: true });
+            }
+
         }
-    };
+    }, [auth, data, navigate, redirectPath]);
 
     const styles = {
         form: {
@@ -148,53 +149,53 @@ const UserLoginForm = () => {
                             <Typography component="h1" variant="h5">
                                 Sign in
                             </Typography>
-                            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                                <TextField
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="email"
-                                    label="Email Address"
-                                    name="email"
-                                    autoComplete="email"
-                                    autoFocus
-                                    sx={styles.textField}
-                                    value={logInfo.email}
-                                    onChange={handleChange}
-                                    error={Boolean(errors.emailError)}
-                                    helperText={errors.emailError}
-                                />
-                                <TextField
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    label="Password"
-                                    type="password"
-                                    id="password"
-                                    autoComplete="current-password"
-                                    sx={styles.textField}
-                                    value={logInfo.password}
-                                    onChange={handleChange}
-                                    error={Boolean(errors.passwordError)}
-                                    helperText={errors.passwordError}
-                                />
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    sx={{ ...styles.button, mt: 3, mb: 2 }}
-                                >
-                                    Sign In
-                                </Button>
-                                <Grid container justifyContent="flex-end">
-                                    <Grid item>
-                                        <Link href="/register" variant="body2">
-                                            Don't have an account? Sign Up
-                                        </Link>
+                            <Form method='post' action='/login'>
+                                <Box noValidate sx={{ mt: 1 }}>
+                                    <TextField
+                                        margin="normal"
+                                        fullWidth
+                                        id="email"
+                                        label="Email Address"
+                                        name="email"
+                                        autoComplete="email"
+                                        autoFocus
+                                        sx={styles.textField}
+                                        value={logInfo.email}
+                                        onChange={handleChange}
+                                        error={Boolean(errors.emailError)}
+                                        helperText={errors.emailError}
+                                    />
+                                    <TextField
+                                        margin="normal"
+                                        fullWidth
+                                        name="password"
+                                        label="Password"
+                                        type="password"
+                                        id="password"
+                                        autoComplete="current-password"
+                                        sx={styles.textField}
+                                        value={logInfo.password}
+                                        onChange={handleChange}
+                                        error={Boolean(errors.passwordError)}
+                                        helperText={errors.passwordError}
+                                    />
+                                    <Button
+                                        type="submit"
+                                        fullWidth
+                                        variant="contained"
+                                        sx={{ ...styles.button, mt: 3, mb: 2 }}
+                                    >
+                                        Sign In
+                                    </Button>
+                                    <Grid container justifyContent="flex-end">
+                                        <Grid item>
+                                            <Link href="/register" variant="body2">
+                                                Don't have an account? Sign Up
+                                            </Link>
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                            </Box>
+                                </Box>
+                            </Form>
                         </Box>
                     </Container>
                 </ThemeProvider>
@@ -209,5 +210,48 @@ const UserLoginForm = () => {
         </Box>
     );
 };
+
+export const loginAction = async ({ request }) => {
+    const data = await request.formData();
+
+    const logInfoSubmission = {
+        email: data.get('email'),
+        password: data.get('password')
+    }
+
+    try {
+        const validationResults = await validateUser(logInfoSubmission);
+        const validationErrors = validationResults.reduce((errors, error, index) => {
+            if (error.startsWith('Erro')) {
+                errors[Object.keys(logInfoSubmission)[index] + 'Error'] = error;
+            }
+            return errors;
+        }, {});
+
+        if (Object.keys(validationErrors).length === 0) {
+            const response = await fetch(`http://localhost:8081/api/users/validateLogin`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(logInfoSubmission)
+            });
+            const json = await response.json();
+            if (!json) {
+                return { alerts: ['error', 'Login e/ou senha inválidos'] };
+            }
+        } else {
+            return { validationErrors }
+        }
+    } catch (error) {
+        return { error: 'Erro: ' + error }
+    }
+
+    return true;
+}
+
+export const logoutAction = async ({ request }) => {
+    console.log(request);
+}
 
 export default UserLoginForm;
