@@ -1,1 +1,0 @@
-module Controllers.Users.AdministratorController () where

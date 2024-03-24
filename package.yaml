@@ -26,6 +26,14 @@ dependencies:
 - time
 - email-validate
 - bytestring
+- aeson
+- servant
+- servant-server
+- time
+- wai
+- wai-cors
+- warp
+- http-types
 
 ghc-options:
 - -Wall
@@ -39,12 +47,12 @@ ghc-options:
 - -Wredundant-constraints
 
 library:
-  source-dirs: src
+  source-dirs: backend/src
 
 executables:
   University-Helper-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         backend/app
     ghc-options:
     - -threaded
     - -rtsopts
@@ -55,7 +63,7 @@ executables:
 tests:
   University-Helper-test:
     main:                Spec.hs
-    source-dirs:         test
+    source-dirs:         backend/test
     ghc-options:
     - -threaded
     - -rtsopts
