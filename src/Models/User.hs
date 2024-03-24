@@ -1,17 +1,16 @@
+{-# LANGUAGE InstanceSigs #-}
+
 module Models.User
   ( User (..),
-    authenticateUser,
     userToString,
     stringToUser,
     writeUserOnFile,
     displayUser,
     setType,
-    removeUser,
+    filterByUserEnroll,
   )
 where
 
-import Data.Foldable (find)
-import Data.Maybe (mapMaybe)
 import Lib
   ( stringToData,
     writeDataOnFile,
@@ -30,22 +29,17 @@ data User = User
 newtype UserEnrollment = UserEnrollment User
 
 instance Eq UserEnrollment where
+  (==) :: UserEnrollment -> UserEnrollment -> Bool
   (UserEnrollment user1) == (UserEnrollment user2) = userEnrollment user1 == userEnrollment user2
-
-authenticateUser :: String -> String -> IO (Maybe User)
-authenticateUser email password = do
-  content <- readFile "data/users.txt"
-  let users = mapMaybe stringToUser (lines content)
-  return $ find (\user -> userEmail user == email && userPassword user == password) users
 
 userToString :: User -> String
 userToString = show
 
 stringToUser :: String -> Maybe User
-stringToUser line = stringToData line
+stringToUser = stringToData
 
 writeUserOnFile :: FilePath -> User -> IO ()
-writeUserOnFile filePath user = writeDataOnFile filePath user
+writeUserOnFile = writeDataOnFile
 
 userTypeToString :: User -> String
 userTypeToString user
@@ -55,7 +49,7 @@ userTypeToString user
   | otherwise = "NotAValidType"
 
 setType :: String -> User -> User
-setType userType user = user {userType = userType}
+setType userType' user = user {userType = userType'}
 
 displayUser :: User -> IO ()
 displayUser user = do
@@ -63,8 +57,8 @@ displayUser user = do
   putStrLn $ userUniversity user
   putStrLn $ userEmail user
 
-removeUser :: String -> [User] -> [User]
-removeUser _ [] = []
-removeUser enroll (u : userList)
-  | enroll == userEnrollment u = removeUser enroll userList
-  | otherwise = u : removeUser enroll userList
+filterByUserEnroll :: String -> [User] -> [User]
+filterByUserEnroll _ [] = []
+filterByUserEnroll enroll (u : userList)
+  | enroll == userEnrollment u = filterByUserEnroll enroll userList
+  | otherwise = u : filterByUserEnroll enroll userList
