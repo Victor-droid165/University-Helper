@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module DBConfig (
+module Util.Database.DBConfig (
   DBConfig(..)
 ) where
 

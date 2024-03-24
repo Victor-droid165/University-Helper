@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Lib
+module Util.Database.DBFunctions
   ( populateAppDBIfNotPopulated,
     isDBCreated,
     initDB,
@@ -13,7 +13,6 @@ module Lib
 where
 
 import Control.Exception
-import DBConfig
 import DBLib
   ( connectToDB,
     createDB,
@@ -37,6 +36,7 @@ import Database.PostgreSQL.Simple.Types (Query (..))
 import System.Directory (getCurrentDirectory)
 import System.FilePath ((</>))
 import System.IO.Unsafe (unsafePerformIO)
+import Util.Database.DBConfig
 
 loadYamlFile :: (FromJSON a) => FilePath -> IO (Maybe a)
 loadYamlFile filePath = do
@@ -50,7 +50,7 @@ loadYamlFile filePath = do
 loadDBConfig :: IO DBConfig
 loadDBConfig = do
   currentDir <- getCurrentDirectory
-  maybeDbConfig <- loadYamlFile (currentDir </> "database" </> "config.yaml")
+  maybeDbConfig <- loadYamlFile ( "" </> "backend" </> "database" </> "config.yaml")
   case maybeDbConfig of
     Just dbConfig' -> return dbConfig'
     Nothing -> error "Failed to load database configuration"
