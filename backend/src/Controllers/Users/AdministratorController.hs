@@ -4,28 +4,18 @@ module Controllers.Users.AdministratorController
   )
 where
 
-import Controllers.Users.UserController (getUser, removeUser)
-import Data.Maybe (mapMaybe)
-import Models.User (filterByUserEnroll, stringToUser, writeUserOnFile)
-import System.Directory (removeFile)
-
+import Controllers.Users.UserController (getLoggedUser)
+import Data.Maybe (fromJust)
+import Models.DBUser (DBUser (validatorId))
+import Models.User (User (userEnrollment))
+import Util.Database.Functions.UsersDBFunctions (selectAllFromUsersWhereAppDB, updateInUsersWhereAppDB)
+-- Not working
 validateUserAPI :: String -> IO ()
 validateUserAPI enrollment = do
-  contents <- readFile "backend/data/toValidate.txt"
-  let validateList = mapMaybe stringToUser (lines contents)
-
-  let placeHolderUser = getUser enrollment validateList
-  let newValidateList = filterByUserEnroll enrollment validateList
-
-  removeFile "backend/data/toValidate.txt"
-  mapM_ (writeUserOnFile "backend/data/toValidate.txt") newValidateList
-  writeUserOnFile "backend/data/users.txt" placeHolderUser
+  loggedUser <- getLoggedUser
+  loggedDBUser <- selectAllFromUsersWhereAppDB [("enrollment_number", "=", userEnrollment (fromJust loggedUser))]
+  updateInUsersWhereAppDB [("admin_validator_id", show $ validatorId (head loggedDBUser))] [("enrollment_number", "=", enrollment)]
 
 unvalidateUserAPI :: String -> IO ()
 unvalidateUserAPI enrollment = do
-  contents <- readFile "backend/data/toValidate.txt"
-  let validateList = mapMaybe stringToUser (lines contents)
-  let newValidateList = filterByUserEnroll enrollment validateList
-
-  removeFile "backend/data/toValidate.txt"
-  mapM_ (writeUserOnFile "backend/data/toValidate.txt") newValidateList
+  updateInUsersWhereAppDB [("admin_validator_id", "NULL")] [("enrollment_number", "=", enrollment)]

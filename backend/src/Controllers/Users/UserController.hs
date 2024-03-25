@@ -7,6 +7,7 @@ module Controllers.Users.UserController
     swapUser,
     removeUser,
     verifyLoginIO,
+    getLoggedUser
   )
 where
 
@@ -17,6 +18,7 @@ import Models.User
   ( User (..),
     displayUser,
     filterByUserEnroll,
+    fromDBUser,
     setType,
     stringToUser,
     writeUserOnFile,
@@ -26,6 +28,7 @@ import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegister
 import TerminalUI.Users.Student (displayStudentOptions)
 import TerminalUI.Users.Teacher (displayTeacherOptions)
 import TerminalUI.Users.User (loginUI, registerUI, typeEnrollment, typeUserEmail, typeUserPassword)
+import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersAppDB, updateAllInUsersWhereAppDB)
 import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
 
 userRegister :: IO ()
@@ -56,16 +59,8 @@ toValidate user
 
 updateUser :: User -> IO ()
 updateUser user = do
-  userList <- getUsers
-  let oldUser = getUser (userEnrollment user) userList
-
-  let newUserL = swapUser oldUser user userList
-  removeFile "backend/data/users.txt"
-  mapM_ (writeUserOnFile "backend/data/users.txt") newUserL
-
-  screenCleaner
-  putStrLn "O seguinte usuário foi atualizado com sucesso: "
-  displayUser user
+  let newValues = [userName user, userEmail user, userPassword user, userEnrollment user, userType user, userUniversity user]
+  updateAllInUsersWhereAppDB newValues [("enrollment_number", "=", userEnrollment user)]
 
 swapUser :: User -> User -> [User] -> [User]
 swapUser _ _ [] = []
@@ -74,9 +69,7 @@ swapUser old new (u : userL)
   | otherwise = u : swapUser old new userL
 
 getUsers :: IO [User]
-getUsers = do
-  content <- readFile "backend/data/users.txt"
-  return (mapMaybe stringToUser (lines content))
+getUsers = map fromDBUser <$> selectAllFromUsersAppDB
 
 getUser :: String -> [User] -> User
 getUser _ [] = User {}
@@ -90,12 +83,7 @@ getLoggedUser = do
   return $ stringToUser (head (lines loggedUsers))
 
 removeUser :: String -> IO ()
-removeUser enroll = do
-  userList <- getUsers
-  let newUserList = filterByUserEnroll enroll userList
-
-  removeFile "backend/data/users.txt"
-  mapM_ (writeUserOnFile "backend/data/users.txt") newUserList
+removeUser enroll = deleteFromUsersWhereAppDB [("enrollment_number", "=", enroll)]
 
 autoRemove :: IO ()
 autoRemove = do

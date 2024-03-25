@@ -19,7 +19,7 @@ import Data.Maybe (mapMaybe)
 import GHC.Generics
 import Models.User
   ( User (userEmail, userType),
-    getUserValidateList,
+    getUsersToValidate,
     showAll,
     showUserAPI,
     stringToUser,
@@ -63,10 +63,6 @@ type API =
            :<|> "showToValidate" :> Get '[JSON] String
            :<|> "showAllUsers" :> Get '[JSON] String
        )
-
-instance ToJSON User
-
-instance FromJSON User
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
@@ -134,10 +130,11 @@ isRegistered email = do
     else return "Failure"
   where
     verify email = do
-      content1 <- readFile "backend/data/users.txt"
-      content2 <- readFile "backend/data/toValidate.txt"
-      let list = mapMaybe stringToUser (lines (content1 ++ content2))
-      validEmails <- forM list (return . userEmail)
+      registeredUsers <- getUsers
+      usersToValidate <- getUsersToValidate
+      let allUsers = registeredUsers ++ usersToValidate
+          validEmails = map userEmail allUsers
+      print allUsers
       return $ handleValidationServer (belongsToList validEmails email)
 
 showUser :: MyData -> Handler String
@@ -152,7 +149,7 @@ showAllUsers = do
 
 showToValidate :: Handler String
 showToValidate = do
-  users <- liftIO getUserValidateList
+  users <- liftIO getUsersToValidate
   return $ showAll users
 
 -- LOGIN AND REGISTER

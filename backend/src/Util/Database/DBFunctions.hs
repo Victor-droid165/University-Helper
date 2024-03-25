@@ -2,41 +2,46 @@
 
 module Util.Database.DBFunctions
   ( populateAppDBIfNotPopulated,
-    isDBCreated,
     initDB,
-    insertIntoAppDB,
+    insertIntoTableAppDB,
+    insertAllIntoTableAppDB,
     selectFromTableAppDB,
     selectFromTableWhereAppDB,
     selectAllFromTableAppDB,
     selectAllFromTableWhereAppDB,
+    connectToAppDB,
+    updateInTableWhereAppDB,
+    updateInTableAppDB,
+    deleteFromTableWhereAppDB,
+    deleteFromTableAppDB,
   )
 where
 
-import Control.Exception
+import Control.Exception (SomeException, catch)
 import DBLib
   ( connectToDB,
     createDB,
     createDBUser,
     createSchema,
+    deleteFromTableWhere,
     grantAllPrivilegesOnDBToUser,
-    grantAllPrivilegesOnSchemaToUser,
     insertIntoTable,
     isDBCreated,
     isDBPopulated,
     isSchemaCreated,
     populateDB,
-    selectFromTable,
     selectFromTableWhere,
+    updateInTableWhere,
   )
 import qualified Data.ByteString.Char8 as BS
 import Data.Yaml (FromJSON (..), decodeFileThrow)
-import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple (Connection, FromRow, close)
 import Database.PostgreSQL.Simple.ToField (ToField)
-import Database.PostgreSQL.Simple.Types (Query (..))
-import System.Directory (getCurrentDirectory)
 import System.FilePath ((</>))
 import System.IO.Unsafe (unsafePerformIO)
 import Util.Database.DBConfig
+  ( DBConfig (dbHost, dbName, dbPassword, dbPort, dbUser),
+  )
 
 loadYamlFile :: (FromJSON a) => FilePath -> IO (Maybe a)
 loadYamlFile filePath = do
@@ -49,7 +54,6 @@ loadYamlFile filePath = do
 
 loadDBConfig :: IO DBConfig
 loadDBConfig = do
-  currentDir <- getCurrentDirectory
   maybeDbConfig <- loadYamlFile ("" </> "backend" </> "database" </> "config.yaml")
   case maybeDbConfig of
     Just dbConfig' -> return dbConfig'
@@ -136,8 +140,11 @@ isAppDBCreated = do
   close conn
   return result
 
-insertIntoAppDB :: String -> [String] -> [String] -> IO ()
-insertIntoAppDB tableName cols vals = do
+insertAllIntoTableAppDB :: (ToField a) => String -> [a] -> IO ()
+insertAllIntoTableAppDB tableName = insertIntoTableAppDB tableName ([] :: [String])
+
+insertIntoTableAppDB :: (ToField a) => String -> [String] -> [a] -> IO ()
+insertIntoTableAppDB tableName cols vals = do
   conn <- connectToAppDB
   insertIntoTable conn ("uh_schema." ++ tableName) cols vals
   close conn
@@ -146,11 +153,7 @@ selectAllFromTableAppDB :: (FromRow a) => String -> IO [a]
 selectAllFromTableAppDB tableName = selectFromTableAppDB tableName ["*"]
 
 selectFromTableAppDB :: (FromRow a) => String -> [String] -> IO [a]
-selectFromTableAppDB tableName columns = do
-  conn <- connectToAppDB
-  result <- selectFromTable conn ("uh_schema." ++ tableName) columns
-  close conn
-  return result
+selectFromTableAppDB tableName columns = selectFromTableWhereAppDB tableName columns ([] :: [(String, String, BS.ByteString)])
 
 selectAllFromTableWhereAppDB :: (FromRow a, ToField b) => String -> [(String, String, b)] -> IO [a]
 selectAllFromTableWhereAppDB tableName = selectFromTableWhereAppDB tableName ["*"]
@@ -161,6 +164,24 @@ selectFromTableWhereAppDB tableName columns conditions = do
   result <- selectFromTableWhere conn ("uh_schema." ++ tableName) columns conditions
   close conn
   return result
+
+updateInTableAppDB :: (ToField b) => String -> [(String, b)] -> IO ()
+updateInTableAppDB tableName updateValues = updateInTableWhereAppDB tableName updateValues ([] :: [(String, String, b)])
+
+updateInTableWhereAppDB :: (ToField b) => String -> [(String, b)] -> [(String, String, b)] -> IO ()
+updateInTableWhereAppDB tableName updateValues conditions = do
+  conn <- connectToAppDB
+  updateInTableWhere conn ("uh_schema." ++ tableName) updateValues conditions
+  close conn
+
+deleteFromTableAppDB :: String -> IO ()
+deleteFromTableAppDB tableName = deleteFromTableWhereAppDB tableName ([] :: [(String, String, BS.ByteString)])
+
+deleteFromTableWhereAppDB :: (ToField b) => String -> [(String, String, b)] -> IO ()
+deleteFromTableWhereAppDB tableName conditions = do
+  conn <- connectToAppDB
+  deleteFromTableWhere conn ("uh_schema." ++ tableName) conditions
+  close conn
 
 initDB :: String -> IO ()
 initDB dbName' = do

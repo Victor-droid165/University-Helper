@@ -13,18 +13,33 @@ module DBLib
     grantAllPrivilegesOnSchemaToUser,
     isSchemaCreated,
     insertIntoTable,
-    selectFromTable,
     selectFromTableWhere,
+    updateInTableWhere,
+    deleteFromTableWhere,
   )
 where
 
 import qualified Data.ByteString.Char8 as BS
 import Database.PostgreSQL.Simple
+  ( Connection,
+    FromRow,
+    Only (Only),
+    connectPostgreSQL,
+    execute,
+    execute_,
+    query,
+  )
 import Database.PostgreSQL.Simple.ToField (ToField)
-import Database.PostgreSQL.Simple.ToRow (toRow)
 import Database.PostgreSQL.Simple.Types (Query (..))
-import System.Directory (getCurrentDirectory)
 import System.FilePath ((</>))
+
+type WhereConditions b = [(String, String, b)]
+
+buildWhereClauses :: WhereConditions a -> BS.ByteString
+buildWhereClauses conditions =
+  if null conditions
+    then BS.empty
+    else " WHERE " <> BS.intercalate " AND " [BS.pack col <> " " <> BS.pack op <> " ?" | (col, op, _) <- conditions]
 
 connectToDB :: String -> Int -> String -> String -> String -> IO Connection
 connectToDB host port dbName' user password = do
@@ -70,8 +85,6 @@ isDBPopulated conn schemaName tableNames = do
 
 populateDB :: Connection -> IO ()
 populateDB conn = do
-  currentDir <- getCurrentDirectory
-
   putStrLn "Initializing database..."
   executeSqlFile conn ("" </> "backend" </> "database" </> "init.sql")
   putStrLn "Database all set up!"
@@ -119,30 +132,44 @@ createSchema conn schemaName = do
   _ <- execute_ conn $ Query $ "CREATE SCHEMA " <> BS.pack schemaName
   putStrLn $ "Schema '" ++ schemaName ++ "' created successfully."
 
-insertIntoTable :: Connection -> String -> [String] -> [String] -> IO ()
+insertIntoTable :: (ToField b) => Connection -> String -> [String] -> [b] -> IO ()
 insertIntoTable conn tableName cols vals = do
-  let columns = BS.intercalate ", " (map BS.pack cols)
+  let columns = map BS.pack cols
+      colsBS = if null cols then BS.empty else " (" <> BS.intercalate ", " columns <> ")"
       placeholders = BS.intercalate ", " (replicate (length vals) "?")
       tableName' = BS.pack tableName
-      queryText = "INSERT INTO " <> tableName' <> " (" <> columns <> ") VALUES (" <> placeholders <> ")"
-  _ <- execute conn (Query queryText) (map BS.pack vals)
+      queryText = "INSERT INTO " <> tableName' <> colsBS <> " VALUES (" <> placeholders <> ")"
+  print queryText
+  _ <- execute conn (Query queryText) vals
   putStrLn "Data inserted successfully."
-
-selectFromTable :: (FromRow a) => Connection -> String -> [String] -> IO [a]
-selectFromTable conn tableName columns = selectFromTableWhere conn tableName columns ([] :: [(String, String, BS.ByteString)])
 
 selectFromTableWhere :: (FromRow a, ToField b) => Connection -> String -> [String] -> [(String, String, b)] -> IO [a]
 selectFromTableWhere conn tableName columns conditions = do
   let tableNameBS = BS.pack tableName
       columnsBS = BS.intercalate ", " $ map BS.pack columns
-      conditionsBS =
-        if null conditions
-          then BS.empty
-          else
-            " WHERE "
-              <> BS.intercalate
-                " AND "
-                [conditionBS' | (col, op, _) <- conditions, let conditionBS' = BS.pack col <> " " <> BS.pack op <> " ?"]
+      conditionsBS = buildWhereClauses conditions
       values = map (\(_, _, val) -> val) conditions
       queryText = "SELECT " <> columnsBS <> " FROM " <> tableNameBS <> conditionsBS
   query conn (Query queryText) values
+
+updateInTableWhere :: (ToField b) => Connection -> String -> [(String, b)] -> [(String, String, b)] -> IO ()
+updateInTableWhere conn tableName updateValues conditions = do
+  let tableNameBS = BS.pack tableName
+      updateText =
+        if null updateValues
+          then BS.empty
+          else " SET " <> BS.intercalate ", " [BS.pack col <> " = ?" | (col, _) <- updateValues]
+      conditionsBS = buildWhereClauses conditions
+      values = map (\(_, _, val) -> val) conditions
+      queryText = "UPDATE " <> tableNameBS <> updateText <> conditionsBS
+  _ <- execute conn (Query queryText) (map snd updateValues ++ values)
+  putStrLn "Data updated successfully."
+
+deleteFromTableWhere :: (ToField b) => Connection -> String -> WhereConditions b -> IO ()
+deleteFromTableWhere conn tableName conditions = do
+  let tableNameBS = BS.pack tableName
+      conditionsBS = buildWhereClauses conditions
+      values = map (\(_, _, val) -> val) conditions
+      queryText = "DELETE FROM " <> tableNameBS <> conditionsBS
+  _ <- execute conn (Query queryText) values
+  putStrLn "Data deleted successfully."

@@ -2,7 +2,6 @@ SET search_path TO "uh_schema";
 
 -- Create the users table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     email VARCHAR(80) UNIQUE NOT NULL,
     password VARCHAR(50) NOT NULL,
@@ -10,13 +9,14 @@ CREATE TABLE users (
     enrollment_number VARCHAR(20),
     university_name VARCHAR(100),
     admin_validator_id INT,
+    id SERIAL PRIMARY KEY,
     FOREIGN KEY (admin_validator_id) REFERENCES users(id)
 );
 
 CREATE TABLE notebooks (
-    id SERIAL PRIMARY KEY,
     type VARCHAR(20) CHECK (type IN ('Convencional', 'Cronológico', 'Mental')) NOT NULL,
-    name VARCHAR(100) UNIQUE NOT NULL
+    name VARCHAR(100) UNIQUE NOT NULL,
+    id SERIAL PRIMARY KEY
 );
 
 CREATE TABLE notebook_subjects (
@@ -27,10 +27,10 @@ CREATE TABLE notebook_subjects (
 );
 
 CREATE TABLE pages (
-    id SERIAL PRIMARY KEY,
     notebook_id INT NOT NULL,
     subject_name VARCHAR(100) NOT NULL,
     page_number INT NOT NULL,
+    id SERIAL PRIMARY KEY,
     FOREIGN KEY (notebook_id, subject_name) REFERENCES notebook_subjects(notebook_id, name)
 );
 

@@ -12,28 +12,30 @@ module Models.User
     removeUser,
     showUserAPI,
     showAll,
-    getUserValidateList,
+    getUsersToValidate,
     filterByUserEnroll,
+    fromDBUser,
   )
 where
 
-import Data.Maybe (mapMaybe)
-import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.ToRow
+import Database.PostgreSQL.Simple.FromRow ( FromRow )
+import Database.PostgreSQL.Simple.ToRow ( ToRow )
 import GHC.Generics (Generic)
 import Lib
   ( stringToData,
     writeDataOnFile,
   )
-import Util.Database.Functions.UsersDBFunctions (selectAllFromUsersWhereAppDB)
+import Models.DBUser (DBUser (..))
+import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB)
+import Data.Aeson.Types (ToJSON, FromJSON)
 
 data User = User
-  { userType :: String,
-    userName :: String,
-    userUniversity :: String,
-    userEnrollment :: String,
+  { userName :: String,
     userEmail :: String,
-    userPassword :: String
+    userPassword :: String,
+    userType :: String,
+    userEnrollment :: String,
+    userUniversity :: String
   }
   deriving (Show, Read, Eq, Generic)
 
@@ -46,6 +48,9 @@ instance Eq UserEnrollment where
 instance FromRow User
 
 instance ToRow User
+instance ToJSON User
+
+instance FromJSON User
 
 userToString :: User -> String
 userToString = show
@@ -85,8 +90,19 @@ showUserAPI user =
     ++ userEmail user
     ++ "\n"
 
-getUserValidateList :: IO [User]
-getUserValidateList = selectAllFromUsersWhereAppDB [("admin_validator_id", "IS", "NULL")]
+fromDBUser :: DBUser -> User
+fromDBUser dbUser =
+  User
+    { userName = dbUserName dbUser,
+      userEmail = dbUserEmail dbUser,
+      userPassword = dbUserPassword dbUser,
+      userType = dbUserType dbUser,
+      userEnrollment = dbUserEnrollment dbUser,
+      userUniversity = dbUserUniversity dbUser
+    }
+
+getUsersToValidate :: IO [User]
+getUsersToValidate = selectFromUsersWhereAppDB ["name", "email", "password", "type", "enrollment_number", "university_name"] [("admin_validator_id", "IS", "NULL")]
 
 showAll :: [User] -> String
 showAll = concatMap showUserAPI
