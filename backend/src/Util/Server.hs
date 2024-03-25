@@ -30,7 +30,6 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.Cors
 import Servant
-import Util.Database.DBFunctions (initDB)
 import Util.ScreenCleaner (start)
 import Util.Validate
   ( belongsToList,
@@ -162,4 +161,4 @@ users :: Handler [User]
 users = liftIO getUsers
 
 serveOn :: IO ()
-serveOn = initDB "plp_db" >> start >> run 8081 (app userAPI superServer)
+serveOn = start >> run 8081 (app userAPI superServer)

@@ -25,7 +25,7 @@ import Lib
   ( stringToData,
     writeDataOnFile,
   )
-import Util.Database.DBFunctions (selectAllFromUsersWhereAppDB)
+import Util.Database.Functions.UsersDBFunctions (selectAllFromUsersWhereAppDB)
 
 data User = User
   { userType :: String,

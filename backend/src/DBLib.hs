@@ -72,8 +72,9 @@ populateDB :: Connection -> IO ()
 populateDB conn = do
   currentDir <- getCurrentDirectory
 
-  putStrLn "Iniciando o banco de dados..."
-  executeSqlFile conn (currentDir </> "database" </> "init.sql")
+  putStrLn "Initializing database..."
+  executeSqlFile conn ("" </> "backend" </> "database" </> "init.sql")
+  putStrLn "Database all set up!"
 
 isDBCreated :: Connection -> String -> IO Bool
 isDBCreated conn dbName' = do

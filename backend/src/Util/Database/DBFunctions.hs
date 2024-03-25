@@ -9,7 +9,6 @@ module Util.Database.DBFunctions
     selectFromTableWhereAppDB,
     selectAllFromTableAppDB,
     selectAllFromTableWhereAppDB,
-    selectAllFromUsersWhereAppDB,
   )
 where
 
@@ -128,7 +127,6 @@ grantAllPrivilegesToAppUser :: IO ()
 grantAllPrivilegesToAppUser = do
   conn <- connectToSuperUserDB
   grantAllPrivilegesOnDBToUser conn "plp_db" "admin"
-  grantAllPrivilegesOnSchemaToUser conn "uh_schema" "admin"
   close conn
 
 isAppDBCreated :: IO Bool
@@ -157,9 +155,6 @@ selectFromTableAppDB tableName columns = do
 selectAllFromTableWhereAppDB :: (FromRow a, ToField b) => String -> [(String, String, b)] -> IO [a]
 selectAllFromTableWhereAppDB tableName = selectFromTableWhereAppDB tableName ["*"]
 
-selectAllFromUsersWhereAppDB :: (FromRow a, ToField b) => [(String, String, b)] -> IO [a]
-selectAllFromUsersWhereAppDB = selectFromTableWhereAppDB "users" ["*"]
-
 selectFromTableWhereAppDB :: (FromRow a, ToField b) => String -> [String] -> [(String, String, b)] -> IO [a]
 selectFromTableWhereAppDB tableName columns conditions = do
   conn <- connectToAppDB
@@ -170,12 +165,15 @@ selectFromTableWhereAppDB tableName columns conditions = do
 initDB :: String -> IO ()
 initDB dbName' = do
   appDBExists <- isAppDBCreated
-  createAppSchemaIfNotCreated
   if appDBExists
-    then
+    then do
+      createAppSchemaIfNotCreated
       populateAppDBIfNotPopulated
     else do
       createAppDB
       createUserAppDB
       grantAllPrivilegesToAppUser
+      createAppSchemaIfNotCreated
       populateAppDB
+
+-- TODO : SCHEMA
