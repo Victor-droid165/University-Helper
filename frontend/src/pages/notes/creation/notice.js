@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Select, MenuItem } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { mockDataTeam } from "../../data/mockData.js";
+import { mockDataTeam } from "../../../data/mockData.js";
 
 const Notice = () => {
   const [title, setTitle] = useState('');
   const [notice, setNotice] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
-  const [rows, setRows] = useState(mockDataTeam);
+  const [rows] = useState(mockDataTeam);
 
   const handleSave = () => {
     const now = new Date();

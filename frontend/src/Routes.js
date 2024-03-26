@@ -5,7 +5,7 @@ import HomePage from './pages/home';
 import RegisterPage, { registerAction } from './pages/register';
 import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
-import NoteCreationPage from './pages/notes';
+import NoteCreationPage from './pages/notes/creation';
 import { loginAction, logoutAction } from './components/UserLoginForm/UserLoginForm';
 
 const router = createBrowserRouter(
