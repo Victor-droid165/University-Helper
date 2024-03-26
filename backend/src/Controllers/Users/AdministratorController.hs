@@ -4,28 +4,21 @@ module Controllers.Users.AdministratorController
   )
 where
 
-import Controllers.Users.UserController (getUser, removeUser)
-import Data.Maybe (mapMaybe)
-import Models.User (filterByUserEnroll, stringToUser, writeUserOnFile)
-import System.Directory (removeFile)
+import Controllers.Users.UserController (getLoggedUser)
+import Data.Maybe (fromJust)
+import Models.DBUser (DBUser (dbUserId))
+import Models.User (User (userEnrollment))
+import Util.Database.Functions.UsersDBFunctions (selectAllFromUsersWhereAppDB)
+import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhereAppDB, insertAllIntoValidationsAppDB)
 
+-- Not working
 validateUserAPI :: String -> IO ()
 validateUserAPI enrollment = do
-  contents <- readFile "backend/data/toValidate.txt"
-  let validateList = mapMaybe stringToUser (lines contents)
-
-  let placeHolderUser = getUser enrollment validateList
-  let newValidateList = filterByUserEnroll enrollment validateList
-
-  removeFile "backend/data/toValidate.txt"
-  mapM_ (writeUserOnFile "backend/data/toValidate.txt") newValidateList
-  writeUserOnFile "backend/data/users.txt" placeHolderUser
+  loggedUser <- getLoggedUser
+  loggedDBUser <- selectAllFromUsersWhereAppDB [("enrollment_number", "=", userEnrollment (fromJust loggedUser))]
+  toValidateDBUser <- selectAllFromUsersWhereAppDB [("enrollment_number", "=", enrollment)]
+  insertAllIntoValidationsAppDB [(dbUserId . head) loggedDBUser, (dbUserId . head) toValidateDBUser]
 
 unvalidateUserAPI :: String -> IO ()
 unvalidateUserAPI enrollment = do
-  contents <- readFile "backend/data/toValidate.txt"
-  let validateList = mapMaybe stringToUser (lines contents)
-  let newValidateList = filterByUserEnroll enrollment validateList
-
-  removeFile "backend/data/toValidate.txt"
-  mapM_ (writeUserOnFile "backend/data/toValidate.txt") newValidateList
+  deleteFromValidationsWhereAppDB [("enrollment_number", "=", enrollment)]

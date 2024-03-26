@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
-{-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# OPTIONS_GHC -Wno-missing-fields #-}
 
 module Models.User
   ( User (..),
@@ -9,28 +9,29 @@ module Models.User
     writeUserOnFile,
     displayUser,
     setType,
-    removeUser,
     showUserAPI,
     showAll,
-    getUserValidateList,
-    filterByUserEnroll,
+    fromDBUser,
   )
 where
 
+import Data.Aeson.Types (FromJSON, ToJSON)
+import Database.PostgreSQL.Simple.FromRow (FromRow)
+import Database.PostgreSQL.Simple.ToRow (ToRow)
+import GHC.Generics (Generic)
 import Lib
   ( stringToData,
     writeDataOnFile,
   )
-import GHC.Generics (Generic)
-import Data.Maybe (mapMaybe)
+import Models.DBUser (DBUser (..))
 
 data User = User
-  { userType :: String,
-    userName :: String,
-    userUniversity :: String,
-    userEnrollment :: String,
+  { userName :: String,
     userEmail :: String,
-    userPassword :: String
+    userPassword :: String,
+    userType :: String,
+    userEnrollment :: String,
+    userUniversity :: String
   }
   deriving (Show, Read, Eq, Generic)
 
@@ -39,6 +40,14 @@ newtype UserEnrollment = UserEnrollment User
 instance Eq UserEnrollment where
   (==) :: UserEnrollment -> UserEnrollment -> Bool
   (UserEnrollment user1) == (UserEnrollment user2) = userEnrollment user1 == userEnrollment user2
+
+instance FromRow User
+
+instance ToRow User
+
+instance ToJSON User
+
+instance FromJSON User
 
 userToString :: User -> String
 userToString = show
@@ -51,9 +60,9 @@ writeUserOnFile = writeDataOnFile
 
 userTypeToString :: User -> String
 userTypeToString user
-  | userType user == "teacher" = "Professor"
-  | userType user == "student" = "Aluno"
-  | userType user == "administrator" = "Administrador"
+  | userType user == "Professor" = "Professor"
+  | userType user == "Student" = "Aluno"
+  | userType user == "Admin" = "Administrador"
   | otherwise = "NotAValidType"
 
 setType :: String -> User -> User
@@ -67,26 +76,27 @@ displayUser user = do
 
 showUserAPI :: User -> String
 showUserAPI user =
-      userName user ++ " - " ++ userEnrollment user ++ " (" ++ userTypeToString user ++ ")\n"
-      ++ userUniversity user ++ "\n"
-      ++ userEmail user ++ "\n"
+  userName user
+    ++ " - "
+    ++ userEnrollment user
+    ++ " ("
+    ++ userTypeToString user
+    ++ ")\n"
+    ++ userUniversity user
+    ++ "\n"
+    ++ userEmail user
+    ++ "\n"
 
-getUserValidateList :: IO [User]
-getUserValidateList = do
-    contents <- readFile "backend/data/toValidate.txt"
-    return $ mapMaybe stringToUser (lines contents)
+fromDBUser :: DBUser -> User
+fromDBUser dbUser =
+  User
+    { userName = dbUserName dbUser,
+      userEmail = dbUserEmail dbUser,
+      userPassword = dbUserPassword dbUser,
+      userType = dbUserType dbUser,
+      userEnrollment = dbUserEnrollment dbUser,
+      userUniversity = dbUserUniversity dbUser
+    }
 
 showAll :: [User] -> String
 showAll = concatMap showUserAPI
-
-removeUser :: String -> [User] -> [User]
-removeUser _ [] = []
-removeUser enroll (u : userList)
-  | enroll == userEnrollment u = removeUser enroll userList
-  | otherwise = u : removeUser enroll userList
-
-filterByUserEnroll :: String -> [User] -> [User]
-filterByUserEnroll _ [] = []
-filterByUserEnroll enroll (u : userList)
-  | enroll == userEnrollment u = filterByUserEnroll enroll userList
-  | otherwise = u : filterByUserEnroll enroll userList

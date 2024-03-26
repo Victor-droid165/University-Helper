@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Main
   ( main,
   )
@@ -17,4 +18,4 @@ main :: IO ()
 main = do
   screenCleaner
   serveOn
-  optionInterface
+  --optionInterface

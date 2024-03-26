@@ -10,10 +10,10 @@ module Util.Validate (
     Validation(..),
     Error(..),
     handleValidation,
-    FormValidation(..),
+    FormValidation(..)
 ) where
 import Data.Char (isAlpha, isSpace)
-import Text.Email.Validate
+import Text.Email.Validate ( isValid )
 import qualified Data.ByteString.Char8 as B
 import Util.ScreenCleaner (screenCleaner)
 

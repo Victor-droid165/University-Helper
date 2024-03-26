@@ -9,7 +9,8 @@ where
 
 import Control.Concurrent (threadDelay)
 import Data.Char (toLower)
-import System.Console.ANSI
+import System.Console.ANSI ( clearScreen )
+import Util.Database.DBFunctions (initDB)
 
 screenCleaner :: IO ()
 screenCleaner = do
@@ -45,4 +46,5 @@ quitOpt func _ = do
 start :: IO ()
 start = do
   screenCleaner
+  initDB "plp_db"
   writeFile "backend/data/session.txt" ""

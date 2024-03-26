@@ -24,16 +24,19 @@ dependencies:
 - ansi-terminal
 - directory
 - time
-- email-validate
+- yaml
+- postgresql-simple
 - bytestring
+- filepath
+- email-validate
 - aeson
 - servant
 - servant-server
-- time
 - wai
 - wai-cors
 - warp
 - http-types
+- unordered-containers
 
 ghc-options:
 - -Wall
