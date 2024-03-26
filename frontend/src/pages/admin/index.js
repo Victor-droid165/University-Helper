@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, Typography, MenuItem, Select, ListItemIcon, FormControl, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -11,7 +11,19 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { blue, red } from "@mui/material/colors";
 
 const AdminPage = () => {
-  const [rows, setRows] = useState(mockDataTeam);
+  const [rows, setRows] = useState([]);
+  
+  useEffect( () => {
+      fetch('http://localhost:8081/api/users/users')
+        .then(response=>response.json())
+        .then(data => {
+          console.log(data);
+          const addId = data.map((user, index) => ({id: index + 1, ...user}));
+          setRows(addId);
+        })
+        .catch(error => console.error('Error fetching data:', error))
+    }, []);
+  
 
   const theme = createTheme({
     components: {
@@ -47,7 +59,7 @@ const AdminPage = () => {
   const handleAccessChange = (id, newAccess) => {
     // Impede a alteração do nível de acesso se for 'admin'
     const currentAccess = rows.find(row => row.id === id).userType;
-    if (currentAccess !== "admin") {
+    if (currentAccess !== "Admin") {
       const newRows = rows.map((row) => {
         if (row.id === id) {
           return { ...row, userType: newAccess };
@@ -66,21 +78,21 @@ const AdminPage = () => {
   const columns = [
     { field: 'id', headerName: 'Id', headerAlign: 'center', flex: 0.5 },
     {
-      field: 'name',
+      field: 'userName',
       headerName: 'Nome',
       headerAlign: 'center',
       flex: 1,
     },
     {
-      field: 'university',
+      field: 'userUniversity',
       headerName: 'Universidade',
       type: 'number',
       headerAlign: 'center',
       align: 'left',
       flex: 1,
     },
-    { field: 'enrollment', headerName: 'Matrícula', headerAlign: 'center', align: 'center', flex: 1 },
-    { field: 'email', headerName: 'Email', headerAlign: 'center', flex: 1 },
+    { field: 'userEnrollment', headerName: 'Matrícula', headerAlign: 'center', align: 'center', flex: 1 },
+    { field: 'userEmail', headerName: 'Email', headerAlign: 'center', flex: 1 },
     {
       field: 'delete',
       headerName: 'Deletar',
@@ -113,19 +125,19 @@ const AdminPage = () => {
               color: theme.palette.primary.contrastText,
             }}
           >
-            <MenuItem value="admin" disabled>
+            <MenuItem value="Admin" disabled>
               <ListItemIcon>
                 <AdminPanelSettingsOutlinedIcon fontSize="small" />
               </ListItemIcon>
               <Typography variant="body2">Admin</Typography>
             </MenuItem>
-            <MenuItem value="teacher">
+            <MenuItem value="Professor">
               <ListItemIcon>
                 <SecurityOutlinedIcon fontSize="small" />
               </ListItemIcon>
               <Typography variant="body2">Professor</Typography>
             </MenuItem>
-            <MenuItem value="student">
+            <MenuItem value="Student">
               <ListItemIcon>
                 <LockOpenOutlinedIcon fontSize="small" />
               </ListItemIcon>
