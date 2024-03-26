@@ -12,7 +12,6 @@ module Models.User
     removeUser,
     showUserAPI,
     showAll,
-    getUsersToValidate,
     filterByUserEnroll,
     fromDBUser,
   )
@@ -100,9 +99,6 @@ fromDBUser dbUser =
       userEnrollment = dbUserEnrollment dbUser,
       userUniversity = dbUserUniversity dbUser
     }
-
-getUsersToValidate :: IO [User]
-getUsersToValidate = selectFromUsersWhereAppDB ["name", "email", "password", "type", "enrollment_number", "university_name"] [("admin_validator_id", "IS", "NULL")]
 
 showAll :: [User] -> String
 showAll = concatMap showUserAPI

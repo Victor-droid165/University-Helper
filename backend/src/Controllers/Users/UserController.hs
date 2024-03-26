@@ -8,6 +8,7 @@ module Controllers.Users.UserController
     removeUser,
     verifyLoginIO,
     getLoggedUser,
+    registerUserAPI,
   )
 where
 
@@ -29,7 +30,7 @@ import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegister
 import TerminalUI.Users.Student (displayStudentOptions)
 import TerminalUI.Users.Teacher (displayTeacherOptions)
 import TerminalUI.Users.User (loginUI, registerUI, typeEnrollment, typeUserEmail, typeUserPassword)
-import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersAppDB, updateAllInUsersWhereAppDB)
+import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersAppDB, updateAllInUsersWhereAppDB, insertAllIntoUsersAppDB)
 import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
 
 userRegister :: IO ()
@@ -253,3 +254,6 @@ getUserByEmail _ [] =
 getUserByEmail email (u : userList)
   | email == userEmail u = u
   | otherwise = getUserByEmail email userList
+
+registerUserAPI :: User -> IO ()
+registerUserAPI user = insertAllIntoUsersAppDB [userName user, userEmail user, userPassword user, userType user, userEnrollment user, userUniversity user ]

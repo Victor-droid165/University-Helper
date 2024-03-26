@@ -16,7 +16,6 @@ data DBUser = DBUser
     dbUserEnrollment :: String,
     dbUserUniversity :: String,
     dbUsercreatedAt :: LocalTime,
-    validatorId :: Maybe Int,
     dbUserId :: Int
   }
   deriving (Show, Generic)
