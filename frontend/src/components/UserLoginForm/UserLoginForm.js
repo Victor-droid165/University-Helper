@@ -4,7 +4,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import { Form, useActionData, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../hooks/useAuth';
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -89,7 +89,7 @@ const UserLoginForm = () => {
             else if (data.error)
                 console.log(data.error);
             else {
-                auth.login(data);
+                auth.login(logInfo);
                 navigate(redirectPath, { replace: true });
             }
 
@@ -248,10 +248,6 @@ export const loginAction = async ({ request }) => {
     }
 
     return true;
-}
-
-export const logoutAction = async ({ request }) => {
-    console.log(request);
 }
 
 export default UserLoginForm;

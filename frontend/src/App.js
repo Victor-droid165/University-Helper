@@ -1,9 +1,9 @@
 import React from 'react';
 import './App.css';
 
-import router from './Routes.js';
+import router from './Routes/Routes.js';
 import { RouterProvider } from 'react-router-dom';
-import { AuthProvider } from './auth.js';
+import { AuthProvider } from './contexts/Auth/AuthProvider.js';
 
 function App() {
 

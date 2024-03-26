@@ -6,7 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import { Form, useActionData, useLocation, useNavigate } from 'react-router-dom';
 import { validateUser } from '../../components/UserLoginForm/UserLoginForm';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../hooks/useAuth';
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -312,7 +312,7 @@ export const registerAction = async ({ request }) => {
     return { error: 'Erro: ' + error }
   }
 
-  return true;
+  return { email: registerInfoSubmission.email, password: registerInfoSubmission.password };
 }
 
 export default Register;

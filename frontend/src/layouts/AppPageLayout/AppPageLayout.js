@@ -1,4 +1,4 @@
-import { useAuth } from "../../auth";
+import { useAuth } from "../../hooks/useAuth";
 import NavBar from "../../components/NavBar/NavBar";
 import styles from './AppPageLayout.module.css'
 import { Outlet } from "react-router-dom"
