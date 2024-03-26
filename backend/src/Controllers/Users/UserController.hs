@@ -9,9 +9,9 @@ module Controllers.Users.UserController
     getLoggedUser,
     findUserByEmail,
     findUserByEnroll,
+    registerUserAPI,
   )
 where
-
 
 import Data.Foldable (find)
 import Data.Maybe (fromJust, mapMaybe)
@@ -24,7 +24,7 @@ import Models.User
     stringToUser,
     writeUserOnFile,
   )
-import Repositories.UserRepository (getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB)
+import Repositories.UserRepository (createUserInDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB)
 import System.Directory (removeFile)
 import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegisterUI)
 import TerminalUI.Users.Student (displayStudentOptions)
@@ -245,3 +245,6 @@ findUserByEnroll _ [] = Nothing
 findUserByEnroll enroll (user : users)
   | enroll == userEnrollment user = Just user
   | otherwise = findUserByEnroll enroll users
+
+registerUserAPI :: User -> IO ()
+registerUserAPI = createUserInDB

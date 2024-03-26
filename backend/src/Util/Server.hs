@@ -13,13 +13,13 @@ where
 import Control.Monad (forM)
 import Control.Monad.IO.Class (liftIO)
 import Controllers.Users.AdministratorController (unvalidateUserAPI, validateUserAPI)
-import Controllers.Users.UserController (getUser, getUsers, verifyLoginIO)
+import Controllers.Users.UserController
+    ( findUserByEmail, getUsers, verifyLoginIO, registerUserAPI )
 import Data.Aeson
-import Data.Maybe (mapMaybe)
+import Data.Maybe (mapMaybe, fromJust)
 import GHC.Generics
 import Models.User
-  ( User (userEmail, userType),
-    getUsersToValidate,
+  ( User (..),
     showAll,
     showUserAPI,
     stringToUser,
@@ -40,6 +40,7 @@ import Util.Validate
     userPasswordValidation,
     userUniversityValidation,
   )
+import Util.Database.Functions.UsersDBFunctions (insertAllIntoUsersAppDB)
 
 newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
 
@@ -57,10 +58,9 @@ type API =
            :<|> "validateLogin" :> ReqBody '[JSON] LogInfo :> Post '[JSON] Bool
            :<|> "validateUser" :> ReqBody '[JSON] MyData :> Post '[JSON] NoContent
            :<|> "unvalidateUser" :> ReqBody '[JSON] MyData :> Post '[JSON] NoContent
-           :<|> "register" :> ReqBody '[JSON] User :> Post '[JSON] NoContent
-           :<|> "isRegistered" :> ReqBody '[JSON] MyData :> Post '[JSON] String
+           :<|> "register" :> ReqBody '[JSON] User :> Post '[JSON] String
+           :<|> "isRegistered" :> ReqBody '[JSON] MyData :> Post '[JSON] Bool
            :<|> "showUser" :> ReqBody '[JSON] MyData :> Post '[JSON] String
-           :<|> "showToValidate" :> Get '[JSON] String
            :<|> "showAllUsers" :> Get '[JSON] String
        )
 
@@ -89,7 +89,6 @@ superServer =
     :<|> register
     :<|> isRegistered
     :<|> showUser
-    :<|> showToValidate
     :<|> showAllUsers
 
 validateName :: MyData -> Handler String
@@ -116,40 +115,29 @@ validateUser myData = liftIO (validateUserAPI (value myData)) >> return NoConten
 unvalidateUser :: MyData -> Handler NoContent
 unvalidateUser myData = liftIO (unvalidateUserAPI (value myData)) >> return NoContent
 
-register :: User -> Handler NoContent
-register user
-  | userType user == "student" = liftIO (writeUserOnFile "backend/data/users.txt" user) >> return NoContent
-  | userType user == "teacher" = liftIO (writeUserOnFile "backend/data/toValidate.txt" user) >> return NoContent
-  | otherwise = return NoContent
+register :: User -> Handler String
+register user = do
+  isUserRegistered <- isRegistered (MyData {value = userEmail user})
+  if isUserRegistered
+    then return "Failure"
+    else do
+      liftIO $ registerUserAPI user
+      return "Success"
 
-isRegistered :: MyData -> Handler String
-isRegistered email = do
-  result <- liftIO $ verify (value email)
-  if result == "Success"
-    then return "Success"
-    else return "Failure"
-  where
-    verify email = do
-      registeredUsers <- getUsers
-      usersToValidate <- getUsersToValidate
-      let allUsers = registeredUsers ++ usersToValidate
-          validEmails = map userEmail allUsers
-      print allUsers
-      return $ handleValidationServer (belongsToList validEmails email)
+isRegistered :: MyData -> Handler Bool
+isRegistered emailData = do
+  let email = value emailData
+  allUsers <- liftIO getUsers
+  return $ email `elem` map userEmail allUsers
 
 showUser :: MyData -> Handler String
 showUser myData = do
   users <- liftIO getUsers
-  return $ showUserAPI (getUser (value myData) users)
+  return $ (showUserAPI . fromJust) (findUserByEmail (value myData) users)
 
 showAllUsers :: Handler String
 showAllUsers = do
   users <- liftIO getUsers
-  return $ showAll users
-
-showToValidate :: Handler String
-showToValidate = do
-  users <- liftIO getUsersToValidate
   return $ showAll users
 
 -- LOGIN AND REGISTER

@@ -46,3 +46,4 @@ docker-compose.override.yml
 .idea/
 *.swp
 *node_modules
+*config.yaml
