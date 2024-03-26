@@ -60,9 +60,9 @@ writeUserOnFile = writeDataOnFile
 
 userTypeToString :: User -> String
 userTypeToString user
-  | userType user == "teacher" = "Professor"
-  | userType user == "student" = "Aluno"
-  | userType user == "administrator" = "Administrador"
+  | userType user == "Professor" = "Professor"
+  | userType user == "Student" = "Aluno"
+  | userType user == "Admin" = "Administrador"
   | otherwise = "NotAValidType"
 
 setType :: String -> User -> User
