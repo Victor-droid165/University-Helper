@@ -20,7 +20,7 @@ function Register() {
 
 const User = () => {
   const [user, setUser] = useState({
-    type: 'student',
+    type: 'Student',
     name: '',
     university: '',
     enrollment: '',
@@ -255,7 +255,7 @@ export const registerAction = async ({ request }) => {
   const data = await request.formData();
 
   const registerInfoSubmission = {
-    type: 'student',
+    type: 'Student',
     name: data.get('name'),
     university: data.get('university'),
     enrollment: data.get('enrollment'),
