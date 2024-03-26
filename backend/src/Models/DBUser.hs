@@ -1,12 +1,13 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-missing-fields #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-module Models.DBUser (DBUser (..)) where
+module Models.DBUser (DBUser (..), DBUserOnlyId (..)) where
 
+import Data.Time (LocalTime)
 import Database.PostgreSQL.Simple.FromRow (FromRow)
 import Database.PostgreSQL.Simple.ToRow (ToRow)
 import GHC.Generics (Generic)
-import Data.Time (LocalTime)
 
 data DBUser = DBUser
   { dbUserName :: String,
@@ -16,7 +17,6 @@ data DBUser = DBUser
     dbUserEnrollment :: String,
     dbUserUniversity :: String,
     dbUsercreatedAt :: LocalTime,
-    validatorId :: Maybe Int,
     dbUserId :: Int
   }
   deriving (Show, Generic)
@@ -24,3 +24,12 @@ data DBUser = DBUser
 instance FromRow DBUser
 
 instance ToRow DBUser
+
+newtype DBUserOnlyId = DBUserOnlyId
+  { dbUserOnlyId :: Int
+  }
+  deriving (Show, Generic)
+
+instance FromRow DBUserOnlyId
+
+instance ToRow DBUserOnlyId

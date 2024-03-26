@@ -2,34 +2,34 @@ module Controllers.Users.UserController
   ( userRegister,
     userLogin,
     getUsers,
-    getUser,
     autoRemove,
     swapUser,
     removeUser,
     verifyLoginIO,
     getLoggedUser,
+    findUserByEmail,
+    findUserByEnroll,
   )
 where
 
-import DBLib (AnyField (..))
+
 import Data.Foldable (find)
-import Data.Maybe (mapMaybe)
+import Data.Maybe (fromJust, mapMaybe)
 import Lib (handleMaybe, joinStringArray, selectOption)
 import Models.User
   ( User (..),
     displayUser,
     filterByUserEnroll,
-    fromDBUser,
     setType,
     stringToUser,
     writeUserOnFile,
   )
+import Repositories.UserRepository (getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB)
 import System.Directory (removeFile)
 import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegisterUI)
 import TerminalUI.Users.Student (displayStudentOptions)
 import TerminalUI.Users.Teacher (displayTeacherOptions)
 import TerminalUI.Users.User (loginUI, registerUI, typeEnrollment, typeUserEmail, typeUserPassword)
-import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersAppDB, updateAllInUsersWhereAppDB)
 import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
 
 userRegister :: IO ()
@@ -59,9 +59,7 @@ toValidate user
       putStrLn "Usuário registrado com sucesso!"
 
 updateUser :: User -> IO ()
-updateUser user = do
-  let newValues = [userName user, userEmail user, userPassword user, userEnrollment user, userType user, userUniversity user]
-  updateAllInUsersWhereAppDB newValues [("enrollment_number", "=", userEnrollment user)]
+updateUser = updateUserInDB
 
 swapUser :: User -> User -> [User] -> [User]
 swapUser _ _ [] = []
@@ -70,13 +68,7 @@ swapUser old new (u : userL)
   | otherwise = u : swapUser old new userL
 
 getUsers :: IO [User]
-getUsers = map fromDBUser <$> selectAllFromUsersAppDB
-
-getUser :: String -> [User] -> User
-getUser _ [] = User {}
-getUser enroll (u : userList)
-  | enroll == userEnrollment u = u
-  | otherwise = getUser enroll userList
+getUsers = getUsersFromDB
 
 getLoggedUser :: IO (Maybe User)
 getLoggedUser = do
@@ -84,7 +76,7 @@ getLoggedUser = do
   return $ stringToUser (head (lines loggedUsers))
 
 removeUser :: String -> IO ()
-removeUser enroll = deleteFromUsersWhereAppDB [("enrollment_number", "=", enroll)]
+removeUser = removeUserFromDBByEnroll
 
 autoRemove :: IO ()
 autoRemove = do
@@ -134,9 +126,9 @@ handleUserLogin (Just user) userEmail' userPassword'
   | userEmail' == "everton@admin.ufcg.edu.br" && userPassword' == "senhasegura" = do
       updateEmailPassword user
       userList <- getUsers
-      let updatedUser = getUser (userEnrollment user) userList
-      writeUserOnFile "backend/data/session.txt" updatedUser
-      return (Just updatedUser)
+      let updatedUser = findUserByEmail (userEnrollment user) userList
+      writeUserOnFile "backend/data/session.txt" (fromJust updatedUser)
+      return updatedUser
   | otherwise = do
       writeUserOnFile "backend/data/session.txt" user
       return (Just user)
@@ -169,12 +161,12 @@ updateUserAdmin = do
   enroll <- getLine
   content <- readFile "backend/data/users.txt"
   let userList = mapMaybe stringToUser (lines content)
-  let user = getUser enroll userList
+  let user = findUserByEnroll enroll userList
 
   screenCleaner
   newType <- selectOption $ zip ["ADMINISTRADOR", "PROFESSOR", "ALUNO"] [return "administrator", return "teacher", return "student"]
-  let newUser = setType newType user
-  let newUserL = swapUser user newUser userList
+  let newUser = setType newType (fromJust user)
+  let newUserL = swapUser (fromJust user) newUser userList
   removeFile "backend/data/users.txt"
   mapM_ (writeUserOnFile "backend/data/users.txt") newUserL
 
@@ -192,16 +184,16 @@ validateUser = do
   putStrLn "Digite a matrícula do usuário que deseja validar: "
   enroll <- getLine
   --
-  let placeHolderUser = getUser enroll userList
+  let placeHolderUser = findUserByEmail enroll userList
   let newValidateList = filterByUserEnroll enroll userList
   removeFile "backend/data/toValidate.txt"
   mapM_ (writeUserOnFile "backend/data/toValidate.txt") newValidateList
-  writeUserOnFile "backend/data/users.txt" placeHolderUser
+  writeUserOnFile "backend/data/users.txt" (fromJust placeHolderUser)
 
   --
   screenCleaner
   putStrLn "O seguinte usuário foi validado com sucesso: "
-  displayUser placeHolderUser
+  (displayUser . fromJust) placeHolderUser
   administratorOptions
 
 userRemove :: IO ()
@@ -231,25 +223,25 @@ administratorOptions = displayAdministratorOptions [userRegisterADMIN, userRemov
 verifyLoginIO :: String -> String -> IO Bool
 verifyLoginIO email password = do
   userL <- getUsers
-  let user = getUserByEmail email userL
-  print user
-  if userPassword user == password
-    then do
-      writeUserOnFile "backend/data/session.txt" user
-      return True
-    else
-      return False
+  let user = findUserByEmail email userL
+  tryToPerformLogin user
+  where
+    tryToPerformLogin :: Maybe User -> IO Bool
+    tryToPerformLogin Nothing = return False
+    tryToPerformLogin (Just user)
+      | userPassword user == password = do
+          writeUserOnFile "backend/data/session.txt" user
+          return True
+      | otherwise = return False
 
-getUserByEmail :: String -> [User] -> User
-getUserByEmail _ [] =
-  User
-    { userType = "",
-      userName = "",
-      userUniversity = "",
-      userEnrollment = "",
-      userEmail = "",
-      userPassword = ""
-    }
-getUserByEmail email (u : userList)
-  | email == userEmail u = u
-  | otherwise = getUserByEmail email userList
+findUserByEmail :: String -> [User] -> Maybe User
+findUserByEmail _ [] = Nothing
+findUserByEmail email (user : users)
+  | email == userEmail user = Just user
+  | otherwise = findUserByEmail email users
+
+findUserByEnroll :: String -> [User] -> Maybe User
+findUserByEnroll _ [] = Nothing
+findUserByEnroll enroll (user : users)
+  | enroll == userEnrollment user = Just user
+  | otherwise = findUserByEnroll enroll users
