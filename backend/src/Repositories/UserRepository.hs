@@ -21,8 +21,8 @@ getUserFromDB = fromDBUser . head <$> selectAllFromUsersAppDB
 
 createUserInDB :: User -> IO ()
 createUserInDB user = do 
-  let newUserValues = [userName user, userEmail user, userPassword user, userEnrollment user, userType user, userUniversity user]
-  insertAllIntoUsersAppDB newUserValues  
+  let newUserValues = [userName user, userEmail user, userPassword user, userType user, userEnrollment user, userUniversity user]
+  insertAllIntoUsersAppDB newUserValues
 
 updateUserInDB :: User -> IO ()
 updateUserInDB user = do

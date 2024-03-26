@@ -9,24 +9,21 @@ module Models.User
     writeUserOnFile,
     displayUser,
     setType,
-    removeUser,
     showUserAPI,
     showAll,
-    filterByUserEnroll,
     fromDBUser,
   )
 where
 
-import Database.PostgreSQL.Simple.FromRow ( FromRow )
-import Database.PostgreSQL.Simple.ToRow ( ToRow )
+import Data.Aeson.Types (FromJSON, ToJSON)
+import Database.PostgreSQL.Simple.FromRow (FromRow)
+import Database.PostgreSQL.Simple.ToRow (ToRow)
 import GHC.Generics (Generic)
 import Lib
   ( stringToData,
     writeDataOnFile,
   )
 import Models.DBUser (DBUser (..))
-import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB)
-import Data.Aeson.Types (ToJSON, FromJSON)
 
 data User = User
   { userName :: String,
@@ -47,6 +44,7 @@ instance Eq UserEnrollment where
 instance FromRow User
 
 instance ToRow User
+
 instance ToJSON User
 
 instance FromJSON User
@@ -102,15 +100,3 @@ fromDBUser dbUser =
 
 showAll :: [User] -> String
 showAll = concatMap showUserAPI
-
-removeUser :: String -> [User] -> [User]
-removeUser _ [] = []
-removeUser enroll (u : userList)
-  | enroll == userEnrollment u = removeUser enroll userList
-  | otherwise = u : removeUser enroll userList
-
-filterByUserEnroll :: String -> [User] -> [User]
-filterByUserEnroll _ [] = []
-filterByUserEnroll enroll (u : userList)
-  | enroll == userEnrollment u = filterByUserEnroll enroll userList
-  | otherwise = u : filterByUserEnroll enroll userList

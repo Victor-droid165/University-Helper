@@ -19,7 +19,6 @@ import Lib (handleMaybe, joinStringArray, selectOption)
 import Models.User
   ( User (..),
     displayUser,
-    filterByUserEnroll,
     setType,
     stringToUser,
     writeUserOnFile,
@@ -245,6 +244,12 @@ findUserByEnroll _ [] = Nothing
 findUserByEnroll enroll (user : users)
   | enroll == userEnrollment user = Just user
   | otherwise = findUserByEnroll enroll users
+
+filterByUserEnroll :: String -> [User] -> [User]
+filterByUserEnroll _ [] = []
+filterByUserEnroll enroll (u : userList)
+  | enroll == userEnrollment u = filterByUserEnroll enroll userList
+  | otherwise = u : filterByUserEnroll enroll userList
 
 registerUserAPI :: User -> IO ()
 registerUserAPI = createUserInDB
