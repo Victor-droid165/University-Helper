@@ -8,9 +8,17 @@ CREATE TABLE users (
     type VARCHAR(10) CHECK (type IN ('Admin', 'Student', 'Professor', 'Visitor')) NOT NULL,
     enrollment_number VARCHAR(20),
     university_name VARCHAR(100),
-    admin_validator_id INT,
-    id SERIAL PRIMARY KEY,
-    FOREIGN KEY (admin_validator_id) REFERENCES users(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id SERIAL PRIMARY KEY
+);
+
+CREATE TABLE admin_user_validations (
+    admin_id INT NOT NULL,
+    user_id INT UNIQUE NOT NULL,
+    validation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (admin_id, user_id),
+    FOREIGN KEY (admin_id) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE notebooks (

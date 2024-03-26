@@ -6,6 +6,7 @@ module Models.DBUser (DBUser (..)) where
 import Database.PostgreSQL.Simple.FromRow (FromRow)
 import Database.PostgreSQL.Simple.ToRow (ToRow)
 import GHC.Generics (Generic)
+import Data.Time (LocalTime)
 
 data DBUser = DBUser
   { dbUserName :: String,
@@ -14,7 +15,8 @@ data DBUser = DBUser
     dbUserType :: String,
     dbUserEnrollment :: String,
     dbUserUniversity :: String,
-    validatorId :: Int,
+    dbUsercreatedAt :: LocalTime,
+    validatorId :: Maybe Int,
     dbUserId :: Int
   }
   deriving (Show, Generic)

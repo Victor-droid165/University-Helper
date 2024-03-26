@@ -31,7 +31,7 @@ import DBLib
     isSchemaCreated,
     populateDB,
     selectFromTableWhere,
-    updateInTableWhere,
+    updateInTableWhere, AnyField,
   )
 import qualified Data.ByteString.Char8 as BS
 import Data.Yaml (FromJSON (..), decodeFileThrow)
@@ -165,10 +165,10 @@ selectFromTableWhereAppDB tableName columns conditions = do
   close conn
   return result
 
-updateInTableAppDB :: (ToField b) => String -> [(String, b)] -> IO ()
+updateInTableAppDB :: String -> [(String, String)] -> IO ()
 updateInTableAppDB tableName updateValues = updateInTableWhereAppDB tableName updateValues ([] :: [(String, String, b)])
 
-updateInTableWhereAppDB :: (ToField b) => String -> [(String, b)] -> [(String, String, b)] -> IO ()
+updateInTableWhereAppDB :: String -> [(String, String)] -> [(String, String, String)] -> IO ()
 updateInTableWhereAppDB tableName updateValues conditions = do
   conn <- connectToAppDB
   updateInTableWhere conn ("uh_schema." ++ tableName) updateValues conditions

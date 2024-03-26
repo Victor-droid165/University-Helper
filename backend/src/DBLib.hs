@@ -1,3 +1,4 @@
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module DBLib
@@ -16,6 +17,7 @@ module DBLib
     selectFromTableWhere,
     updateInTableWhere,
     deleteFromTableWhere,
+    AnyField (..),
   )
 where
 
@@ -33,9 +35,18 @@ import Database.PostgreSQL.Simple.ToField (ToField)
 import Database.PostgreSQL.Simple.Types (Query (..))
 import System.FilePath ((</>))
 
-type WhereConditions b = [(String, String, b)]
+type WhereCondition b = (String, String, b)
 
-buildWhereClauses :: WhereConditions a -> BS.ByteString
+data AnyField = IntField Int | StringField String | DoubleField Double | NullableField (Maybe AnyField)
+instance Show AnyField where
+  show :: AnyField -> String
+  show (IntField i) = show i
+  show (DoubleField d) = show d
+  show (StringField s) = s
+  show (NullableField (Just nf)) = show nf
+  show (NullableField _) = "Nothing"
+
+buildWhereClauses :: [WhereCondition a] -> BS.ByteString
 buildWhereClauses conditions =
   if null conditions
     then BS.empty
@@ -143,7 +154,7 @@ insertIntoTable conn tableName cols vals = do
   _ <- execute conn (Query queryText) vals
   putStrLn "Data inserted successfully."
 
-selectFromTableWhere :: (FromRow a, ToField b) => Connection -> String -> [String] -> [(String, String, b)] -> IO [a]
+selectFromTableWhere :: (FromRow a, ToField b) => Connection -> String -> [String] -> [WhereCondition b] -> IO [a]
 selectFromTableWhere conn tableName columns conditions = do
   let tableNameBS = BS.pack tableName
       columnsBS = BS.intercalate ", " $ map BS.pack columns
@@ -152,7 +163,7 @@ selectFromTableWhere conn tableName columns conditions = do
       queryText = "SELECT " <> columnsBS <> " FROM " <> tableNameBS <> conditionsBS
   query conn (Query queryText) values
 
-updateInTableWhere :: (ToField b) => Connection -> String -> [(String, b)] -> [(String, String, b)] -> IO ()
+updateInTableWhere :: Connection -> String -> [(String, String)] -> [WhereCondition String] -> IO ()
 updateInTableWhere conn tableName updateValues conditions = do
   let tableNameBS = BS.pack tableName
       updateText =
@@ -165,7 +176,7 @@ updateInTableWhere conn tableName updateValues conditions = do
   _ <- execute conn (Query queryText) (map snd updateValues ++ values)
   putStrLn "Data updated successfully."
 
-deleteFromTableWhere :: (ToField b) => Connection -> String -> WhereConditions b -> IO ()
+deleteFromTableWhere :: (ToField b) => Connection -> String -> [WhereCondition b] -> IO ()
 deleteFromTableWhere conn tableName conditions = do
   let tableNameBS = BS.pack tableName
       conditionsBS = buildWhereClauses conditions

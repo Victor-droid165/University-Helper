@@ -7,10 +7,11 @@ module Controllers.Users.UserController
     swapUser,
     removeUser,
     verifyLoginIO,
-    getLoggedUser
+    getLoggedUser,
   )
 where
 
+import DBLib (AnyField (..))
 import Data.Foldable (find)
 import Data.Maybe (mapMaybe)
 import Lib (handleMaybe, joinStringArray, selectOption)

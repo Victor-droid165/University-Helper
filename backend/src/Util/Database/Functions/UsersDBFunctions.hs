@@ -33,16 +33,16 @@ selectAllFromUsersAppDB = selectFromTableAppDB "users" ["*"]
 insertAllIntoUsersAppDB :: (ToField a) => [a] -> IO ()
 insertAllIntoUsersAppDB = insertAllIntoTableAppDB "users"
 
-updateAllInUsersAppDB :: (ToField a) => [a] -> IO ()
+updateAllInUsersAppDB :: [String] -> IO ()
 updateAllInUsersAppDB newValues = updateInUsersAppDB $ zip ["name", "email", "password", "type", "enrollment_number", "university_name"] newValues
 
-updateAllInUsersWhereAppDB :: (ToField a) => [a] -> [(String, String, a)] -> IO ()
-updateAllInUsersWhereAppDB newValues = updateInUsersWhereAppDB $ zip ["name", "email", "password", "type", "enrollment_number", "university_name"] newValues 
+updateAllInUsersWhereAppDB :: [String] -> [(String, String, String)] -> IO ()
+updateAllInUsersWhereAppDB newValues = updateInUsersWhereAppDB $ zip ["name", "email", "password", "type", "enrollment_number", "university_name"] newValues
 
-updateInUsersAppDB :: (ToField a) => [(String, a)] -> IO ()
+updateInUsersAppDB :: [(String, String)] -> IO ()
 updateInUsersAppDB = updateInTableAppDB "users"
 
-updateInUsersWhereAppDB :: (ToField b) => [(String, b)] -> [(String, String, b)] -> IO ()
+updateInUsersWhereAppDB :: [(String, String)] -> [(String, String, String)] -> IO ()
 updateInUsersWhereAppDB = updateInTableWhereAppDB "users"
 
 deleteFromUsersAppDB :: IO ()
