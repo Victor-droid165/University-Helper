@@ -14,12 +14,13 @@ const AdminPage = () => {
   const [rows, setRows] = useState([]);
   
   useEffect( () => {
-      fetch('http://localhost:8081/api/users/users')
+      fetch('http://localhost:8081/api/users/usersDB')
         .then(response=>response.json())
         .then(data => {
           console.log(data);
-          const addId = data.map((user, index) => ({id: index + 1, ...user}));
-          setRows(addId);
+          //const addId = data.map((user, index) => ({id: index + 1, validate: "teste", ...user}));
+          //setRows(addId);
+          setRows(data)
         })
         .catch(error => console.error('Error fetching data:', error))
     }, []);
@@ -81,12 +82,12 @@ const AdminPage = () => {
 
   const handleAccessChange = (id, newAccess, email) => {
     // Impede a alteração do nível de acesso se for 'admin'
-    const currentAccess = rows.find(row => row.id === id).userType;
+    const currentAccess = rows.find(row => row.id === id).dbUserType;
     console.log(newAccess);
     if (currentAccess !== "Admin") {
       const newRows = rows.map((row) => {
         if (row.id === id) {
-          return { ...row, userType: newAccess };
+          return { ...row, dbUserType: newAccess };
         }
         return row;
       });
@@ -95,69 +96,73 @@ const AdminPage = () => {
     }
   };
 
-  const handleDeleteRow = (id, email) => {
-    fetch('http://localhost:8081/api/users/deleteUser/', {
+  
+  const handleDeleteRow = (id) => {
+    fetch('http://localhost:8081/api/users/deleteUser', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ value: email }),
+      body: JSON.stringify({ value: rows.find(row => row.id === id).dbUserId.toString() }),
     })
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to delete user');
         }
-        const updatedRows = rows.filter(row => row.id !== id);
-        setRows(updatedRows);
+        window.location.reload()
       })
       .catch(error => console.error('Error deleting user:', error));
   };
 
   const columns = [
-    { field: 'id', headerName: 'Id', headerAlign: 'center', flex: 0.5 },
+    { field: 'dbUserId', headerName: 'Id', headerAlign: 'center', flex: 0.5 },
     {
-      field: 'userName',
+      field: 'dbUserName',
       headerName: 'Nome',
       headerAlign: 'center',
       flex: 1,
     },
     {
-      field: 'userUniversity',
+      field: 'dbUserUniversity',
       headerName: 'Universidade',
       type: 'number',
       headerAlign: 'center',
       align: 'left',
       flex: 1,
     },
-    { field: 'userEnrollment', headerName: 'Matrícula', headerAlign: 'center', align: 'center', flex: 1 },
-    { field: 'userEmail', headerName: 'Email', headerAlign: 'center', flex: 1 },
+    { field: 'dbUserEnrollment', headerName: 'Matrícula', headerAlign: 'center', align: 'center', flex: 1 },
+    { field: 'dbUserEmail', headerName: 'Email', headerAlign: 'center', flex: 1 },
     {
       field: 'delete',
       headerName: 'Deletar',
       headerAlign: 'center',
       flex: 0.5,
       renderCell: (params) => (
-        <IconButton onClick={() => handleDeleteRow(params.row.id, params.row.userEmail)}>
+        <IconButton onClick={() => handleDeleteRow(params.row.id)}>
           <DeleteIcon color="error" />
         </IconButton>
       ),
     },
+    { 
+      field: 'validate', headerName: "Validação", headerAlign: 'center', align: 'center', flex: 1
+      
+    },
     {
-      field: 'userType',
+      field: 'dbUserType',
       headerName: 'Cargo',
       headerAlign: 'center',
       flex: 1,
       renderCell: (params) => (
         <FormControl fullWidth>
           <Select
-            value={params.row.userType}
-            onChange={(event) => handleAccessChange(params.row.id, event.target.value, params.row.userEmail)}
+            value={params.row.dbUserType}
+            onChange={(event) => handleAccessChange(params.row.id, event.target.value, params.row.dbUserEmail)}
             displayEmpty
             size="small"
             sx={{
               display: 'flex',
               alignItems: 'center',
-              backgroundColor: params.row.userType === 'admin'
+              backgroundColor: params.row.dbUserType === 'admin'
                 ? theme.palette.special.main
                 : theme.palette.secondary.main,
               color: theme.palette.primary.contrastText,
@@ -225,7 +230,10 @@ const AdminPage = () => {
             },
           }}
         >
-          <DataGrid rows={rows} columns={columns} autoPageSize/>
+          <DataGrid   rows={rows} 
+                      columns={columns} 
+                      getRowId={(row) => row.dbUserId}
+                      autoPageSize/>
         </Box>
       </Box>
     </ThemeProvider>

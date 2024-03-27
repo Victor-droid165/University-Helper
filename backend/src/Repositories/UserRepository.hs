@@ -7,14 +7,19 @@ module Repositories.UserRepository
     removeUserFromDB,
     updateUserInDB,
     createUserInDB,
+    getDBusersFromDB,
   )
 where
 
 import Models.User (User (..), fromDBUser)
 import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersAppDB, updateAllInUsersWhereAppDB, insertAllIntoUsersAppDB)
+import Models.DBUser (DBUser)
 
 getUsersFromDB :: IO [User]
 getUsersFromDB = map fromDBUser <$> selectAllFromUsersAppDB
+
+getDBusersFromDB :: IO [DBUser]
+getDBusersFromDB = selectAllFromUsersAppDB
 
 getUserFromDB :: IO User
 getUserFromDB = fromDBUser . head <$> selectAllFromUsersAppDB

@@ -14,7 +14,7 @@ import Control.Monad (forM)
 import Control.Monad.IO.Class (liftIO)
 import Controllers.Users.AdministratorController (unvalidateUserAPI, validateUserAPI)
 import Controllers.Users.UserController
-    ( findUserByEmail, getUsers, verifyLoginIO, registerUserAPI )
+    ( findUserByEmail, getUsers, verifyLoginIO, registerUserAPI, getDBUsers )
 import Data.Aeson
 import Data.Maybe (mapMaybe, fromJust)
 import GHC.Generics
@@ -42,6 +42,7 @@ import Util.Validate
   )
 import Util.Database.Functions.UsersDBFunctions (insertAllIntoUsersAppDB, deleteFromUsersAppDB, deleteFromUsersWhereAppDB, updateInUsersWhereAppDB)
 import Util.Database.DBFunctions (deleteFromTableWhereAppDB)
+import Models.DBUser (DBUser)
 
 newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
 
@@ -53,6 +54,7 @@ type API =
   "api"
     :> "users"
     :> ( "users" :> Get '[JSON] [User]
+           :<|> "usersDB" :> Get '[JSON] [DBUser]
            :<|> "validateName" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "validateUniversity" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "validateEmail" :> ReqBody '[JSON] MyData :> Post '[JSON] String
@@ -83,6 +85,7 @@ userAPI = Proxy
 superServer :: Server API
 superServer =
   users
+    :<|> usersDB
     :<|> validateName
     :<|> validateUniversity
     :<|> validateEmail
@@ -149,11 +152,7 @@ showAllUsers = do
   return $ showAll users
 
 deleteUser :: MyData -> Handler String
-deleteUser mydata = do
-  res <- isRegistered mydata
-  if res
-    then liftIO $ deleteFromUsersWhereAppDB [("email", "=", value mydata)] >> return "Success"
-    else return "Failure"
+deleteUser mydata = liftIO $ deleteFromUsersWhereAppDB [("id", "=", value mydata)] >> return "Success"
 
 updateAny :: ChangeData -> Handler String
 updateAny mydata = do 
@@ -164,6 +163,9 @@ updateAny mydata = do
 
 users :: Handler [User]
 users = liftIO getUsers
+
+usersDB :: Handler [DBUser]
+usersDB = liftIO getDBUsers
 
 serveOn :: IO ()
 serveOn = start >> run 8081 (app userAPI superServer)

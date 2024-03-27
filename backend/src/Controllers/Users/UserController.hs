@@ -10,6 +10,7 @@ module Controllers.Users.UserController
     findUserByEmail,
     findUserByEnroll,
     registerUserAPI,
+    getDBUsers,
   )
 where
 
@@ -23,13 +24,15 @@ import Models.User
     stringToUser,
     writeUserOnFile,
   )
-import Repositories.UserRepository (createUserInDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB)
+import Repositories.UserRepository (createUserInDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB, getDBusersFromDB)
 import System.Directory (removeFile)
 import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegisterUI)
 import TerminalUI.Users.Student (displayStudentOptions)
 import TerminalUI.Users.Teacher (displayTeacherOptions)
 import TerminalUI.Users.User (loginUI, registerUI, typeEnrollment, typeUserEmail, typeUserPassword)
 import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
+
+import Models.DBUser (DBUser)
 
 userRegister :: IO ()
 userRegister = do
@@ -68,6 +71,9 @@ swapUser old new (u : userL)
 
 getUsers :: IO [User]
 getUsers = getUsersFromDB
+
+getDBUsers :: IO [DBUser]
+getDBUsers = getDBusersFromDB
 
 getLoggedUser :: IO (Maybe User)
 getLoggedUser = do

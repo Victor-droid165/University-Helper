@@ -98,5 +98,6 @@ fromDBUser dbUser =
       userUniversity = dbUserUniversity dbUser
     }
 
+
 showAll :: [User] -> String
 showAll = concatMap showUserAPI
