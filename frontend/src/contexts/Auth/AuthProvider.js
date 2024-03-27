@@ -15,8 +15,8 @@ export const AuthProvider = ({ children }) => {
     }
 
     const isAuthenticated = () => {
-        return Boolean(user);
-        //return Boolean(localStorage.getItem("loggedUser"))
+        //return Boolean(user);
+        return Boolean(localStorage.getItem("loggedUser"))
     }
 
     useEffect(() => {

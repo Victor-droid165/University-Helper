@@ -24,6 +24,29 @@ const AdminPage = () => {
         .catch(error => console.error('Error fetching data:', error))
     }, []);
   
+  const updateAny = (field, newValue, match, matchValue) => {
+      const data = { field, newValue, match, matchValue };
+      fetch('http://localhost:8081/api/users/updateAny', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to update user');
+          }
+          console.log(response);
+          return response.json();
+        })
+        .then(() => {
+          console.log(data);
+        })
+        .catch(error => {
+          console.error('Error updating user:', error);
+        });
+    };
 
   const theme = createTheme({
     components: {
@@ -56,9 +79,10 @@ const AdminPage = () => {
     },
   });
 
-  const handleAccessChange = (id, newAccess) => {
+  const handleAccessChange = (id, newAccess, email) => {
     // Impede a alteração do nível de acesso se for 'admin'
     const currentAccess = rows.find(row => row.id === id).userType;
+    console.log(newAccess);
     if (currentAccess !== "Admin") {
       const newRows = rows.map((row) => {
         if (row.id === id) {
@@ -66,13 +90,27 @@ const AdminPage = () => {
         }
         return row;
       });
+      updateAny("type", newAccess, "email", email)
       setRows(newRows);
     }
   };
 
-  const handleDeleteRow = (id) => {
-    const updatedRows = rows.filter(row => row.id !== id);
-    setRows(updatedRows);
+  const handleDeleteRow = (id, email) => {
+    fetch('http://localhost:8081/api/users/deleteUser/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ value: email }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to delete user');
+        }
+        const updatedRows = rows.filter(row => row.id !== id);
+        setRows(updatedRows);
+      })
+      .catch(error => console.error('Error deleting user:', error));
   };
 
   const columns = [
@@ -99,7 +137,7 @@ const AdminPage = () => {
       headerAlign: 'center',
       flex: 0.5,
       renderCell: (params) => (
-        <IconButton onClick={() => handleDeleteRow(params.row.id)}>
+        <IconButton onClick={() => handleDeleteRow(params.row.id, params.row.userEmail)}>
           <DeleteIcon color="error" />
         </IconButton>
       ),
@@ -113,7 +151,7 @@ const AdminPage = () => {
         <FormControl fullWidth>
           <Select
             value={params.row.userType}
-            onChange={(event) => handleAccessChange(params.row.id, event.target.value)}
+            onChange={(event) => handleAccessChange(params.row.id, event.target.value, params.row.userEmail)}
             displayEmpty
             size="small"
             sx={{

@@ -19,10 +19,8 @@ const router = createBrowserRouter(
       <Route path="login" element={<LoginPage />} action={loginAction} />
       <Route path="logout" element={<LogoutPage />} />
 
-      <Route element={<ProtectedRoutes />}>
         <Route path="admin" element={<AdminPage />} />
         <Route path="note_creation" element={<NoteCreationPage />} />
-      </Route> 
       {/* <Route path="admin" element={<Album />}/> */}
 
       {/*<Route path='*' element={<NotFoundPage />}/>*/}

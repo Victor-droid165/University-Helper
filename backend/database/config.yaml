@@ -2,4 +2,4 @@ db_host: "localhost"
 db_port: 5432
 db_name: "postgres"
 db_user: "postgres"
-db_password: "minha_senha_forte"
+db_password: "senhaSegura"

@@ -40,11 +40,14 @@ import Util.Validate
     userPasswordValidation,
     userUniversityValidation,
   )
-import Util.Database.Functions.UsersDBFunctions (insertAllIntoUsersAppDB)
+import Util.Database.Functions.UsersDBFunctions (insertAllIntoUsersAppDB, deleteFromUsersAppDB, deleteFromUsersWhereAppDB, updateInUsersWhereAppDB)
+import Util.Database.DBFunctions (deleteFromTableWhereAppDB)
 
 newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
 
 data LogInfo = LogInfo {email :: String, password :: String} deriving (Eq, Show, Generic, FromJSON)
+
+data ChangeData = ChangeData {field :: String, newValue :: String, match :: String, matchValue :: String} deriving (Eq, Show, Generic, FromJSON)
 
 type API =
   "api"
@@ -62,6 +65,8 @@ type API =
            :<|> "isRegistered" :> ReqBody '[JSON] MyData :> Post '[JSON] Bool
            :<|> "showUser" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "showAllUsers" :> Get '[JSON] String
+           :<|> "deleteUser" :> ReqBody '[JSON] MyData :> Post '[JSON] String
+           :<|> "updateAny" :> ReqBody '[JSON] ChangeData :> Post '[JSON] String
        )
 
 -- 'serve' comes from servant and hands you a WAI Application,
@@ -90,6 +95,9 @@ superServer =
     :<|> isRegistered
     :<|> showUser
     :<|> showAllUsers
+    :<|> deleteUser
+    :<|> updateAny
+
 
 validateName :: MyData -> Handler String
 validateName myData = return $ handleValidationServer (userNameValidation (value myData))
@@ -139,6 +147,18 @@ showAllUsers :: Handler String
 showAllUsers = do
   users <- liftIO getUsers
   return $ showAll users
+
+deleteUser :: MyData -> Handler String
+deleteUser mydata = do
+  res <- isRegistered mydata
+  if res
+    then liftIO $ deleteFromUsersWhereAppDB [("email", "=", value mydata)] >> return "Success"
+    else return "Failure"
+
+updateAny :: ChangeData -> Handler String
+updateAny mydata = do 
+  liftIO $ updateInUsersWhereAppDB [(field mydata, newValue mydata)] [(match mydata, "=", matchValue mydata)] 
+  showUser (MyData {value = matchValue mydata})
 
 -- LOGIN AND REGISTER
 
