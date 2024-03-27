@@ -9,6 +9,7 @@ import NoteCreationPage from '../pages/notes/creation';
 import { loginAction } from '../components/UserLoginForm/UserLoginForm';
 import ProtectedRoutes from './ProtectedRoutes'
 import LogoutPage from '../pages/logout/LogoutPage';
+import ListNotes from '../pages/notes/list';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,8 +20,12 @@ const router = createBrowserRouter(
       <Route path="login" element={<LoginPage />} action={loginAction} />
       <Route path="logout" element={<LogoutPage />} />
 
+      <Route element={<ProtectedRoutes />}>
         <Route path="admin" element={<AdminPage />} />
         <Route path="note_creation" element={<NoteCreationPage />} />
+        <Route path="note_list" element={<ListNotes />} />
+      </Route>
+
       {/* <Route path="admin" element={<Album />}/> */}
 
       {/*<Route path='*' element={<NotFoundPage />}/>*/}
