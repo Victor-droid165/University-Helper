@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container, MenuItem } from '@mui/material';
+import { Avatar, Button, CssBaseline, TextField, Select, Link, Grid, Box, Typography, Container, MenuItem } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
@@ -179,6 +179,19 @@ const User = () => {
                       />
                     </Grid>
                     <Grid item xs={12}>
+                      <Select
+                        fullWidth
+                        id="userType"
+                        name="type"
+                        autoComplete="userType"
+                        value={user.type}
+                        onChange={handleChange}
+                      >
+                        <MenuItem value="Student">Aluno</MenuItem>
+                        <MenuItem value="Professor">Professor</MenuItem>
+                      </Select> 
+                    </Grid>
+                    <Grid item xs={12}>
                       <TextField
                         fullWidth
                         id="userEnrollment"
@@ -255,7 +268,7 @@ export const registerAction = async ({ request }) => {
   const data = await request.formData();
 
   const registerInfoSubmission = {
-    type: 'Student',
+    type: data.get('type'),
     name: data.get('name'),
     university: data.get('university'),
     enrollment: data.get('enrollment'),
