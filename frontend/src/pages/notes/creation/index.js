@@ -7,7 +7,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import TextNote from './textNote';
 import { blue, red } from "@mui/material/colors";
-import Notice from './notice';
+import Warning from './warning';
 import Reminder from './reminder';
 
 export default function IconPositionTabs() {
@@ -20,7 +20,7 @@ export default function IconPositionTabs() {
   const getContent = (index) => {
     switch (index) {
       case 0:
-        return <Notice />;
+        return <Warning />;
       case 1:
         return <TextNote />;
       case 2:

@@ -3,9 +3,9 @@ import { Button, TextField, Typography, Container, Grid, IconButton, Select, Men
 import DeleteIcon from '@mui/icons-material/Delete';
 import { mockDataTeam } from "../../../data/mockData.js";
 
-const Notice = () => {
+const Warning = () => {
   const [title, setTitle] = useState('');
-  const [notice, setNotice] = useState('');
+  const [warning, setWarning] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
   const [rows] = useState(mockDataTeam);
 
@@ -14,13 +14,13 @@ const Notice = () => {
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Usuário Selecionado:", selectedUser);
     console.log("Título:", title);
-    console.log("Aviso:", notice);
+    console.log("Aviso:", warning);
     // Aqui você pode adicionar lógica para salvar no backend, se necessário
   };
 
   const handleClear = () => {
     setTitle('');
-    setNotice('');
+    setWarning('');
     setSelectedUser('');
   };
 
@@ -67,11 +67,11 @@ const Notice = () => {
             fullWidth
             multiline
             rows={8}
-            id="notice"
+            id="warning"
             label="Aviso"
-            name="notice"
-            value={notice}
-            onChange={(e) => setNotice(e.target.value)}
+            name="warning"
+            value={warning}
+            onChange={(e) => setWarning(e.target.value)}
             style={{ marginBottom: '1rem' }}
           />
           <Grid container spacing={2}>
@@ -108,4 +108,4 @@ const Notice = () => {
   );
 };
 
-export default Notice;
+export default Warning;
