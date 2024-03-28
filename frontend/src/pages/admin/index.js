@@ -9,46 +9,20 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { blue, red } from "@mui/material/colors";
+import { useApi } from "../../hooks/useApi.js";
 
 const AdminPage = () => {
   const [rows, setRows] = useState([]);
-  
-  useEffect( () => {
-      fetch('http://localhost:8081/api/users/usersDB')
-        .then(response=>response.json())
-        .then(data => {
-          console.log(data);
-          //const addId = data.map((user, index) => ({id: index + 1, validate: "teste", ...user}));
-          //setRows(addId);
-          setRows(data)
-        })
-        .catch(error => console.error('Error fetching data:', error))
-    }, []);
-  
-  const updateAny = (field, newValue, match, matchValue) => {
-      const data = { field, newValue, match, matchValue };
-      fetch('http://localhost:8081/api/users/updateAny', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to update user');
-          }
-          console.log(response);
-          return response.json();
-        })
-        .then(() => {
-          console.log(data);
-        })
-        .catch(error => {
-          console.error('Error updating user:', error);
-        });
+  const api = useApi();
+
+  useEffect(() => {
+    api.getDBUsers().then((dbUsers) => setRows(dbUsers));
+  }, []);
+
+  const updateUser = async (field, newValue, match, matchValue) => {
+    await api.updateUserField({ field, newValue, match, matchValue });
   };
-  
+
   const setValidates = () => {
     fetch('http://localhost:8081/api/users/getIdsValidated', {
       method: 'GET',
@@ -58,7 +32,7 @@ const AdminPage = () => {
       body: JSON.stringify(),
     })
       .then(response => response.json())
-      .then(data => { 
+      .then(data => {
         console.log();
       })
       .catch(error => {
@@ -107,12 +81,12 @@ const AdminPage = () => {
         }
         return row;
       });
-      updateAny("type", newAccess, "email", email);
+      updateUser("type", newAccess, "email", email);
       setRows(newRows);
     }
   };
-  
-  
+
+
   const handleDeleteRow = (dbUserId) => {
     fetch('http://localhost:8081/api/users/deleteUser', {
       method: 'POST',
@@ -121,13 +95,13 @@ const AdminPage = () => {
       },
       body: JSON.stringify({ value: dbUserId.toString() }),
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to delete user');
-      }
-      setRows(prevRows => prevRows.filter(row => row.dbUserId !== dbUserId));
-    })
-    .catch(error => console.error('Error deleting user:', error));
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to delete user');
+        }
+        setRows(prevRows => prevRows.filter(row => row.dbUserId !== dbUserId));
+      })
+      .catch(error => console.error('Error deleting user:', error));
   };
 
   const columns = [
@@ -168,7 +142,7 @@ const AdminPage = () => {
       renderCell: (params) => {
         // O ideal é usar o padrão abaixo igual nos outros casos, mas por hora, deixarei mockado
         // const isValidated = params.row.isValidated;
-    
+
         const isValidated = true;
 
         if (!isValidated) {
@@ -276,10 +250,10 @@ const AdminPage = () => {
             },
           }}
         >
-          <DataGrid   rows={rows} 
-                      columns={columns} 
-                      getRowId={(row) => row.dbUserId}
-                      autoPageSize/>
+          <DataGrid rows={rows}
+            columns={columns}
+            getRowId={(row) => row.dbUserId}
+            autoPageSize />
         </Box>
       </Box>
     </ThemeProvider>

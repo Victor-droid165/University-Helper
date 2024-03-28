@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom/client';
 import { Avatar, Button, CssBaseline, TextField, Select, Link, Grid, Box, Typography, Container, MenuItem } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
-import { Form, useActionData, useLocation, useNavigate } from 'react-router-dom';
-import { validateUser } from '../../components/UserLoginForm/UserLoginForm';
+import { Form, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+import { useApi } from '../../hooks/useApi';
+import { validateUser } from '../../utils/utils';
 
 function Register() {
   return (
@@ -29,17 +25,17 @@ const User = () => {
   });
 
   const [errors, setErrors] = useState({
-    userNameError: '',
-    userUniversityError: '',
-    userEmailError: '',
-    userEnrollmentError: '',
-    userPasswordError: '',
+    nameError: '',
+    universityError: '',
+    emailError: '',
+    enrollmentError: '',
+    passwordError: '',
   });
 
   const [alerts, setAlerts] = useState([]);
 
-  const data = useActionData();
   const auth = useAuth();
+  const api = useApi();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -47,9 +43,6 @@ const User = () => {
 
   useEffect(() => {
     setErrors(errors);
-  }, [errors]);
-
-  useEffect(() => {
     if (alerts.length > 0) {
       const timer = setTimeout(() => {
         setAlerts(prevAlerts => prevAlerts.slice(1));
@@ -57,7 +50,7 @@ const User = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [alerts]);
+  }, [alerts, errors]);
 
   const showAlert = (severity, message) => {
     setAlerts(prevAlerts => [...prevAlerts, { severity, message }]);
@@ -70,30 +63,48 @@ const User = () => {
     });
   };
 
-  useEffect(() => {
-    if (data) {
-      if (data.validationErrors) {
-        setErrors(data.validationErrors);
-      }
-      else if (data.alerts) {
-        showAlert(...data.alerts);
-        setErrors({
-          userNameError: '',
-          userUniversityError: '',
-          userEmailError: '',
-          userEnrollmentError: '',
-          userPasswordError: '',
-        });
-      }
-      else if (data.error)
-        console.log(data.error);
-      else {
-        auth.login(data);
-        navigate(redirectPath, { replace: true });
-      }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleRegister();
+  };
 
+  const handleRegister = async () => {
+    try {
+      const validationErrors = await validateUser(api, user);
+
+      if (Object.keys(validationErrors).length === 0) {
+
+        const isRegistered = await api.isRegistered(user);
+        const canRegister = isRegistered !== "Failure";
+
+        const normalizedUserInfo = Object.keys(user).reduce((acc, key) => {
+          const normalizedKey = 'user' + key.charAt(0).toUpperCase() + key.slice(1);
+          acc[normalizedKey] = user[key];
+          return acc;
+        }, {});
+
+        if (canRegister) {
+          await api.registerUser(normalizedUserInfo);
+          auth.login({ email: user.email });
+          navigate(redirectPath, { replace: true });
+
+        } else {
+          showAlert('error', "Usuário já cadastrado no nosso sistema!\nFaça o login!");
+          setErrors({
+            nameError: '',
+            universityError: '',
+            emailError: '',
+            enrollmentError: '',
+            passwordError: '',
+          });
+        }
+      } else {
+        setErrors(validationErrors);
+      }
+    } catch (error) {
+      console.log(error);
     }
-  }, [auth, data, navigate, redirectPath]);
+  }
 
   const styles = {
     form: {
@@ -148,7 +159,7 @@ const User = () => {
               <Typography component="h1" variant="h5">
                 Sign up
               </Typography>
-              <Form method='post' action='/register'>
+              <Form method='post' onSubmit={handleSubmit}>
                 <Box noValidate sx={{ mt: 3 }}>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
@@ -159,8 +170,8 @@ const User = () => {
                         id="userName"
                         label="Nome"
                         autoFocus
-                        error={Boolean(errors.userNameError)}
-                        helperText={errors.userNameError}
+                        error={Boolean(errors.nameError)}
+                        helperText={errors.nameError}
                         value={user.name}
                         onChange={handleChange}
                       />
@@ -172,8 +183,8 @@ const User = () => {
                         label="Universidade"
                         name="university"
                         autoComplete="university"
-                        error={Boolean(errors.userUniversityError)}
-                        helperText={errors.userUniversityError}
+                        error={Boolean(errors.universityError)}
+                        helperText={errors.universityError}
                         value={user.university}
                         onChange={handleChange}
                       />
@@ -189,7 +200,7 @@ const User = () => {
                       >
                         <MenuItem value="Student">Aluno</MenuItem>
                         <MenuItem value="Professor">Professor</MenuItem>
-                      </Select> 
+                      </Select>
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
@@ -198,8 +209,8 @@ const User = () => {
                         label="Matrícula"
                         name="enrollment"
                         autoComplete="enrollment"
-                        error={Boolean(errors.userEnrollmentError)}
-                        helperText={errors.userEnrollmentError}
+                        error={Boolean(errors.enrollmentError)}
+                        helperText={errors.enrollmentError}
                         value={user.enrollment}
                         onChange={handleChange}
                       />
@@ -211,8 +222,8 @@ const User = () => {
                         label="Email Address"
                         name="email"
                         autoComplete="email"
-                        error={Boolean(errors.userEmailError)}
-                        helperText={errors.userEmailError}
+                        error={Boolean(errors.emailError)}
+                        helperText={errors.emailError}
                         value={user.email}
                         onChange={handleChange}
                       />
@@ -225,8 +236,8 @@ const User = () => {
                         type="password"
                         id="userPassword"
                         autoComplete="new-password"
-                        error={Boolean(errors.userPasswordError)}
-                        helperText={errors.userPasswordError}
+                        error={Boolean(errors.passwordError)}
+                        helperText={errors.passwordError}
                         value={user.password}
                         onChange={handleChange}
                       />
@@ -262,70 +273,6 @@ const User = () => {
       </Box>
     </Box>
   );
-}
-
-export const registerAction = async ({ request }) => {
-  const data = await request.formData();
-
-  const registerInfoSubmission = {
-    type: data.get('type'),
-    name: data.get('name'),
-    university: data.get('university'),
-    enrollment: data.get('enrollment'),
-    email: data.get('email'),
-    password: data.get('password'),
-  }
-
-  try {
-    const validationResults = await validateUser(registerInfoSubmission);
-
-    const validationErrors = validationResults.reduce((errors, error, index) => {
-      if (error?.startsWith('Erro')) {
-        errors['user' + capitalize(Object.keys(registerInfoSubmission)[index]) + 'Error'] = error;
-      }
-      return errors;
-    }, {});
-
-    if (Object.keys(validationErrors).length === 0) {
-
-      const response = await fetch('http://localhost:8081/api/users/isRegistered', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ value: registerInfoSubmission.email })
-      })
-      const json = await response.json();
-      const canRegister = json !== "Failure";
-
-      const normalizedRegisterInfoSubmission = Object.keys(registerInfoSubmission).reduce((acc, key) => {
-        const normalizedKey = 'user' + key.charAt(0).toUpperCase() + key.slice(1);
-        acc[normalizedKey] = registerInfoSubmission[key];
-        return acc;
-      }, {});
-
-      if (canRegister) {
-        (async () => {
-          await fetch('http://localhost:8081/api/users/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({u_type: data.get('type'), user: normalizedRegisterInfoSubmission}),
-          });
-        })();
-
-      } else {
-        return { alerts: ['error', "Usuário já cadastrado no nosso sistema!\nFaça o login!"] }
-      }
-    } else {
-      return { validationErrors }
-    }
-  } catch (error) {
-    return { error: 'Erro: ' + error }
-  }
-
-  return { email: registerInfoSubmission.email, password: registerInfoSubmission.password };
 }
 
 export default Register;

@@ -12,12 +12,20 @@ where
 
 import Control.Monad (forM)
 import Control.Monad.IO.Class (liftIO)
-import Controllers.Users.AdministratorController (unvalidateUserAPI, validateUserAPI, getIds)
+import Controllers.Users.AdministratorController (getIds, unvalidateUserAPI, validateUserAPI)
 import Controllers.Users.UserController
-    ( findUserByEmail, getUsers, verifyLoginIO, registerUserAPI, getDBUsers, registerStudentAPI )
+  ( findUserByEmail,
+    getDBUsers,
+    getUsers,
+    registerStudentAPI,
+    registerUserAPI,
+    verifyLoginIO,
+  )
 import Data.Aeson
-import Data.Maybe (mapMaybe, fromJust)
+import Data.Maybe (fromJust, mapMaybe)
 import GHC.Generics
+import Models.AdminValidate (AdminV)
+import Models.DBUser (DBUser)
 import Models.User
   ( User (..),
     showAll,
@@ -30,6 +38,8 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.Cors
 import Servant
+import Util.Database.DBFunctions (deleteFromTableWhereAppDB)
+import Util.Database.Functions.UsersDBFunctions (deleteFromUsersAppDB, deleteFromUsersWhereAppDB, insertAllIntoUsersAppDB, selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
 import Util.ScreenCleaner (start)
 import Util.Validate
   ( belongsToList,
@@ -40,10 +50,7 @@ import Util.Validate
     userPasswordValidation,
     userUniversityValidation,
   )
-import Util.Database.Functions.UsersDBFunctions (insertAllIntoUsersAppDB, deleteFromUsersAppDB, deleteFromUsersWhereAppDB, updateInUsersWhereAppDB)
-import Util.Database.DBFunctions (deleteFromTableWhereAppDB)
-import Models.DBUser (DBUser)
-import Models.AdminValidate (AdminV)
+import Database.PostgreSQL.Simple (FromRow, ToRow)
 
 newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
 
@@ -52,6 +59,8 @@ data LogInfo = LogInfo {email :: String, password :: String} deriving (Eq, Show,
 data RegisterInfo = RegisterInfo {u_type :: String, user :: User} deriving (Eq, Show, Generic, FromJSON)
 
 data ChangeData = ChangeData {field :: String, newValue :: String, match :: String, matchValue :: String} deriving (Eq, Show, Generic, FromJSON)
+
+data GetUserFieldData = GetUserFieldData {unique_key_name :: Maybe String, unique_key :: Maybe String, attribute :: Maybe String} deriving (Eq, Show, Generic, FromJSON)
 
 type API =
   "api"
@@ -73,6 +82,12 @@ type API =
            :<|> "showAllUsers" :> Get '[JSON] String
            :<|> "deleteUser" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "updateAny" :> ReqBody '[JSON] ChangeData :> Post '[JSON] String
+           :<|> ( "getAny"
+                    :> QueryParam "unique_key_name" String
+                    :> QueryParam "unique_key" String
+                    :> QueryParam "attribute" String
+                    :> Get '[JSON] String
+                )
        )
 
 -- 'serve' comes from servant and hands you a WAI Application,
@@ -105,10 +120,10 @@ superServer =
     :<|> showAllUsers
     :<|> deleteUser
     :<|> updateAny
-
+    :<|> getAny
 
 getIdsValidated :: Handler [AdminV]
-getIdsValidated = liftIO $ getIds
+getIdsValidated = liftIO getIds
 
 validateName :: MyData -> Handler String
 validateName myData = return $ handleValidationServer (userNameValidation (value myData))
@@ -141,9 +156,10 @@ register registerInfo = do
     then return "Failure"
     else do
       liftIO $ registerIn registerInfo
-  where 
-    registerIn registerInfo | u_type registerInfo == "Professor" = liftIO $ registerUserAPI (user registerInfo) >> return "Success"
-                            | otherwise = liftIO $ registerStudentAPI (user registerInfo) >> return "Success"
+  where
+    registerIn registerInfo
+      | u_type registerInfo == "Professor" = liftIO $ registerUserAPI (user registerInfo) >> return "Success"
+      | otherwise = liftIO $ registerStudentAPI (user registerInfo) >> return "Success"
 
 isRegistered :: MyData -> Handler Bool
 isRegistered emailData = do
@@ -165,9 +181,22 @@ deleteUser :: MyData -> Handler String
 deleteUser mydata = liftIO $ deleteFromUsersWhereAppDB [("id", "=", value mydata)] >> return "Success"
 
 updateAny :: ChangeData -> Handler String
-updateAny mydata = do 
-  liftIO $ updateInUsersWhereAppDB [(field mydata, newValue mydata)] [(match mydata, "=", matchValue mydata)] 
+updateAny mydata = do
+  liftIO $ updateInUsersWhereAppDB [(field mydata, newValue mydata)] [(match mydata, "=", matchValue mydata)]
   showUser (MyData {value = matchValue mydata})
+
+newtype RandomData = RandomData {userType' :: String} deriving (Show, Read, Eq, Generic)
+instance FromRow RandomData
+instance ToRow RandomData
+
+
+getAny :: Maybe String -> Maybe String -> Maybe String -> Handler String
+getAny mUniqueKeyName mUniqueKey mAttribute = do
+  liftIO $ print mUniqueKeyName
+  liftIO $ print mUniqueKey
+  liftIO $ print mAttribute
+  result <- liftIO (selectFromUsersWhereAppDB [fromJust mAttribute] [(fromJust mUniqueKeyName, "=", fromJust mUniqueKey)] :: IO [RandomData])
+  return $ (userType' . head) result
 
 -- LOGIN AND REGISTER
 

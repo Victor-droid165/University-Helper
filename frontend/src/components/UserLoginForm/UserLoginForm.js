@@ -3,36 +3,10 @@ import { Avatar, Button, CssBaseline, TextField, Link, Grid, Box, Typography, Co
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
-import { Form, useActionData, useLocation, useNavigate } from 'react-router-dom';
+import { Form, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-export const validateUser = async (userInfo) => {
-    const validationPromises = Object.keys(userInfo).map(async (field) => {
-        if(field === 'type') return;
-
-        const routeField = "api/users/validate" + capitalize(field);
-
-        const response = await fetch(`http://localhost:8081/${routeField}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ value: userInfo[field] })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message);
-        }
-        return response.json();
-    });
-
-    return await Promise.all(validationPromises);
-}
+import { useApi } from '../../hooks/useApi';
+import { validateUser } from '../../utils/utils';
 
 const UserLoginForm = () => {
     const [logInfo, setLogInfo] = useState({
@@ -46,8 +20,8 @@ const UserLoginForm = () => {
     });
 
     const [alerts, setAlerts] = useState([]);
-    const data = useActionData();
     const auth = useAuth();
+    const api = useApi();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -55,9 +29,6 @@ const UserLoginForm = () => {
 
     useEffect(() => {
         setErrors(errors);
-    }, [errors]);
-
-    useEffect(() => {
         if (alerts.length > 0) {
             const timer = setTimeout(() => {
                 setAlerts(prevAlerts => prevAlerts.slice(1));
@@ -65,7 +36,7 @@ const UserLoginForm = () => {
 
             return () => clearTimeout(timer);
         }
-    }, [alerts]);
+    }, [alerts, errors]);
 
     const showAlert = (severity, message) => {
         setAlerts(prevAlerts => [...prevAlerts, { severity, message }]);
@@ -78,23 +49,31 @@ const UserLoginForm = () => {
         });
     };
 
-    useEffect(() => {
-        if (data) {
-            if (data.validationErrors)
-                setErrors(data.validationErrors);
-            else if (data.alerts){
-                showAlert(...data.alerts);
-                setErrors({emailError: '', passwordError:''});
-            }
-            else if (data.error)
-                console.log(data.error);
-            else {
-                auth.login(logInfo);
-                navigate(redirectPath, { replace: true });
-            }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        handleLogin();
+    };
 
+    const handleLogin = async () => {
+        try {
+            const validationErrors = await validateUser(api, logInfo);
+
+            if (Object.keys(validationErrors).length === 0) {
+                const json = await api.validateLogin(logInfo);
+                if (json) {
+                    auth.login({ email: logInfo.email });
+                    navigate(redirectPath, { replace: true });
+                } else {
+                    showAlert('error', 'Login e/ou senha inválidos');
+                    setErrors({ emailError: '', passwordError: '' });
+                }
+            } else {
+                setErrors(validationErrors);
+            }
+        } catch (error) {
+            console.log(error);
         }
-    }, [auth, data, navigate, redirectPath]);
+    }
 
     const styles = {
         form: {
@@ -149,7 +128,7 @@ const UserLoginForm = () => {
                             <Typography component="h1" variant="h5">
                                 Sign in
                             </Typography>
-                            <Form method='post' action='/login'>
+                            <Form method='post' onSubmit={handleSubmit}>
                                 <Box noValidate sx={{ mt: 1 }}>
                                     <TextField
                                         margin="normal"
@@ -210,44 +189,5 @@ const UserLoginForm = () => {
         </Box>
     );
 };
-
-export const loginAction = async ({ request }) => {
-    const data = await request.formData();
-
-    const logInfoSubmission = {
-        email: data.get('email'),
-        password: data.get('password')
-    }
-
-    try {
-        const validationResults = await validateUser(logInfoSubmission);
-        const validationErrors = validationResults.reduce((errors, error, index) => {
-            if (error.startsWith('Erro')) {
-                errors[Object.keys(logInfoSubmission)[index] + 'Error'] = error;
-            }
-            return errors;
-        }, {});
-
-        if (Object.keys(validationErrors).length === 0) {
-            const response = await fetch(`http://localhost:8081/api/users/validateLogin`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(logInfoSubmission)
-            });
-            const json = await response.json();
-            if (!json) {
-                return { alerts: ['error', 'Login e/ou senha inválidos'] };
-            }
-        } else {
-            return { validationErrors }
-        }
-    } catch (error) {
-        return { error: 'Erro: ' + error }
-    }
-
-    return true;
-}
 
 export default UserLoginForm;
