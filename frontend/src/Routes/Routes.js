@@ -10,6 +10,7 @@ import { loginAction } from '../components/UserLoginForm/UserLoginForm';
 import ProtectedRoutes from './ProtectedRoutes'
 import LogoutPage from '../pages/logout/LogoutPage';
 import ListNotes from '../pages/notes/list';
+import EditeNote from '../pages/notes/edition';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,11 +21,12 @@ const router = createBrowserRouter(
       <Route path="login" element={<LoginPage />} action={loginAction} />
       <Route path="logout" element={<LogoutPage />} />
 
-      {/*<Route element={<ProtectedRoutes />}>*/}
+      <Route element={<ProtectedRoutes />}>
         <Route path="admin" element={<AdminPage />} />
-        <Route path="note_creation" element={<NoteCreationPage />} />
-        <Route path="note_list" element={<ListNotes />} />
-      {/*</Route>*/}
+        <Route path="note-creation" element={<NoteCreationPage />} />
+        <Route path="note-list" element={<ListNotes />} />
+        <Route path="note-edition" element={<EditeNote />} />
+      </Route>
 
       {/* <Route path="admin" element={<Album />}/> */}
 
