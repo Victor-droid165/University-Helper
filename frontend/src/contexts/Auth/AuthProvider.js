@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState();
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("loggedUser")));
 
     const login = (user) => {
         localStorage.setItem("loggedUser", JSON.stringify(user));
@@ -15,14 +15,12 @@ export const AuthProvider = ({ children }) => {
     }
 
     const isAuthenticated = () => {
-        //return Boolean(user);
-        return Boolean(localStorage.getItem("loggedUser"))
+        return Boolean(user);
     }
 
-    useEffect(() => {
-        const loggedUser = localStorage.getItem("loggedUser")
-        if(loggedUser) setUser(loggedUser)
-    }, [])
+    const isAuthorized = ({ authorizedRoles }) => {
+        return authorizedRoles?.includes(user?.type);
+    }
 
-    return <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}> {children} </AuthContext.Provider>
+    return <AuthContext.Provider value={{ user, login, logout, isAuthenticated, isAuthorized }}> {children} </AuthContext.Provider>
 }
