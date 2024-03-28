@@ -80,38 +80,37 @@ const AdminPage = () => {
     },
   });
 
-  const handleAccessChange = (id, newAccess, email) => {
+  const handleAccessChange = (dbUserId, newAccess, email) => {
     // Impede a alteração do nível de acesso se for 'admin'
-    const currentAccess = rows.find(row => row.id === id).dbUserType;
-    console.log(newAccess);
+    const currentAccess = rows.find(row => row.dbUserId === dbUserId).dbUserType;
     if (currentAccess !== "Admin") {
       const newRows = rows.map((row) => {
-        if (row.id === id) {
+        if (row.dbUserId === dbUserId) {
           return { ...row, dbUserType: newAccess };
         }
         return row;
       });
-      updateAny("type", newAccess, "email", email)
+      updateAny("type", newAccess, "email", email);
       setRows(newRows);
     }
   };
-
   
-  const handleDeleteRow = (id) => {
+  
+  const handleDeleteRow = (dbUserId) => {
     fetch('http://localhost:8081/api/users/deleteUser', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ value: rows.find(row => row.id === id).dbUserId.toString() }),
+      body: JSON.stringify({ value: dbUserId.toString() }),
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to delete user');
-        }
-        window.location.reload()
-      })
-      .catch(error => console.error('Error deleting user:', error));
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+      setRows(prevRows => prevRows.filter(row => row.dbUserId !== dbUserId));
+    })
+    .catch(error => console.error('Error deleting user:', error));
   };
 
   const columns = [
@@ -138,7 +137,7 @@ const AdminPage = () => {
       headerAlign: 'center',
       flex: 0.5,
       renderCell: (params) => (
-        <IconButton onClick={() => handleDeleteRow(params.row.id)}>
+        <IconButton onClick={() => handleDeleteRow(params.row.dbUserId)}>
           <DeleteIcon color="error" />
         </IconButton>
       ),
@@ -156,7 +155,7 @@ const AdminPage = () => {
         <FormControl fullWidth>
           <Select
             value={params.row.dbUserType}
-            onChange={(event) => handleAccessChange(params.row.id, event.target.value, params.row.dbUserEmail)}
+            onChange={(event) => handleAccessChange(params.row.dbUserId, event.target.value, params.row.dbUserEmail)}
             displayEmpty
             size="small"
             sx={{
