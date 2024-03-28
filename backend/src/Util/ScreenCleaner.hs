@@ -12,6 +12,7 @@ import Data.Char (toLower)
 import System.Console.ANSI ( clearScreen )
 import Util.Database.DBFunctions (initDB, isAppDBCreated)
 import Util.Database.Functions.UsersDBFunctions (insertAllIntoUsersAppDB)
+import Util.Database.Functions.ValidationDBFunctions (insertAllIntoValidationsAppDB)
 
 screenCleaner :: IO ()
 screenCleaner = do
@@ -44,6 +45,12 @@ quitOpt func _ = do
   screenCleaner
   func
 
+registerADMIN :: IO ()
+registerADMIN = do
+  let newUserValues = ["everton", "everton@admin.ufcg.edu.br", "senhaSegura", "Admin", "1195010000", "UFCG"]
+  insertAllIntoUsersAppDB newUserValues  
+  insertAllIntoValidationsAppDB [1 :: Integer, 1 :: Integer]
+
 start :: IO ()
 start = do
   screenCleaner
@@ -53,6 +60,5 @@ start = do
       writeFile "backend/data/session.txt" ""
     else do
       initDB "plp_db"
-      let newUserValues = ["everton", "everton@admin.ufcg.edu.br", "senhaSegura", "Admin", "1195010000", "UFCG"]
-      insertAllIntoUsersAppDB newUserValues
+      registerADMIN
       writeFile "backend/data/session.txt" ""

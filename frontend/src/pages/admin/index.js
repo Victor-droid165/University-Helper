@@ -17,6 +17,7 @@ const AdminPage = () => {
 
   useEffect(() => {
     api.getDBUsers().then((dbUsers) => setRows(dbUsers));
+    setValidates();
   }, []);
 
   const updateUser = async (field, newValue, match, matchValue) => {
@@ -33,7 +34,15 @@ const AdminPage = () => {
     })
       .then(response => response.json())
       .then(data => {
-        console.log();
+        const userIds = data.map(item => item.userId);
+        const hashSet = new Set(userIds);
+        setRows(
+          nRows => nRows.map(row => ({
+              ...row,
+              isValidated: hashSet.has(row.dbUserId), 
+            }))
+        );
+        console.log(hashSet);
       })
       .catch(error => {
         console.error('Error updating user:', error);
@@ -99,7 +108,9 @@ const AdminPage = () => {
         if (!response.ok) {
           throw new Error('Failed to delete user');
         }
-        setRows(prevRows => prevRows.filter(row => row.dbUserId !== dbUserId));
+        if (response === "Success") {
+          setRows(prevRows => prevRows.filter(row => row.dbUserId !== dbUserId));
+        } 
       })
       .catch(error => console.error('Error deleting user:', error));
   };
@@ -141,15 +152,27 @@ const AdminPage = () => {
       flex: 1,
       renderCell: (params) => {
         // O ideal é usar o padrão abaixo igual nos outros casos, mas por hora, deixarei mockado
-        // const isValidated = params.row.isValidated;
+        const isValidated = params.row.isValidated;
 
-        const isValidated = true;
+        //const isValidated = true;
 
         if (!isValidated) {
           // Botão vermelho para validar
           return (
             <Button
-              onClick={() => console.log('Validar usuário', params.row.dbUserId)}
+              onClick={() => {
+                fetch('http://localhost:8081/api/users/validateUser', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ integerValue: params.row.dbUserId }),
+                }           
+                )
+                console.log('Validar usuário', params.row.dbUserId) 
+                params.row.isValidated = true;
+                }
+              }
               style={{ color: 'white', backgroundColor: 'red', padding: '3px 10px', borderRadius: '4px' }}
             >
               Validar

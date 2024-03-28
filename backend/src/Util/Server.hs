@@ -51,8 +51,11 @@ import Util.Validate
     userUniversityValidation,
   )
 import Database.PostgreSQL.Simple (FromRow, ToRow)
+import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhereAppDB)
 
 newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
+
+newtype IntegerData = IntegerData {integerValue :: Integer} deriving (Generic, FromJSON)
 
 data LogInfo = LogInfo {email :: String, password :: String} deriving (Eq, Show, Generic, FromJSON)
 
@@ -74,7 +77,7 @@ type API =
            :<|> "validateEnrollment" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "validatePassword" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "validateLogin" :> ReqBody '[JSON] LogInfo :> Post '[JSON] Bool
-           :<|> "validateUser" :> ReqBody '[JSON] MyData :> Post '[JSON] NoContent
+           :<|> "validateUser" :> ReqBody '[JSON] IntegerData :> Post '[JSON] NoContent
            :<|> "unvalidateUser" :> ReqBody '[JSON] MyData :> Post '[JSON] NoContent
            :<|> "register" :> ReqBody '[JSON] RegisterInfo :> Post '[JSON] String
            :<|> "isRegistered" :> ReqBody '[JSON] MyData :> Post '[JSON] Bool
@@ -143,8 +146,8 @@ validatePassword myData = return $ handleValidationServer (userPasswordValidatio
 validateLogin :: LogInfo -> Handler Bool
 validateLogin logInfo = liftIO $ verifyLoginIO (email logInfo) (password logInfo)
 
-validateUser :: MyData -> Handler NoContent
-validateUser myData = liftIO (validateUserAPI (value myData)) >> return NoContent
+validateUser :: IntegerData -> Handler NoContent
+validateUser myData = liftIO (validateUserAPI (integerValue myData)) >> return NoContent
 
 unvalidateUser :: MyData -> Handler NoContent
 unvalidateUser myData = liftIO (unvalidateUserAPI (value myData)) >> return NoContent
@@ -178,7 +181,14 @@ showAllUsers = do
   return $ showAll users
 
 deleteUser :: MyData -> Handler String
-deleteUser mydata = liftIO $ deleteFromUsersWhereAppDB [("id", "=", value mydata)] >> return "Success"
+deleteUser mydata = do 
+  if value mydata /= "1"
+    then do 
+    liftIO $ deleteFromValidationsWhereAppDB [("user_id", "=", value mydata)]
+    liftIO $ deleteFromUsersWhereAppDB [("id", "=", value mydata)] 
+    return "Success"
+  else 
+    return "You can't delete yourself, cuz you're the ADMIN"
 
 updateAny :: ChangeData -> Handler String
 updateAny mydata = do
@@ -188,7 +198,6 @@ updateAny mydata = do
 newtype RandomData = RandomData {userType' :: String} deriving (Show, Read, Eq, Generic)
 instance FromRow RandomData
 instance ToRow RandomData
-
 
 getAny :: Maybe String -> Maybe String -> Maybe String -> Handler String
 getAny mUniqueKeyName mUniqueKey mAttribute = do
