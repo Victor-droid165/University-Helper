@@ -10,8 +10,15 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import { IconButton, Grid } from '@mui/material';
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from 'react-router-dom';
 
-export default function NoteCard({ title, type }) {
+export default function NoteCard({ note }) {
+  const navigate = useNavigate();
+
+  const handleEditClick = () => {
+    navigate('/note-edition', { state: { note } });
+  };
+
   // Define os ícones e as cores para cada tipo de anotação
   const tagStyles = {
     warning: { icon: <WarningIcon />, color: '#f32f2f' }, // Um tom mais escuro de vermelho
@@ -20,7 +27,7 @@ export default function NoteCard({ title, type }) {
   };
 
   // Escolhe o ícone e a cor com base no tipo de anotação
-  const { icon, color } = tagStyles[type] || { icon: null, color: 'grey' };
+  const { icon, color } = tagStyles[note.type] || { icon: null, color: 'grey' };
 
   return (
     <Box sx={{ minWidth: 275, position: 'relative', mb: 2 }}>
@@ -42,7 +49,7 @@ export default function NoteCard({ title, type }) {
       >
         {icon}
         <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-          {type.toUpperCase()}
+          {(note.type).toUpperCase()}
         </Typography>
       </Box>
       <Card variant="outlined" sx={{ pt: 7 }}>
@@ -58,7 +65,7 @@ export default function NoteCard({ title, type }) {
               maxWidth: '100%',
             }}
           >
-            {title}
+            {note.type === 'reminder' ? note.content : note.title}
           </Typography>
         </CardContent>
         <CardActions>
@@ -69,7 +76,7 @@ export default function NoteCard({ title, type }) {
               </IconButton>
             </Grid>
             <Grid item>
-              <Button size="small">Editar</Button>
+              <Button size="small" onClick={handleEditClick}>Editar</Button>
             </Grid>
           </Grid>
         </CardActions>
