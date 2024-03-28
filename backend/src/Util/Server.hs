@@ -43,6 +43,7 @@ import Util.Validate
 import Util.Database.Functions.UsersDBFunctions (insertAllIntoUsersAppDB, deleteFromUsersAppDB, deleteFromUsersWhereAppDB, updateInUsersWhereAppDB)
 import Util.Database.DBFunctions (deleteFromTableWhereAppDB)
 import Models.DBUser (DBUser)
+import Models.AdminValidate (AdminV)
 
 newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
 
@@ -57,7 +58,7 @@ type API =
     :> "users"
     :> ( "users" :> Get '[JSON] [User]
            :<|> "usersDB" :> Get '[JSON] [DBUser]
-           :<|> "getIdsValidated" :> Get '[JSON] [DBUser]
+           :<|> "getIdsValidated" :> Get '[JSON] [AdminV]
            :<|> "validateName" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "validateUniversity" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "validateEmail" :> ReqBody '[JSON] MyData :> Post '[JSON] String
@@ -106,7 +107,7 @@ superServer =
     :<|> updateAny
 
 
-getIdsValidated :: Handler [DBUser]
+getIdsValidated :: Handler [AdminV]
 getIdsValidated = liftIO $ getIds
 
 validateName :: MyData -> Handler String

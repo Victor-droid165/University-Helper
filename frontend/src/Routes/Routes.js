@@ -21,12 +21,12 @@ const router = createBrowserRouter(
       <Route path="login" element={<LoginPage />} action={loginAction} />
       <Route path="logout" element={<LogoutPage />} />
 
-      <Route element={<ProtectedRoutes />}>
+      {/* <Route element={<ProtectedRoutes />}> */}
         <Route path="admin" element={<AdminPage />} />
         <Route path="note-creation" element={<NoteCreationPage />} />
         <Route path="note-list" element={<ListNotes />} />
         <Route path="note-edition" element={<EditeNote />} />
-      </Route>
+      {/* </Route> */}
 
       {/* <Route path="admin" element={<Album />}/> */}
 

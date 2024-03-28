@@ -27,7 +27,7 @@ selectFromValidationsAppDB = selectFromTableAppDB "admin_user_validations"
 selectAllFromValidationsWhereAppDB :: (ToField b) => [(String, String, b)] -> IO [DBUser]
 selectAllFromValidationsWhereAppDB = selectFromTableWhereAppDB "admin_user_validations" ["*"]
 
-selectAllFromValidationsAppDB :: IO [DBUser]
+selectAllFromValidationsAppDB :: (FromRow a) => IO [a]
 selectAllFromValidationsAppDB = selectFromTableAppDB "admin_user_validations" ["*"]
 
 insertAllIntoValidationsAppDB :: (ToField a) => [a] -> IO ()

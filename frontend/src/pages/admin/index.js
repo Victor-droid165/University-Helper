@@ -47,7 +47,24 @@ const AdminPage = () => {
         .catch(error => {
           console.error('Error updating user:', error);
         });
-    };
+  };
+  
+  const setValidates = () => {
+    fetch('http://localhost:8081/api/users/getIdsValidated', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(),
+    })
+      .then(response => response.json())
+      .then(data => { 
+        console.log();
+      })
+      .catch(error => {
+        console.error('Error updating user:', error);
+      });
+  };
 
   const theme = createTheme({
     components: {
