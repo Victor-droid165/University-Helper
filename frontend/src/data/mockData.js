@@ -73,78 +73,79 @@ export const mockDataTeam = [
   }
 ];
 
+
 export const mockDataNotes = [
   {
     id: 1,
     title: 'Nota de Texto',
     content: 'Conteúdo da nota de texto.',
-    type: 'textNote'
+    type: 'textNote',
+    isPublic: false
   },
   {
     id: 8,
-    title: 'Lembrete 2',
-    content: 'Conteúdo do lembrete 2.',
+    content: 'Conteúdo da nota de texto.',
     type: 'reminder'
   },
   {
     id: 9,
     title: 'Nota de Texto',
     content: 'Conteúdo da nota de texto.',
-    type: 'textNote'
+    type: 'textNote',
+    isPublic: false
   },
   {
     id: 10,
-    title: 'Lembrasssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssete',
-    content: 'Conteúdo do lembrete.',
+    content: 'Conteúdo da nota de textooooooooooooooooooooo.',
     type: 'reminder'
   },
   {
     id: 11,
-    title: 'Advertência',
-    content: 'Conteúdo da advertência.',
-    type: 'warning'
+    title: 'Aviso pra tu',
+    content: 'Conteúdo da nota de texto.',
+    type: 'warning',
+    selectedUser: 3
   },
   {
     id: 12,
-    title: 'Lembrete 2',
-    content: 'Conteúdo do lembrete 2.',
+    content: 'Conteúdo da nota de texto.',
     type: 'reminder'
   },
   {
     id: 2,
-    title: 'Lembrasssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssete',
-    content: 'Conteúdo do lembrete.',
+    content: 'Conteúdo da nota de texto.',
     type: 'reminder'
   },
   {
     id: 3,
-    title: 'Advertência',
-    content: 'Conteúdo da advertência.',
-    type: 'warning'
+    title: 'Aviso pra tu',
+    content: 'Conteúdo da nota de texto.',
+    type: 'warning',
+    selectedUser: 1
   },
   {
     id: 4,
-    title: 'Lembrete 2',
-    content: 'Conteúdo do lembrete 2.',
+    content: 'Conteúdo da nota de texto.',
     type: 'reminder'
   },
   {
     id: 5,
     title: 'Nota de Texto',
     content: 'Conteúdo da nota de texto.',
-    type: 'textNote'
+    type: 'textNote',
+    isPublic: false
   },
   {
     id: 6,
-    title: 'Lembrasssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssete',
-    content: 'Conteúdo do lembrete.',
+    content: 'Conteúdo da noooooooooooooooooota de texto.',
     type: 'reminder'
   },
   {
     id: 7,
-    title: 'Advertência',
-    content: 'Conteúdo da advertência.',
-    type: 'warning'
+    title: 'Aviso pra tu',
+    content: 'Conteúdo da nota de texto.',
+    type: 'warning',
+    selectedUser: 5
   },
   // Adicione mais notas conforme necessário
 ];
