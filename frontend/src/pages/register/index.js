@@ -311,7 +311,7 @@ export const registerAction = async ({ request }) => {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(normalizedRegisterInfoSubmission),
+            body: JSON.stringify({u_type: data.get('type'), user: normalizedRegisterInfoSubmission}),
           });
         })();
 

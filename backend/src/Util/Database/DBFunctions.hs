@@ -14,6 +14,7 @@ module Util.Database.DBFunctions
     updateInTableAppDB,
     deleteFromTableWhereAppDB,
     deleteFromTableAppDB,
+    isAppDBCreated,
   )
 where
 
@@ -196,5 +197,6 @@ initDB dbName' = do
       grantAllPrivilegesToAppUser
       createAppSchemaIfNotCreated
       populateAppDB
+      
 
 -- TODO : SCHEMA

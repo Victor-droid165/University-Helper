@@ -12,9 +12,9 @@ where
 
 import Control.Monad (forM)
 import Control.Monad.IO.Class (liftIO)
-import Controllers.Users.AdministratorController (unvalidateUserAPI, validateUserAPI)
+import Controllers.Users.AdministratorController (unvalidateUserAPI, validateUserAPI, getIds)
 import Controllers.Users.UserController
-    ( findUserByEmail, getUsers, verifyLoginIO, registerUserAPI, getDBUsers )
+    ( findUserByEmail, getUsers, verifyLoginIO, registerUserAPI, getDBUsers, registerStudentAPI )
 import Data.Aeson
 import Data.Maybe (mapMaybe, fromJust)
 import GHC.Generics
@@ -48,6 +48,8 @@ newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
 
 data LogInfo = LogInfo {email :: String, password :: String} deriving (Eq, Show, Generic, FromJSON)
 
+data RegisterInfo = RegisterInfo {u_type :: String, user :: User} deriving (Eq, Show, Generic, FromJSON)
+
 data ChangeData = ChangeData {field :: String, newValue :: String, match :: String, matchValue :: String} deriving (Eq, Show, Generic, FromJSON)
 
 type API =
@@ -55,6 +57,7 @@ type API =
     :> "users"
     :> ( "users" :> Get '[JSON] [User]
            :<|> "usersDB" :> Get '[JSON] [DBUser]
+           :<|> "getIdsValidated" :> Get '[JSON] [DBUser]
            :<|> "validateName" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "validateUniversity" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "validateEmail" :> ReqBody '[JSON] MyData :> Post '[JSON] String
@@ -63,7 +66,7 @@ type API =
            :<|> "validateLogin" :> ReqBody '[JSON] LogInfo :> Post '[JSON] Bool
            :<|> "validateUser" :> ReqBody '[JSON] MyData :> Post '[JSON] NoContent
            :<|> "unvalidateUser" :> ReqBody '[JSON] MyData :> Post '[JSON] NoContent
-           :<|> "register" :> ReqBody '[JSON] User :> Post '[JSON] String
+           :<|> "register" :> ReqBody '[JSON] RegisterInfo :> Post '[JSON] String
            :<|> "isRegistered" :> ReqBody '[JSON] MyData :> Post '[JSON] Bool
            :<|> "showUser" :> ReqBody '[JSON] MyData :> Post '[JSON] String
            :<|> "showAllUsers" :> Get '[JSON] String
@@ -86,6 +89,7 @@ superServer :: Server API
 superServer =
   users
     :<|> usersDB
+    :<|> getIdsValidated
     :<|> validateName
     :<|> validateUniversity
     :<|> validateEmail
@@ -101,6 +105,9 @@ superServer =
     :<|> deleteUser
     :<|> updateAny
 
+
+getIdsValidated :: Handler [DBUser]
+getIdsValidated = liftIO $ getIds
 
 validateName :: MyData -> Handler String
 validateName myData = return $ handleValidationServer (userNameValidation (value myData))
@@ -126,14 +133,16 @@ validateUser myData = liftIO (validateUserAPI (value myData)) >> return NoConten
 unvalidateUser :: MyData -> Handler NoContent
 unvalidateUser myData = liftIO (unvalidateUserAPI (value myData)) >> return NoContent
 
-register :: User -> Handler String
-register user = do
-  isUserRegistered <- isRegistered (MyData {value = userEmail user})
+register :: RegisterInfo -> Handler String
+register registerInfo = do
+  isUserRegistered <- isRegistered (MyData {value = userEmail (user registerInfo)})
   if isUserRegistered
     then return "Failure"
     else do
-      liftIO $ registerUserAPI user
-      return "Success"
+      liftIO $ registerIn registerInfo
+  where 
+    registerIn registerInfo | u_type registerInfo == "Professor" = liftIO $ registerUserAPI (user registerInfo) >> return "Success"
+                            | otherwise = liftIO $ registerStudentAPI (user registerInfo) >> return "Success"
 
 isRegistered :: MyData -> Handler Bool
 isRegistered emailData = do

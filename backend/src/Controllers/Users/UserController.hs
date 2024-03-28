@@ -1,3 +1,5 @@
+{-# LANGUAGE BinaryLiterals #-}
+{-# LANGUAGE NumDecimals #-}
 module Controllers.Users.UserController
   ( userRegister,
     userLogin,
@@ -11,6 +13,7 @@ module Controllers.Users.UserController
     findUserByEnroll,
     registerUserAPI,
     getDBUsers,
+    registerStudentAPI,
   )
 where
 
@@ -33,6 +36,11 @@ import TerminalUI.Users.User (loginUI, registerUI, typeEnrollment, typeUserEmail
 import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
 
 import Models.DBUser (DBUser)
+import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB)
+import Database.PostgreSQL.Simple.Types (Only(..))
+import Util.Database.Functions.ValidationDBFunctions (insertAllIntoValidationsAppDB)
+import Database.PostgreSQL.Simple.FromRow (FromRow, field)
+
 
 userRegister :: IO ()
 userRegister = do
@@ -259,3 +267,10 @@ filterByUserEnroll enroll (u : userList)
 
 registerUserAPI :: User -> IO ()
 registerUserAPI = createUserInDB
+
+registerStudentAPI :: User -> IO ()
+registerStudentAPI user = do
+  createUserInDB user
+  [userId] <- selectFromUsersWhereAppDB ["id"] [("email", "=", userEmail user)]
+  let (Only userIdValue) = userId
+  insertAllIntoValidationsAppDB [1 :: Integer, userIdValue]

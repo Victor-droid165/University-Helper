@@ -1,6 +1,7 @@
 module Controllers.Users.AdministratorController
   ( validateUserAPI,
     unvalidateUserAPI,
+    getIds
   )
 where
 
@@ -9,7 +10,7 @@ import Data.Maybe (fromJust)
 import Models.DBUser (DBUser (dbUserId))
 import Models.User (User (userEnrollment))
 import Util.Database.Functions.UsersDBFunctions (selectAllFromUsersWhereAppDB)
-import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhereAppDB, insertAllIntoValidationsAppDB)
+import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhereAppDB, insertAllIntoValidationsAppDB, selectAllFromValidationsAppDB)
 
 -- Not working
 validateUserAPI :: String -> IO ()
@@ -22,3 +23,6 @@ validateUserAPI enrollment = do
 unvalidateUserAPI :: String -> IO ()
 unvalidateUserAPI enrollment = do
   deleteFromValidationsWhereAppDB [("enrollment_number", "=", enrollment)]
+
+getIds :: IO [DBUser]
+getIds = selectAllFromValidationsAppDB 

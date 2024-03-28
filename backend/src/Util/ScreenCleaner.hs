@@ -10,7 +10,8 @@ where
 import Control.Concurrent (threadDelay)
 import Data.Char (toLower)
 import System.Console.ANSI ( clearScreen )
-import Util.Database.DBFunctions (initDB)
+import Util.Database.DBFunctions (initDB, isAppDBCreated)
+import Util.Database.Functions.UsersDBFunctions (insertAllIntoUsersAppDB)
 
 screenCleaner :: IO ()
 screenCleaner = do
@@ -46,5 +47,12 @@ quitOpt func _ = do
 start :: IO ()
 start = do
   screenCleaner
-  initDB "plp_db"
-  writeFile "backend/data/session.txt" ""
+  check <- isAppDBCreated
+  if check
+    then do
+      writeFile "backend/data/session.txt" ""
+    else do
+      initDB "plp_db"
+      let newUserValues = ["everton", "everton@admin.ufcg.edu.br", "senhaSegura", "Admin", "1195010000", "UFCG"]
+      insertAllIntoUsersAppDB newUserValues
+      writeFile "backend/data/session.txt" ""
