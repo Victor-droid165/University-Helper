@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Box, Typography, MenuItem, Select, ListItemIcon, FormControl, IconButton } from "@mui/material";
+import { Box, Button, Typography, MenuItem, Select, ListItemIcon, FormControl, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { mockDataTeam } from "../../data/mockData.js";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
@@ -159,9 +159,39 @@ const AdminPage = () => {
         </IconButton>
       ),
     },
-    { 
-      field: 'validate', headerName: "Validação", headerAlign: 'center', align: 'center', flex: 1
-      
+    {
+      field: 'validate',
+      headerName: 'Status',
+      headerAlign: 'center',
+      align: 'center',
+      flex: 1,
+      renderCell: (params) => {
+        // O ideal é usar o padrão abaixo igual nos outros casos, mas por hora, deixarei mockado
+        // const isValidated = params.row.isValidated;
+    
+        const isValidated = true;
+
+        if (!isValidated) {
+          // Botão vermelho para validar
+          return (
+            <Button
+              onClick={() => console.log('Validar usuário', params.row.dbUserId)}
+              style={{ color: 'white', backgroundColor: 'red', padding: '3px 10px', borderRadius: '4px' }}
+            >
+              Validar
+            </Button>
+          );
+        } else {
+          // Texto estilizado para indicar que o usuário foi validado
+          return (
+            <Button
+              style={{ color: 'white', backgroundColor: 'green', padding: '3px 10px', borderRadius: '4px' }}
+            >
+              Validado
+            </Button>
+          );
+        }
+      }
     },
     {
       field: 'dbUserType',
