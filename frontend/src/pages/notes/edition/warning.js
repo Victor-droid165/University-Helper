@@ -1,21 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Select, MenuItem } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import { mockDataTeam } from "../../../data/mockData.js";
 
-const Warning = () => {
+const Warning = ({ note }) => {
   const [title, setTitle] = useState('');
   const [warning, setWarning] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
-  const [rows] = useState(mockDataTeam);
+
+  // Atualiza os estados quando o componente recebe uma nova 'note'
+  useEffect(() => {
+    if (note) {
+      setTitle(note.title);
+      setWarning(note.content); // Supondo que 'content' é a propriedade do aviso
+      if (mockDataTeam && note.selectedUser) {
+        const user = mockDataTeam.find(u => u.id === note.selectedUser);
+        setSelectedUser(user ? user.name : '');
+      }
+    }
+  }, [note, mockDataTeam]);
 
   const handleSave = () => {
     const now = new Date();
+    console.log("Título:", title);
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Usuário Selecionado:", selectedUser);
-    console.log("Título:", title);
     console.log("Aviso:", warning);
-    // Aqui você pode adicionar lógica para salvar no backend
+    // Aqui você pode adicionar lógica para editar no backend
   };
 
   const handleClear = () => {
@@ -28,7 +39,7 @@ const Warning = () => {
     <Container component="main" maxWidth='100%'>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5" style={{ marginBottom: '1rem' }}>
-          Criar Aviso
+          Editar Aviso
         </Typography>
         <form noValidate style={{ width: '100%' }}>
           <Select
@@ -41,7 +52,7 @@ const Warning = () => {
             <MenuItem value="">
               <em>Selecione um usuário</em>
             </MenuItem>
-            {rows.map((user) => (
+            {mockDataTeam.map((user) => (
               <MenuItem key={user.id} value={user.name}>
                 {user.name}
               </MenuItem>

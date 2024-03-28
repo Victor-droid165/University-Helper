@@ -11,9 +11,9 @@ export default function ListNotes() {
         container
         spacing={2}
       >
-        {mockDataNotes.map((note, index) => (
+        {mockDataNotes.map((currentNote, index) => (
           <Grid key={index} xs={12} sm={6} md={4} lg={3} minHeight={160}>
-            <NoteCard {...note} />
+            <NoteCard note={currentNote} />
           </Grid>
         ))}
       </Grid>

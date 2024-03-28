@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 
 const Reminder = () => {
   const [content, setContent] = useState('');
@@ -9,7 +9,7 @@ const Reminder = () => {
     const now = new Date();
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Conteúdo:", content);
-    // Aqui você pode adicionar lógica para salvar no backend, se necessário
+    // Aqui você pode adicionar lógica para salvar no backend
   };
 
   const handleClear = () => {
@@ -52,7 +52,7 @@ const Reminder = () => {
                   marginTop: '1rem',
                 }}
               >
-                <DeleteIcon />
+                <CleaningServicesIcon />
               </IconButton>
               <Button
                 type="button"

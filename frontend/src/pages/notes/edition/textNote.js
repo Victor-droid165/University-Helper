@@ -1,52 +1,43 @@
-import React, { useState } from 'react';
-import { Button, TextField, Typography, Container, Grid, IconButton, Select, MenuItem } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, TextField, Typography, Container, Grid, IconButton, Checkbox, FormControlLabel } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-import { mockDataTeam } from "../../../data/mockData.js";
 
-const Warning = () => {
+const TextNote = ({ note }) => {
   const [title, setTitle] = useState('');
-  const [warning, setWarning] = useState('');
-  const [selectedUser, setSelectedUser] = useState('');
-  const [rows] = useState(mockDataTeam);
+  const [content, setContent] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
+
+  // Atualiza os estados quando o componente recebe uma nova 'note'
+  useEffect(() => {
+    if (note) {
+      setTitle(note.title);
+      setContent(note.content);
+      setIsPublic(note.isPublic); // Supondo que 'isPublic' é uma propriedade do objeto 'note'
+    }
+  }, [note]);
 
   const handleSave = () => {
     const now = new Date();
-    console.log("Data e Hora:", now.toLocaleString());
-    console.log("Usuário Selecionado:", selectedUser);
     console.log("Título:", title);
-    console.log("Aviso:", warning);
-    // Aqui você pode adicionar lógica para salvar no backend
+    console.log("Data e Hora:", now.toLocaleString());
+    console.log("Conteúdo:", content);
+    console.log("É público:", isPublic);
+    // Aqui você pode adicionar lógica para editar no backend
   };
 
   const handleClear = () => {
     setTitle('');
-    setWarning('');
-    setSelectedUser('');
+    setContent('');
+    setIsPublic(false);
   };
 
   return (
     <Container component="main" maxWidth='100%'>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5" style={{ marginBottom: '1rem' }}>
-          Criar Aviso
+          Editar Anotação
         </Typography>
         <form noValidate style={{ width: '100%' }}>
-          <Select
-            value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
-            displayEmpty
-            fullWidth
-            style={{ marginBottom: '1rem' }}
-          >
-            <MenuItem value="">
-              <em>Selecione um usuário</em>
-            </MenuItem>
-            {rows.map((user) => (
-              <MenuItem key={user.id} value={user.name}>
-                {user.name}
-              </MenuItem>
-            ))}
-          </Select>
           <TextField
             variant="outlined"
             margin="normal"
@@ -67,15 +58,28 @@ const Warning = () => {
             fullWidth
             multiline
             rows={8}
-            id="warning"
-            label="Aviso"
-            name="warning"
-            value={warning}
-            onChange={(e) => setWarning(e.target.value)}
+            id="content"
+            label="Conteúdo"
+            name="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
             style={{ marginBottom: '1rem' }}
           />
           <Grid container spacing={2}>
-            <Grid item xs={12} container justifyContent="flex-end">
+            <Grid item xs={6} container justifyContent="flex-start">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                    name="isPublic"
+                    color="primary"
+                  />
+                }
+                label="Público"
+              />
+            </Grid>
+            <Grid item xs={6} container justifyContent="flex-end">
               <IconButton
                 type="button"
                 onClick={handleClear}
@@ -108,4 +112,4 @@ const Warning = () => {
   );
 };
 
-export default Warning;
+export default TextNote;

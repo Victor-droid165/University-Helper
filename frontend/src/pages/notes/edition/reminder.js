@@ -1,47 +1,35 @@
-import React, { useState } from 'react';
-import { Button, TextField, Typography, Container, Grid, IconButton, Checkbox, FormControlLabel } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, TextField, Typography, Container, Grid, IconButton } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 
-const TextNote = () => {
-  const [title, setTitle] = useState('');
+const Reminder = ({ note }) => {
   const [content, setContent] = useState('');
-  const [isPublic, setIsPublic] = useState(false);
+
+  // Atualiza os estados quando o componente recebe uma nova 'note'
+  useEffect(() => {
+    if (note) {
+      setContent(note.content);
+    }
+  }, [note]);
 
   const handleSave = () => {
     const now = new Date();
     console.log("Data e Hora:", now.toLocaleString());
-    console.log("Título:", title);
     console.log("Conteúdo:", content);
-    console.log("É público:", isPublic);
-    // Aqui você pode adicionar lógica para salvar no backend
+    // Aqui você pode adicionar lógica para atualizar no backend
   };
 
   const handleClear = () => {
-    setTitle('');
     setContent('');
-    setIsPublic(false);
   };
 
   return (
     <Container component="main" maxWidth='100%'>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5" style={{ marginBottom: '1rem' }}>
-          Criar Anotação
+          Editar Lembrete
         </Typography>
         <form noValidate style={{ width: '100%' }}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="title"
-            label="Título"
-            name="title"
-            autoFocus
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{ marginBottom: '1rem' }}
-          />
           <TextField
             variant="outlined"
             margin="normal"
@@ -57,20 +45,7 @@ const TextNote = () => {
             style={{ marginBottom: '1rem' }}
           />
           <Grid container spacing={2}>
-            <Grid item xs={6} container justifyContent="flex-start">
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isPublic}
-                    onChange={(e) => setIsPublic(e.target.checked)}
-                    name="isPublic"
-                    color="primary"
-                  />
-                }
-                label="Público"
-              />
-            </Grid>
-            <Grid item xs={6} container justifyContent="flex-end">
+            <Grid item xs={12} container justifyContent="flex-end">
               <IconButton
                 type="button"
                 onClick={handleClear}
@@ -103,4 +78,4 @@ const TextNote = () => {
   );
 };
 
-export default TextNote;
+export default Reminder;

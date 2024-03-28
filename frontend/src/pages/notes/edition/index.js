@@ -6,11 +6,15 @@ import WarningIcon from '@mui/icons-material/Warning';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import TextNote from './textNote';
-import { blue, red } from "@mui/material/colors";
 import Warning from './warning';
 import Reminder from './reminder';
+// Change to mockDataReminder or mockDataWarning to see all cases
+import { blue, red } from "@mui/material/colors";
+import { useLocation } from 'react-router-dom';
 
-export default function IconPositionTabs() {
+export default function EditeNote() {
+  const location = useLocation();
+  const noteEditingNow = location.state.note;
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -18,21 +22,26 @@ export default function IconPositionTabs() {
   };
 
   const getContent = (index) => {
-    switch (index) {
-      case 0:
-        return <Warning />;
-      case 1:
-        return <TextNote />;
-      case 2:
-        return <Reminder />;
+    switch (noteEditingNow.type) {
+      case 'warning':
+        return <Warning note={noteEditingNow}/>;
+      case 'textNote':
+        return <TextNote note={noteEditingNow} />;
+      case 'reminder':
+        return <Reminder note={noteEditingNow} />;
       default:
         return null;
     }
   };
 
+  // Função para verificar se o tab deve ser visível
+  const isTabVisible = (tabName) => {
+    return noteEditingNow.type === tabName;
+  };
+
   return (
     <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', borderRadius: '16px' }}>
+      <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', flexDirection: 'column', borderRadius: '16px' }}>
         <Tabs
           value={value}
           onChange={handleChange}
@@ -55,9 +64,9 @@ export default function IconPositionTabs() {
             },
           }}
         >
-          <Tab icon={<WarningIcon />} label="Advertência" />
-          <Tab icon={<DescriptionIcon />} label="Texto Corrido" />
-          <Tab icon={<LightbulbIcon />} label="Lembrete" />
+          {isTabVisible('warning') && <Tab icon={<WarningIcon />} label="Advertência" />}
+          {isTabVisible('textNote') && <Tab icon={<DescriptionIcon />} label="Texto Corrido" />}
+          {isTabVisible('reminder') && <Tab icon={<LightbulbIcon />} label="Lembrete" />}
         </Tabs>
         <Box sx={{ p: 5, borderRadius: '16px' }}>
           {getContent(value)}
