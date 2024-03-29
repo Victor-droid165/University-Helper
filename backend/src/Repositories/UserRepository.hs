@@ -8,12 +8,15 @@ module Repositories.UserRepository
     updateUserInDB,
     createUserInDB,
     getDBusersFromDB,
+    getUserField,
   )
 where
 
 import Models.User (User (..), fromDBUser)
-import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersAppDB, updateAllInUsersWhereAppDB, insertAllIntoUsersAppDB)
+import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersAppDB, updateAllInUsersWhereAppDB, insertAllIntoUsersAppDB, selectAllFromUsersWhereAppDB, selectFromUsersWhereAppDB)
 import Models.DBUser (DBUser)
+import Database.PostgreSQL.Simple.ToField (ToField)
+import Database.PostgreSQL.Simple (FromRow)
 
 getUsersFromDB :: IO [User]
 getUsersFromDB = map fromDBUser <$> selectAllFromUsersAppDB
@@ -21,11 +24,16 @@ getUsersFromDB = map fromDBUser <$> selectAllFromUsersAppDB
 getDBusersFromDB :: IO [DBUser]
 getDBusersFromDB = selectAllFromUsersAppDB
 
-getUserFromDB :: IO User
-getUserFromDB = fromDBUser . head <$> selectAllFromUsersAppDB
+getUserFromDB :: ToField b => [(String, String, b)] -> IO User
+getUserFromDB conditions = fromDBUser . head <$> selectAllFromUsersWhereAppDB conditions
+
+getUserField :: (FromRow a) => User -> String -> IO a
+getUserField user field = do 
+  result <- selectFromUsersWhereAppDB [field] [("email", "=", userEmail user)]
+  return $ head result
 
 createUserInDB :: User -> IO ()
-createUserInDB user = do 
+createUserInDB user = do
   let newUserValues = [userName user, userEmail user, userPassword user, userType user, userEnrollment user, userUniversity user]
   insertAllIntoUsersAppDB newUserValues
 

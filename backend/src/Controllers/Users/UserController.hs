@@ -1,5 +1,6 @@
 {-# LANGUAGE BinaryLiterals #-}
 {-# LANGUAGE NumDecimals #-}
+
 module Controllers.Users.UserController
   ( userRegister,
     userLogin,
@@ -14,12 +15,15 @@ module Controllers.Users.UserController
     registerUserAPI,
     getDBUsers,
     registerStudentAPI,
+    getUserById,
   )
 where
 
 import Data.Foldable (find)
 import Data.Maybe (fromJust, mapMaybe)
+import Database.PostgreSQL.Simple.Types (Only (..))
 import Lib (handleMaybe, joinStringArray, selectOption)
+import Models.DBUser (DBUser)
 import Models.User
   ( User (..),
     displayUser,
@@ -27,20 +31,15 @@ import Models.User
     stringToUser,
     writeUserOnFile,
   )
-import Repositories.UserRepository (createUserInDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB, getDBusersFromDB)
+import Repositories.UserRepository (createUserInDB, getDBusersFromDB, getUserFromDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB)
 import System.Directory (removeFile)
 import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegisterUI)
 import TerminalUI.Users.Student (displayStudentOptions)
 import TerminalUI.Users.Teacher (displayTeacherOptions)
 import TerminalUI.Users.User (loginUI, registerUI, typeEnrollment, typeUserEmail, typeUserPassword)
-import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
-
-import Models.DBUser (DBUser)
 import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB)
-import Database.PostgreSQL.Simple.Types (Only(..))
 import Util.Database.Functions.ValidationDBFunctions (insertAllIntoValidationsAppDB)
-import Database.PostgreSQL.Simple.FromRow (FromRow, field)
-
+import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
 
 userRegister :: IO ()
 userRegister = do
@@ -76,6 +75,9 @@ swapUser _ _ [] = []
 swapUser old new (u : userL)
   | old == u = new : swapUser old new userL
   | otherwise = u : swapUser old new userL
+
+getUserById :: Int -> IO User
+getUserById userId = getUserFromDB [("id", "=", userId)]
 
 getUsers :: IO [User]
 getUsers = getUsersFromDB

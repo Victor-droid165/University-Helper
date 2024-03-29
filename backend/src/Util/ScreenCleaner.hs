@@ -47,12 +47,5 @@ quitOpt func _ = do
 start :: IO ()
 start = do
   screenCleaner
-  check <- isAppDBCreated
-  if check
-    then do
-      writeFile "backend/data/session.txt" ""
-    else do
-      initDB "plp_db"
-      let newUserValues = ["everton", "everton@admin.ufcg.edu.br", "senhaSegura", "Admin", "1195010000", "UFCG"]
-      insertAllIntoUsersAppDB newUserValues
-      writeFile "backend/data/session.txt" ""
+  initDB "plp_db"
+  writeFile "backend/data/session.txt" ""

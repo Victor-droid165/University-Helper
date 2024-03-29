@@ -1,0 +1,1 @@
+INSERT INTO users VALUES ('everton', 'everton@admin.ufcg.edu.br', 'senhaSegura', 'Admin', '1195010000', 'UFCG');
