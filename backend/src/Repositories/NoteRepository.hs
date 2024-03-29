@@ -4,21 +4,38 @@ module Repositories.NoteRepository
     removeNoteFromDB,
     updateNoteInDB,
     createNoteInDB,
-    getDBusersFromDB,
+    countNotesFromDB,
+    countNotesPrefixesFromDB,
   )
 where
 
-import Models.Note (Note (..), fromDBNote)
-import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, selectAllFromNotesAppDB, updateAllInNotesWhereAppDB, insertAllIntoNotesAppDB, selectAllFromNotesWhereAppDB)
-import Models.DBNote (DBNote)
+import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToField (ToField)
+import Models.DBCountResult (DBCountResult (DBCountResult))
+import Models.DBNote (DBNote)
+import Models.Note (Note (..), fromDBNote)
 import Repositories.UserRepository (getUserField)
+import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, insertAllIntoNotesAppDB, selectAllFromNotesAppDB, selectAllFromNotesWhereAppDB, selectFromNotesAppDB, selectFromNotesWhereAppDB, updateAllInNotesWhereAppDB)
 
 getNotesFromDB :: IO [IO Note]
 getNotesFromDB = map fromDBNote <$> selectAllFromNotesAppDB
 
-getDBusersFromDB :: IO [DBNote]
-getDBusersFromDB = selectAllFromNotesAppDB
+getDBNotesFromDB :: IO [DBNote]
+getDBNotesFromDB = selectAllFromNotesAppDB
+
+countNotesFromDB :: IO Int
+countNotesFromDB = do
+  result <- selectFromNotesAppDB ["COUNT(*)"] :: IO [DBCountResult]
+  evaluateResult (head result)
+  where
+    evaluateResult (DBCountResult count) = return count
+
+countNotesPrefixesFromDB :: String -> IO Int
+countNotesPrefixesFromDB notePrefix = do
+  result <- selectFromNotesWhereAppDB ["COUNT(*)"] [("id", "LIKE", notePrefix ++ "%")] :: IO [DBCountResult]
+  evaluateResult (head result)
+  where
+    evaluateResult (DBCountResult count) = return count
 
 createNoteInDB :: Note -> IO ()
 createNoteInDB note = do

@@ -1,16 +1,17 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Models.Note (
-  Note(..),
-  fromDBNote
-) where
+module Models.Note
+  ( Note (..),
+    fromDBNote,
+  )
+where
 
 import Controllers.Users.UserController (getUserById)
 import Data.Time.Clock ()
 import GHC.Generics (Generic)
+import Lib (stringToData, writeDataOnFile)
 import Models.DBNote (DBNote (..))
 import Models.User (User (..))
-import Lib (stringToData, writeDataOnFile)
 
 data NoteType = Reminder | StickyNote | PlainText | Warning deriving (Show, Read, Eq)
 
@@ -34,24 +35,25 @@ prefix StickyNote = "SNS"
 prefix PlainText = "PLT"
 prefix Warning = "WAR"
 
-userToString :: Note -> String
-userToString = show
+noteToString :: Note -> String
+noteToString = show
 
-stringToUser :: String -> Maybe Note
-stringToUser = stringToData
+stringToNote :: String -> Maybe Note
+stringToNote = stringToData
 
-writeUserOnFile :: FilePath -> Note -> IO ()
-writeUserOnFile = writeDataOnFile
+writeNoteOnFile :: FilePath -> Note -> IO ()
+writeNoteOnFile = writeDataOnFile
 
 fromDBNote :: DBNote -> IO Note
 fromDBNote dbNote = do
   user <- getUserById $ dbNoteCreatorId dbNote
-  return Note
-    { noteId = dbNoteId dbNote,
-      noteType = dbNoteType dbNote,
-      content = dbNoteContent dbNote,
-      visibility = dbNoteVisibility dbNote,
-      title = dbNoteTitle dbNote,
-      subject = dbNoteSubject dbNote,
-      creator = user
-    }
+  return
+    Note
+      { noteId = dbNoteId dbNote,
+        noteType = dbNoteType dbNote,
+        content = dbNoteContent dbNote,
+        visibility = dbNoteVisibility dbNote,
+        title = dbNoteTitle dbNote,
+        subject = dbNoteSubject dbNote,
+        creator = user
+      }
