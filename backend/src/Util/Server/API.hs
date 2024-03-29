@@ -19,9 +19,9 @@ import Util.Server.Notes.APIRoutes (NotesAPI)
 import Util.Server.Users.APIFunctions (usersAPIFunctions)
 import Util.Server.Users.APIRoutes (UsersAPI)
 
-type API =
-  "api" :> UsersAPI
-    :<|> "api" :> NotesAPI
+type API = "api" :>
+    ("users" :> UsersAPI
+    :<|> "notes" :> NotesAPI)
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,

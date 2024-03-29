@@ -14,7 +14,7 @@ import Servant
 import Util.Server.Users.APIDatas
 
 type UsersAPI =
-  "usersG" :> Get '[JSON] [User]
+  "users" :> Get '[JSON] [User]
     :<|> "usersDB" :> Get '[JSON] [DBUser]
     :<|> "getIdsValidated" :> Get '[JSON] [AdminV]
     :<|> "validateName" :> ReqBody '[JSON] MyData :> Post '[JSON] String

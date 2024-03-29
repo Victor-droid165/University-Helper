@@ -39,7 +39,7 @@ import Util.Validate
 
 usersAPIFunctions :: Server Util.Server.Users.APIRoutes.UsersAPI
 usersAPIFunctions =
-  usersG
+  users
     :<|> usersDB
     :<|> getIdsValidated
     :<|> validateName
@@ -139,8 +139,8 @@ getAny mUniqueKeyName mUniqueKey mAttribute = do
 
 -- LOGIN AND REGISTER
 
-usersG :: Handler [User]
-usersG = liftIO getUsers
+users :: Handler [User]
+users = liftIO getUsers
 
 usersDB :: Handler [DBUser]
 usersDB = liftIO getDBUsers

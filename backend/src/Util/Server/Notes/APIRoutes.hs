@@ -9,5 +9,11 @@ module Util.Server.Notes.APIRoutes
 where
 
 import Servant
+import Models.Note (Note)
+import Util.Server.Users.APIDatas (MyData)
 
-type NotesAPI = "createNote" :> Get '[JSON] NoContent
+type NotesAPI = "notes" :> ReqBody '[JSON] MyData :> Post '[JSON] [Note] 
+           :<|> "removeNote" :> ReqBody '[JSON] Note :> Post '[JSON] String
+           :<|> "removeByID" :> ReqBody '[JSON] String :> Post '[JSON] String
+           :<|> "registerNote" :> ReqBody '[JSON] Note :> Post '[JSON] String
+

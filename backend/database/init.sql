@@ -150,4 +150,3 @@ CREATE TABLE note_contestations (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (resolved_by) REFERENCES users(id)
 );
-
