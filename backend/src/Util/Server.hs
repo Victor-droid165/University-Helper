@@ -25,7 +25,7 @@ import Data.Aeson
 import Data.Maybe (fromJust, mapMaybe)
 import GHC.Generics
 import Models.AdminValidate (AdminV)
-import Models.DBUser (DBUser)
+import Models.DBUser (DBUser (DBUser))
 import Models.User
   ( User (..),
     showAll,
@@ -38,8 +38,7 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.Cors
 import Servant
-import Util.Database.DBFunctions (deleteFromTableWhereAppDB)
-import Util.Database.Functions.UsersDBFunctions (deleteFromUsersAppDB, deleteFromUsersWhereAppDB, insertAllIntoUsersAppDB, selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
+import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB, deleteFromUsersAppDB, deleteFromUsersWhereAppDB, insertAllIntoUsersAppDB, selectFromUsersWhereAppDB, updateInUsersWhereAppDB, selectAllFromUsersWhereAppDB, updateAllInUsersWhereAppDB)
 import Util.ScreenCleaner (start)
 import Util.Validate
   ( belongsToList,
@@ -150,7 +149,7 @@ validateUser :: IntegerData -> Handler NoContent
 validateUser myData = liftIO (validateUserAPI (integerValue myData)) >> return NoContent
 
 unvalidateUser :: MyData -> Handler NoContent
-unvalidateUser myData = liftIO (unvalidateUserAPI (value myData)) >> return NoContent
+unvalidateUser myData = deleteUser myData >> return NoContent
 
 register :: RegisterInfo -> Handler String
 register registerInfo = do
@@ -181,13 +180,14 @@ showAllUsers = do
   return $ showAll users
 
 deleteUser :: MyData -> Handler String
-deleteUser mydata = do 
+deleteUser mydata = do
   if value mydata /= "1"
-    then do 
-    liftIO $ deleteFromValidationsWhereAppDB [("user_id", "=", value mydata)]
-    liftIO $ deleteFromUsersWhereAppDB [("id", "=", value mydata)] 
+    then do
+    liftIO $ updateInUsersWhereAppDB [("is_deleted", "t")] [("id", "=", value mydata)]
+    --liftIO $ deleteFromValidationsWhereAppDB [("user_id", "=", value mydata)]
+    --liftIO $ deleteFromUsersWhereAppDB [("id", "=", value mydata)] 
     return "Success"
-  else 
+  else
     return "You can't delete yourself, cuz you're the ADMIN"
 
 updateAny :: ChangeData -> Handler String

@@ -34,10 +34,10 @@ insertAllIntoUsersAppDB :: (ToField a) => [a] -> IO ()
 insertAllIntoUsersAppDB = insertAllIntoTableAppDB "users"
 
 updateAllInUsersAppDB :: [String] -> IO ()
-updateAllInUsersAppDB newValues = updateInUsersAppDB $ zip ["name", "email", "password", "type", "enrollment_number", "university_name", "created_at"] newValues
+updateAllInUsersAppDB newValues = updateInUsersAppDB $ zip ["name", "email", "password", "type", "enrollment_number", "university_name", "is_deleted", "created_at"] newValues
 
 updateAllInUsersWhereAppDB :: [String] -> [(String, String, String)] -> IO ()
-updateAllInUsersWhereAppDB newValues = updateInUsersWhereAppDB $ zip ["name", "email", "password", "type", "enrollment_number", "university_name"] newValues
+updateAllInUsersWhereAppDB newValues = updateInUsersWhereAppDB $ zip ["name", "email", "password", "type", "enrollment_number", "university_name", "is_deleted"] newValues
 
 updateInUsersAppDB :: [(String, String)] -> IO ()
 updateInUsersAppDB = updateInTableAppDB "users"

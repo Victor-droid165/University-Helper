@@ -16,7 +16,11 @@ const AdminPage = () => {
   const api = useApi();
 
   useEffect(() => {
-    api.getDBUsers().then((dbUsers) => setRows(dbUsers));
+    api.getDBUsers().then((dbUsers) => {
+      const activeUsers = dbUsers.filter(user => user.dbIsDeleted !== true);
+      console.log(activeUsers);
+      setRows(activeUsers);
+    });
     setValidates();
   }, []);
 

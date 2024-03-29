@@ -17,6 +17,7 @@ data DBUser = DBUser
     dbUserType :: String,
     dbUserEnrollment :: String,
     dbUserUniversity :: String,
+    dbIsDeleted :: Bool,
     dbUsercreatedAt :: LocalTime,
     dbUserId :: Int
   }
