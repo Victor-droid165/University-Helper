@@ -17,6 +17,7 @@ import Models.Note (Note (..), fromDBNote)
 import Repositories.UserRepository (getUserField)
 import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, insertAllIntoNotesAppDB, selectAllFromNotesAppDB, selectAllFromNotesWhereAppDB, selectFromNotesAppDB, selectFromNotesWhereAppDB, updateAllInNotesWhereAppDB)
 
+
 getNotesFromDB :: IO [IO Note]
 getNotesFromDB = map fromDBNote <$> selectAllFromNotesAppDB
 

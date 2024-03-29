@@ -7,7 +7,7 @@ where
 import Controllers.Users.UserController (userLogin, userRegister)
 import Lib (printWelcomeMessages, selectOption)
 import Util.ScreenCleaner (quitIO, screenCleaner)
-import Util.Server (serveOn)
+import Util.Server.API (serveOn)
 
 optionInterface :: IO ()
 optionInterface = do
