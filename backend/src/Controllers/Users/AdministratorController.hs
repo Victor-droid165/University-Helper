@@ -14,12 +14,9 @@ import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhere
 import Models.AdminValidate (AdminV)
 
 -- Not working
-validateUserAPI :: String -> IO ()
-validateUserAPI enrollment = do
-  loggedUser <- getLoggedUser
-  loggedDBUser <- selectAllFromUsersWhereAppDB [("enrollment_number", "=", userEnrollment (fromJust loggedUser))]
-  toValidateDBUser <- selectAllFromUsersWhereAppDB [("enrollment_number", "=", enrollment)]
-  insertAllIntoValidationsAppDB [(dbUserId . head) loggedDBUser, (dbUserId . head) toValidateDBUser]
+validateUserAPI :: Integer -> IO ()
+validateUserAPI uid = insertAllIntoValidationsAppDB [1 :: Integer, uid]
+
 
 unvalidateUserAPI :: String -> IO ()
 unvalidateUserAPI enrollment = do
