@@ -1,5 +1,4 @@
 {-# LANGUAGE BinaryLiterals #-}
-{-# LANGUAGE NumDecimals #-}
 
 module Controllers.Users.UserController
   ( userRegister,
@@ -31,7 +30,7 @@ import Models.User
     stringToUser,
     writeUserOnFile,
   )
-import Repositories.UserRepository (createUserInDB, getDBusersFromDB, getUserFromDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB)
+import Repositories.UserRepository (createUserInDB, getDBusersFromDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB, getUserFromDBWhere)
 import System.Directory (removeFile)
 import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegisterUI)
 import TerminalUI.Users.Student (displayStudentOptions)
@@ -77,7 +76,7 @@ swapUser old new (u : userL)
   | otherwise = u : swapUser old new userL
 
 getUserById :: Int -> IO User
-getUserById userId = getUserFromDB [("id", "=", userId)]
+getUserById userId = getUserFromDBWhere [("id", "=", userId)]
 
 getUsers :: IO [User]
 getUsers = getUsersFromDB

@@ -1,6 +1,6 @@
 module Repositories.UserRepository
   ( getUsersFromDB,
-    getUserFromDB,
+    getUserFromDBWhere,
     removeUserFromDBByEnroll,
     removeUserFromDBByEmail,
     removeUserFromDBById,
@@ -24,8 +24,8 @@ getUsersFromDB = map fromDBUser <$> selectAllFromUsersAppDB
 getDBusersFromDB :: IO [DBUser]
 getDBusersFromDB = selectAllFromUsersAppDB
 
-getUserFromDB :: ToField b => [(String, String, b)] -> IO User
-getUserFromDB conditions = fromDBUser . head <$> selectAllFromUsersWhereAppDB conditions
+getUserFromDBWhere :: ToField b => [(String, String, b)] -> IO User
+getUserFromDBWhere conditions = fromDBUser . head <$> selectAllFromUsersWhereAppDB conditions
 
 getUserField :: (FromRow a) => User -> String -> IO a
 getUserField user field = do 

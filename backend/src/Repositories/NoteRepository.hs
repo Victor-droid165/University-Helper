@@ -6,6 +6,8 @@ module Repositories.NoteRepository
     createNoteInDB,
     countNotesFromDB,
     countNotesPrefixesFromDB,
+    getDBNotesFromDB,
+    getNotesFromDBWhere
   )
 where
 
@@ -19,10 +21,13 @@ import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, inse
 
 
 getNotesFromDB :: IO [IO Note]
-getNotesFromDB = map fromDBNote <$> selectAllFromNotesAppDB
+getNotesFromDB = getNotesFromDBWhere ([] :: [(String, String, String)])
 
 getDBNotesFromDB :: IO [DBNote]
 getDBNotesFromDB = selectAllFromNotesAppDB
+
+getNotesFromDBWhere :: ToField b => [(String, String, b)] -> IO [IO Note]
+getNotesFromDBWhere conditions = map fromDBNote <$> selectAllFromNotesWhereAppDB conditions
 
 countNotesFromDB :: IO Int
 countNotesFromDB = do
@@ -53,4 +58,4 @@ removeNoteFromDB :: Note -> IO ()
 removeNoteFromDB = removeNoteFromDBById . noteId
 
 removeNoteFromDBById :: String -> IO ()
-removeNoteFromDBById noteId = deleteFromNotesWhereAppDB [("id", "=", noteId)]
+removeNoteFromDBById noteId' = deleteFromNotesWhereAppDB [("id", "=", noteId')]
