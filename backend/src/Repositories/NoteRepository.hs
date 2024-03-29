@@ -13,6 +13,9 @@ import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, sele
 import Models.DBNote (DBNote)
 import Database.PostgreSQL.Simple.ToField (ToField)
 import Repositories.UserRepository (getUserField)
+import Data.Aeson (FromJSON)
+
+instance FromJSON Note
 
 getNotesFromDB :: IO [IO Note]
 getNotesFromDB = map fromDBNote <$> selectAllFromNotesAppDB

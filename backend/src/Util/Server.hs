@@ -51,6 +51,7 @@ import Util.Validate
   )
 import Database.PostgreSQL.Simple (FromRow, ToRow)
 import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhereAppDB)
+import Models.Note (Note)
 
 newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
 
@@ -64,10 +65,11 @@ data ChangeData = ChangeData {field :: String, newValue :: String, match :: Stri
 
 data GetUserFieldData = GetUserFieldData {unique_key_name :: Maybe String, unique_key :: Maybe String, attribute :: Maybe String} deriving (Eq, Show, Generic, FromJSON)
 
-type API =
-  "api"
-    :> "users"
-    :> ( "users" :> Get '[JSON] [User]
+
+type API =       "users" :> UsersAPI
+            :<|> "notes" :> Notes
+
+type UsersAPI = "usersG" :> Get '[JSON] [User]
            :<|> "usersDB" :> Get '[JSON] [DBUser]
            :<|> "getIdsValidated" :> Get '[JSON] [AdminV]
            :<|> "validateName" :> ReqBody '[JSON] MyData :> Post '[JSON] String
@@ -90,7 +92,8 @@ type API =
                     :> QueryParam "attribute" String
                     :> Get '[JSON] String
                 )
-       )
+
+type Notes = "createNote" :> Get '[JSON] NoContent
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
@@ -100,12 +103,14 @@ app api ser = corsMiddleware $ serve api ser
   where
     corsMiddleware = cors (const $ Just simpleCorsResourcePolicy {corsRequestHeaders = [hContentType]})
 
-userAPI :: Proxy API
-userAPI = Proxy
+proxyAPI :: Proxy API
+proxyAPI = Proxy
 
-superServer :: Server API
-superServer =
-  users
+serverS :: Server API
+serverS = users :<|> userNotes
+
+users :: Server UsersAPI
+users =   usersG
     :<|> usersDB
     :<|> getIdsValidated
     :<|> validateName
@@ -123,6 +128,12 @@ superServer =
     :<|> deleteUser
     :<|> updateAny
     :<|> getAny
+
+userNotes :: Server Notes
+userNotes = notes
+
+notes ::  Handler NoContent
+notes = return NoContent
 
 getIdsValidated :: Handler [AdminV]
 getIdsValidated = liftIO getIds
@@ -209,11 +220,11 @@ getAny mUniqueKeyName mUniqueKey mAttribute = do
 
 -- LOGIN AND REGISTER
 
-users :: Handler [User]
-users = liftIO getUsers
+usersG :: Handler [User]
+usersG = liftIO getUsers
 
 usersDB :: Handler [DBUser]
 usersDB = liftIO getDBUsers
 
 serveOn :: IO ()
-serveOn = start >> run 8081 (app userAPI superServer)
+serveOn = start >> run 8081 (app proxyAPI serverS)
