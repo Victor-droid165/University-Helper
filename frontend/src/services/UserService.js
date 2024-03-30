@@ -117,4 +117,18 @@ export default class UserService {
 
         return await response.json();
     }
+
+    async getID(idType) {
+        const response = await fetch('http://localhost:8081/api/notes/getId', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ value: idType }),
+        });
+        const data = await response.json();
+        console.log(data);
+        return data;
+    }
+      
 }

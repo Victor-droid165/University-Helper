@@ -9,40 +9,13 @@ const Reminder = () => {
   const api = useApi();
   const session = useAuth().user.email;
 
-  useEffect(() => {
-    const fetchDBUserSession = async () => {
-      const users = await api.getDBUsers();
-      const dbUserSession = users.filter(user => user.dbUserEmail === session);
-      console.log(dbUserSession[0]);
-      return dbUserSession[0];
-    }
-  }, [api, session]);
-
-  const getId = async (idType) => {
-    try {
-      const response = await fetch('http://localhost:8081/api/notes/getId', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({value: idType}),
-      });
-      const data = await response.json();
-      console.log(data);
-      return data;
-    } catch (error) {
-      console.error('Error updating user:', error);
-    }
-  };
-
   const handleSave = async () => {
     const now = new Date();
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Conteúdo:", content);
-    const noteID = await getId("REM");
+    const noteID = await api.getID("REM");
     const users = await api.getDBUsers();
     const dbUserSession = users.filter(user => user.dbUserEmail === session);
-    console.log(dbUserSession[0]);
 
     const user = {
       userName: dbUserSession[0].dbUserName,

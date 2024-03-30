@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Checkbox, FormControlLabel } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import { useAuth } from '../../../hooks/useAuth';
+import { useApi } from '../../../hooks/useApi';
+
 
 const TextNote = ({ note }) => {
   const [title, setTitle] = useState('');
@@ -23,6 +26,7 @@ const TextNote = ({ note }) => {
     console.log("Conteúdo:", content);
     console.log("É público:", isPublic);
     // Aqui você pode adicionar lógica para editar no backend
+
   };
 
   const handleClear = () => {

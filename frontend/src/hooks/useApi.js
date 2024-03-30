@@ -23,5 +23,8 @@ export const useApi = () => ({
   },
   getUserField: async (data) => {
     return await userService.getUserField(data);
+  },
+  getID: async (data) => {
+    return await userService.getID(data);
   }
 });

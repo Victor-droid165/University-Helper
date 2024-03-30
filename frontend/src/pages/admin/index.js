@@ -79,8 +79,6 @@ export default function IconPositionTabs() {
             <ListNotes data={mockAdminWarnings} />
           </>
         );
-      // case 2:
-      //   return <Reminder />;
       default:
         return null;
     }

@@ -1,21 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Select, MenuItem } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-import { mockDataTeam } from "../../../data/mockData.js";
+//import { mockDataTeam } from "../../../data/mockData.js";
+import { useAuth } from '../../../hooks/useAuth';
+import { useApi } from '../../../hooks/useApi';
 
 const Warning = () => {
+  const api = useApi();
   const [title, setTitle] = useState('');
   const [warning, setWarning] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
-  const [rows] = useState(mockDataTeam);
+  const [dbUsersList, setDbUsersList] = useState([]);
 
-  const handleSave = () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const users = await api.getDBUsers();
+        const newU = users.filter(user => user.dbIsDeleted !== true)
+        setDbUsersList(newU);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    fetchData();
+  }, [api]);
+
+  const handleSave = async () => {
     const now = new Date();
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Usuário Selecionado:", selectedUser);
     console.log("Título:", title);
     console.log("Aviso:", warning);
-    // Aqui você pode adicionar lógica para salvar no backend
+    const noteID = await api.getID("WAR");
+
+    const user = {
+      userName: selectedUser.dbUserName,
+      userEmail: selectedUser.dbUserEmail,
+      userPassword: selectedUser.dbUserPassword,
+      userType: selectedUser.dbUserType,
+      userEnrollment: selectedUser.dbUserEnrollment,
+      userUniversity: selectedUser.dbUserUniversity,
+    }
+
+    await fetch('http://localhost:8081/api/notes/registerNote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        noteId: noteID,
+        noteType: "Warning",
+        visibility: "Private",
+        title: title,
+        subject: "",
+        content: warning,
+        creator: user,
+       }),
+    });
   };
 
   const handleClear = () => {
@@ -41,9 +82,9 @@ const Warning = () => {
             <MenuItem value="">
               <em>Selecione um usuário</em>
             </MenuItem>
-            {rows.map((user) => (
-              <MenuItem key={user.id} value={user.name}>
-                {user.name}
+            {dbUsersList.map((user) => (
+              <MenuItem key={user.dbUserName} value={user.dbUserName}>
+                {user.dbUserName}
               </MenuItem>
             ))}
           </Select>
