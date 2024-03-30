@@ -26,7 +26,7 @@ const Warning = () => {
 
   return (
     <Container component="main" maxWidth='100%'>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ marginTop: "2%", display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5" style={{ marginBottom: '1rem' }}>
           Criar Aviso
         </Typography>
