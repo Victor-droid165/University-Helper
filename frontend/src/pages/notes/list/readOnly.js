@@ -2,9 +2,9 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2';
 import { mockDataNotes } from '../../../data/mockData';
-import NoteCardReadOnly from '../../../components/NoteCards/NoteCard/NoteCardReadOnly';
+import NoteCardReadOnly from '../../../components/NoteCards/NoteCardReadOnly';
 
-export default function ListNotes( {data = mockDataNotes} ) {
+export default function ListNotesReadOnly( {data = mockDataNotes} ) {
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
       <Grid container spacing={2}>

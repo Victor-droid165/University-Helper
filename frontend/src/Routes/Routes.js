@@ -8,14 +8,15 @@ import AdminPage from '../pages/admin';
 import NoteCreationPage from '../pages/notes/creation';
 import ProtectedRoutes from './ProtectedRoutes'
 import LogoutPage from '../pages/logout/LogoutPage';
-import ListNotes from '../pages/notes/list/withEdit';
+import ListNotesWithEdit from '../pages/notes/list/withEdit';
+import ListNotesReadOnly from '../pages/notes/list/readOnly';
 import EditNote from '../pages/notes/edition';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<AppPageLayout />}>
       <Route index element={<HomePage />} />
-      <Route path="home" element={<HomePage />} />
+      <Route path="/home" element={<HomePage />} />
       <Route path="register" element={<RegisterPage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="logout" element={<LogoutPage />} />
@@ -26,8 +27,13 @@ const router = createBrowserRouter(
 
       <Route element={<ProtectedRoutes allowedRoles={["Admin", "Professor", "Student"]} />}>
         <Route path="note-creation" element={<NoteCreationPage />} />
-        <Route path="note-list" element={<ListNotes />} />
+        <Route path="note-list" element={<ListNotesWithEdit />} />
         <Route path="note-edition" element={<EditNote />} />
+      </Route>
+
+      {/* Please, remove the admin from the list! */}
+      <Route element={<ProtectedRoutes allowedRoles={["Admin", "Professor", "Student"]} />}>
+        <Route path="warnings" element={<ListNotesReadOnly />} />
       </Route>
 
       {/* <Route path="admin" element={<Album />}/> */}

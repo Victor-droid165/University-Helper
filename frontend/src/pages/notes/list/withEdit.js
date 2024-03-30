@@ -4,7 +4,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { mockDataNotes } from '../../../data/mockData';
 import NoteCardWithEdit from '../../../components/NoteCards/NoteCardWithEdit';
 
-export default function ListNotes( {data = mockDataNotes} ) {
+export default function ListNotesWithEdit( {data = mockDataNotes} ) {
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
       <Grid container spacing={2}>

@@ -77,7 +77,7 @@ export default function NoteCardReadOnly({ note }) {
               </IconButton>
             </Grid>
             <Grid item>
-              <Button size="small" onClick={handleEditClick}>Editar</Button>
+              <Button size="small" onClick={handleEditClick}>Visualizar</Button>
             </Grid>
           </Grid>
         </CardActions>
