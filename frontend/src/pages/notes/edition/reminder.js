@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-import { useAuth } from '../../../hooks/useAuth';
-import { useApi } from '../../../hooks/useApi';
+
 
 
 const Reminder = ({ note }) => {

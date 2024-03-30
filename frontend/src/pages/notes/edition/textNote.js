@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Checkbox, FormControlLabel } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-import { useAuth } from '../../../hooks/useAuth';
-import { useApi } from '../../../hooks/useApi';
 
 
 const TextNote = ({ note }) => {
@@ -19,13 +17,28 @@ const TextNote = ({ note }) => {
     }
   }, [note]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const now = new Date();
     console.log("Título:", title);
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Conteúdo:", content);
     console.log("É público:", isPublic);
     // Aqui você pode adicionar lógica para editar no backend
+    await fetch('http://localhost:8081/api/notes/updateANote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        noteId: note.noteID,
+        noteType: "PlainText",
+        visibility: title === "" ? "Private" : (isPublic ? "Public" : "Private"),
+        title: title,
+        subject: '',
+        content: content,
+        creator: note.creator,
+       }),
+    });
 
   };
 
