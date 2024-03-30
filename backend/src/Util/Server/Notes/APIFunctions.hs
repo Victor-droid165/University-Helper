@@ -7,18 +7,19 @@ import Servant
 import Util.Server.Notes.APIRoutes (NotesAPI)
 import Util.Server.Users.APIDatas (MyData (..))
 import Models.Note (Note, fromDBNote)
-import Util.Database.Functions.NotesDBFunctions (selectAllFromNotesWhereAppDB)
+import Util.Database.Functions.NotesDBFunctions (selectAllFromNotesWhereAppDB, selectAllFromNotesAppDB)
 import Control.Monad.IO.Class (liftIO)
 import Repositories.NoteRepository (removeNoteFromDB, removeNoteFromDBById, createNoteInDB)
-import Controllers.Notes.NoteController (getNoteById, getNotes, getNotesByUserId, removeNoteById, removeByNote, updateNote, getNextNoteId)
+import Controllers.Notes.NoteController (getNoteById, getNotes, getNotesByUserId, removeNoteById, removeByNote, updateNote, getNextNoteId, getDBNotes)
 
 notesAPIFunctions :: Server NotesAPI
 notesAPIFunctions =     notes
                   :<|>  removeNote
-                  :<|>  removeNoteByID 
+                  :<|>  removeNoteByID
                   :<|>  registerNote
                   :<|>  updateANote
                   :<|>  getId
+                  :<|>  listNotes
 
 notes :: MyData -> Handler [Note]
 notes id = liftIO $ getNotesByUserId (value id)
@@ -38,4 +39,7 @@ updateANote note = liftIO $ updateNote note >> return "Updated"
 getId :: MyData -> Handler String
 getId prefix = liftIO $ getNextNoteId (value prefix)
 
-
+listNotes :: Handler [Note]
+listNotes = do
+    dbNotes <- liftIO getDBNotes
+    liftIO $ mapM fromDBNote dbNotes
