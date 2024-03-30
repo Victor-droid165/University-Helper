@@ -160,6 +160,93 @@ CREATE TABLE event_schedules (
         frequency_unit IN ('hour', 'day', 'week', 'month', 'year')
     ),
     event_id INT NOT NULL,
-    schedule_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+CREATE TABLE classes (
+    name VARCHAR(100) NOT NULL,
+    semester VARCHAR(6) NOT NULL,
+    category VARCHAR(10) DEFAULT 'Subject' CHECK (category IN ('Subject', 'Course')),
+    id SERIAL PRIMARY KEY
+);
+CREATE TABLE user_classes (
+    user_id INT NOT NULL,
+    class_id INT NOT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('Student', 'Professor', 'Tutor')),
+    PRIMARY KEY (user_id, class_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
+);
+CREATE TABLE class_records(
+    class_content TEXT NOT NULL,
+    date TIMESTAMP NOT NULL,
+    id SERIAL PRIMARY KEY
+);
+CREATE TABLE class_attendance (
+    class_id INT NOT NULL,
+    class_record_id INT NOT NULL,
+    student_id INT NOT NULL,
+    is_present BOOLEAN NOT NULL,
+    PRIMARY KEY (class_record_id, student_id),
+    FOREIGN KEY (class_record_id) REFERENCES class_records(id) ON DELETE CASCADE,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE class_grades (
+    class_id INT NOT NULL,
+    student_id INT NOT NULL,
+    grade INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE labels(
+    name VARCHAR(100) NOT NULL,
+    color VARCHAR(6),
+    id SERIAL PRIMARY KEY
+);
+CREATE TABLE custom_labels(
+    user_id INT NOT NULL,
+    label_id INT NOT NULL,
+    PRIMARY KEY (user_id, label_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE
+);
+CREATE TABLE user_class_labels(
+    user_id INT NOT NULL,
+    class_id INT NOT NULL,
+    label_id INT NOT NULL,
+    PRIMARY KEY (user_id, class_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE
+);
+CREATE TABLE default_note_event_labels (
+    label_id INT NOT NULL,
+    FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE
+);
+CREATE TABLE note_labels(
+    note_id VARCHAR(24) NOT NULL,
+    label_id INT NOT NULL,
+    PRIMARY KEY (note_id, label_id),
+    FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE,
+    FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE
+);
+CREATE TABLE event_labels(
+    event_id INT NOT NULL,
+    label_id INT NOT NULL,
+    PRIMARY KEY (event_id, label_id),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE
+);
+CREATE TABLE default_class_labels (
+    label_id INT NOT NULL,
+    FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE
+);
+CREATE TABLE class_labels(
+    class_id INT NOT NULL,
+    label_id INT NOT NULL,
+    PRIMARY KEY (class_id, label_id),
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE
 );
