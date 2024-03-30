@@ -45,8 +45,10 @@ countNotesPrefixesFromDB notePrefix = do
 
 createNoteInDB :: Note -> IO ()
 createNoteInDB note = do
-  userId <- getUserField (creator note) "id"
-  let newNoteValues = [noteId note, noteType note, visibility note, show $ title note, show $ subject note, content note, userId]
+  userId <- getUserField (creator note) "id" :: IO Int
+  let newNoteValues = [noteId note, noteType note, visibility note, show $ title note, show $ subject note, content note, show userId]
+  let cu  = map show newNoteValues
+  print cu
   insertAllIntoNotesAppDB newNoteValues
 
 updateNoteInDB :: Note -> IO ()

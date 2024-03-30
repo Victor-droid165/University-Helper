@@ -5,13 +5,14 @@ module Controllers.Notes.NoteController
     getDBNotes,
     getNoteById,
     updateNote,
-    removeNote,
+    removeByNote,
     removeNoteById,
+    getNotesByUserId
   )
 where
 
 import Models.DBNote (DBNote)
-import Models.Note
+import Models.Note ( Note )
 import Repositories.NoteRepository (countNotesPrefixesFromDB, createNoteInDB, getDBNotesFromDB, getNotesFromDB, getNotesFromDBWhere, removeNoteFromDB, removeNoteFromDBById, updateNoteInDB)
 
 getNextNoteId :: String -> IO String
@@ -21,6 +22,9 @@ getNextNoteId notePrefix = do
 
 getNotes :: IO [Note]
 getNotes = sequence =<< getNotesFromDB
+
+getNotesByUserId :: String -> IO [Note]
+getNotesByUserId id = sequence =<< getNotesFromDBWhere [("user_id", "=", id)]
 
 getDBNotes :: IO [DBNote]
 getDBNotes = getDBNotesFromDB
@@ -36,8 +40,8 @@ registerNote = createNoteInDB
 updateNote :: Note -> IO ()
 updateNote = updateNoteInDB
 
-removeNote :: Note -> IO ()
-removeNote = removeNoteFromDB
+removeByNote :: Note -> IO ()
+removeByNote = removeNoteFromDB
 
 removeNoteById :: String -> IO ()
 removeNoteById = removeNoteFromDBById
