@@ -14,6 +14,8 @@ import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.Cors
 import Servant
 import Util.ScreenCleaner (start)
+import Util.Server.Notebooks.APIFunctions (notebooksAPIFunctions)
+import Util.Server.Notebooks.APIRoutes (NotebooksAPI)
 import Util.Server.Notes.APIFunctions (notesAPIFunctions)
 import Util.Server.Notes.APIRoutes (NotesAPI)
 import Util.Server.Users.APIFunctions (usersAPIFunctions)
@@ -21,7 +23,8 @@ import Util.Server.Users.APIRoutes (UsersAPI)
 
 type API = "api" :>
     ("users" :> UsersAPI
-    :<|> "notes" :> NotesAPI)
+    :<|> "notes" :> NotesAPI
+    :<|> "notebooks" :> NotebooksAPI)
 
 -- 'serve' comes from servant and hands you a WAI Application,
 -- which you can think of as an "abstract" web application,
@@ -38,4 +41,4 @@ serveOn :: IO ()
 serveOn = start >> run 8081 (app proxyAPI serverS)
 
 serverS :: Server API
-serverS = usersAPIFunctions :<|> notesAPIFunctions
+serverS = usersAPIFunctions :<|> notesAPIFunctions :<|> notebooksAPIFunctions
