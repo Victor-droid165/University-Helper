@@ -1,32 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Select, MenuItem } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-import { mockDataTeam } from "../../../data/mockData.js";
+import { useApi } from '../../../hooks/useApi';
 
 const Warning = ({ note }) => {
+  const api = useApi();
   const [title, setTitle] = useState('');
   const [warning, setWarning] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
+  const [dbUsersList, setDbUsersList] = useState([]);
 
   // Atualiza os estados quando o componente recebe uma nova 'note'
   useEffect(() => {
     if (note) {
       setTitle(note.title);
       setWarning(note.content); // Supondo que 'content' é a propriedade do aviso
-      if (mockDataTeam && note.selectedUser) {
-        const user = mockDataTeam.find(u => u.id === note.selectedUser);
-        setSelectedUser(user ? user.name : '');
-      }
     }
-  }, [note, mockDataTeam]);
+  }, [note]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const users = await api.getDBUsers();
+        const newU = users.filter(user => user.dbIsDeleted !== true)
+        setDbUsersList(newU);
+        const user = dbUsersList.find(u => u.dbUserName === note.selectedUser);
+        setSelectedUser(user ? user.name : '');
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    fetchData();
+  }, [api]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const now = new Date();
     console.log("Título:", title);
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Usuário Selecionado:", selectedUser);
     console.log("Aviso:", warning);
     // Aqui você pode adicionar lógica para editar no backend
+    const user = {
+      userName: selectedUser.dbUserName,
+      userEmail: selectedUser.dbUserEmail,
+      userPassword: selectedUser.dbUserPassword,
+      userType: selectedUser.dbUserType,
+      userEnrollment: selectedUser.dbUserEnrollment,
+      userUniversity: selectedUser.dbUserUniversity,
+    }
+
+    await fetch('http://localhost:8081/api/notes/registerNote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        noteId: note.noteID,
+        noteType: "Warning",
+        visibility: "Private",
+        title: title,
+        subject: "",
+        content: warning,
+        creator: user,
+       }),
+    });
   };
 
   const handleClear = () => {
@@ -52,7 +89,7 @@ const Warning = ({ note }) => {
             <MenuItem value="">
               <em>Selecione um usuário</em>
             </MenuItem>
-            {mockDataTeam.map((user) => (
+            {dbUsersList.map((user) => (
               <MenuItem key={user.id} value={user.name}>
                 {user.name}
               </MenuItem>
