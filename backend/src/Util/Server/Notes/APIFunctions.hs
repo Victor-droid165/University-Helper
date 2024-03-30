@@ -10,28 +10,32 @@ import Models.Note (Note, fromDBNote)
 import Util.Database.Functions.NotesDBFunctions (selectAllFromNotesWhereAppDB)
 import Control.Monad.IO.Class (liftIO)
 import Repositories.NoteRepository (removeNoteFromDB, removeNoteFromDBById, createNoteInDB)
+import Controllers.Notes.NoteController (getNoteById, getNotes, getNotesByUserId, removeNoteById, removeByNote, updateNote, getNextNoteId)
 
 notesAPIFunctions :: Server NotesAPI
 notesAPIFunctions =     notes
                   :<|>  removeNote
                   :<|>  removeNoteByID 
                   :<|>  registerNote
+                  :<|>  updateANote
+                  :<|>  getId
 
 notes :: MyData -> Handler [Note]
-notes id = do
-  noteList <- liftIO $ selectAllFromNotesWhereAppDB [("creator_id", "=", value id)]
-  liftIO $ mapM fromDBNote noteList
+notes id = liftIO $ getNotesByUserId (value id)
 
 removeNote :: Note -> Handler String
-removeNote note = liftIO $ removeNoteFromDB note >> return "Removed"
+removeNote note = liftIO $ removeByNote note >> return "Removed"
 
 removeNoteByID :: String -> Handler String
-removeNoteByID id = liftIO $ removeNoteFromDBById id >> return "Removed"
+removeNoteByID id = liftIO $ removeNoteById id >> return "Removed"
 
 registerNote :: Note -> Handler String
 registerNote note = liftIO $ createNoteInDB note >> return "Created"
 
+updateANote :: Note -> Handler String
+updateANote note = liftIO $ updateNote note >> return "Updated"
 
-
+getId :: MyData -> Handler String
+getId prefix = liftIO $ getNextNoteId (value prefix)
 
 
