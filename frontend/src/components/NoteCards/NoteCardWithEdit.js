@@ -12,7 +12,7 @@ import { IconButton, Grid } from '@mui/material';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from 'react-router-dom';
 
-export default function NoteCard({ note }) {
+export default function NoteCardWithEdit({ note }) {
   const navigate = useNavigate();
 
   const handleEditClick = () => {

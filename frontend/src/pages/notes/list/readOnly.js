@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2';
 import { mockDataNotes } from '../../../data/mockData';
-import NoteCard from '../../../components/NoteCard/NoteCard';
+import NoteCardReadOnly from '../../../components/NoteCards/NoteCard/NoteCardReadOnly';
 
 export default function ListNotes( {data = mockDataNotes} ) {
   return (
@@ -10,7 +10,7 @@ export default function ListNotes( {data = mockDataNotes} ) {
       <Grid container spacing={2}>
         {data.map((currentNote, index) => (
           <Grid key={index} xs={12} sm={6} md={4} lg={3} minHeight={160}>
-            <NoteCard note={currentNote} />
+            <NoteCardReadOnly note={currentNote} />
           </Grid>
         ))}
       </Grid>

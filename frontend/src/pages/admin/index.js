@@ -5,17 +5,13 @@ import Box from '@mui/material/Box';
 import WarningIcon from '@mui/icons-material/Warning';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ListUsers from './listUsers';
-import ListNotes from '../notes/list';
-// import TextNote from './textNote';
+import ListNotes from '../notes/list/withEdit';
 import { blue, red } from "@mui/material/colors";
 import Warning from '../notes/creation/warning';
 import { mockAdminWarnings } from '../../data/mockData';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import Icon from '@mui/material/Icon';
 import AddIcon from '@mui/icons-material/Add';
-// import Warning from './warning';
-// import Reminder from './reminder';
 
 export default function IconPositionTabs() {
   const [value, setValue] = React.useState(0);

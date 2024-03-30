@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, Button, Typography, MenuItem, Select, ListItemIcon, FormControl, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { mockDataTeam } from "../../data/mockData.js";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";

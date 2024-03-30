@@ -8,7 +8,7 @@ import AdminPage from '../pages/admin';
 import NoteCreationPage from '../pages/notes/creation';
 import ProtectedRoutes from './ProtectedRoutes'
 import LogoutPage from '../pages/logout/LogoutPage';
-import ListNotes from '../pages/notes/list';
+import ListNotes from '../pages/notes/list/withEdit';
 import EditNote from '../pages/notes/edition';
 
 const router = createBrowserRouter(
