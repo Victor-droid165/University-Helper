@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Repositories.NoteRepository
   ( getNotesFromDB,
     removeNoteFromDBById,
@@ -7,18 +9,19 @@ module Repositories.NoteRepository
     countNotesFromDB,
     countNotesPrefixesFromDB,
     getDBNotesFromDB,
-    getNotesFromDBWhere
+    getNotesFromDBWhere,
   )
 where
 
 import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToField (ToField)
+import GHC.Generics (Generic)
 import Models.DBCountResult (DBCountResult (DBCountResult))
 import Models.DBNote (DBNote)
+import Models.IntWrapper
 import Models.Note (Note (..), fromDBNote)
 import Repositories.UserRepository (getUserField)
 import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, insertAllIntoNotesAppDB, selectAllFromNotesAppDB, selectAllFromNotesWhereAppDB, selectFromNotesAppDB, selectFromNotesWhereAppDB, updateAllInNotesWhereAppDB)
-
 
 getNotesFromDB :: IO [IO Note]
 getNotesFromDB = getNotesFromDBWhere ([] :: [(String, String, String)])
@@ -26,7 +29,7 @@ getNotesFromDB = getNotesFromDBWhere ([] :: [(String, String, String)])
 getDBNotesFromDB :: IO [DBNote]
 getDBNotesFromDB = selectAllFromNotesAppDB
 
-getNotesFromDBWhere :: ToField b => [(String, String, b)] -> IO [IO Note]
+getNotesFromDBWhere :: (ToField b) => [(String, String, b)] -> IO [IO Note]
 getNotesFromDBWhere conditions = map fromDBNote <$> selectAllFromNotesWhereAppDB conditions
 
 countNotesFromDB :: IO Int
@@ -45,10 +48,8 @@ countNotesPrefixesFromDB notePrefix = do
 
 createNoteInDB :: Note -> IO ()
 createNoteInDB note = do
-  userId <- getUserField (creator note) "id" :: IO Int
-  let newNoteValues = [noteId note, noteType note, visibility note, show $ title note, show $ subject note, content note, show userId]
-  let cu  = map show newNoteValues
-  print cu
+  userId <- getUserField (creator note) "id" :: IO IntWrapper
+  let newNoteValues = [noteId note, noteType note, visibility note, show $ title note, show $ subject note, content note, show $ extractInt userId]
   insertAllIntoNotesAppDB newNoteValues
 
 updateNoteInDB :: Note -> IO ()
