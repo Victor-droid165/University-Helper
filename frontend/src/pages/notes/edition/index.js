@@ -12,7 +12,7 @@ import Reminder from './reminder';
 import { blue, red } from "@mui/material/colors";
 import { useLocation } from 'react-router-dom';
 
-export default function EditeNote() {
+export default function EditNote() {
   const location = useLocation();
   const noteEditingNow = location.state.note;
   const [value, setValue] = React.useState(0);

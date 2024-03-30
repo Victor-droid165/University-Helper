@@ -9,7 +9,7 @@ import NoteCreationPage from '../pages/notes/creation';
 import ProtectedRoutes from './ProtectedRoutes'
 import LogoutPage from '../pages/logout/LogoutPage';
 import ListNotes from '../pages/notes/list';
-import EditeNote from '../pages/notes/edition';
+import EditNote from '../pages/notes/edition';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,7 +27,7 @@ const router = createBrowserRouter(
       <Route element={<ProtectedRoutes allowedRoles={["Admin", "Professor", "Student"]} />}>
         <Route path="note-creation" element={<NoteCreationPage />} />
         <Route path="note-list" element={<ListNotes />} />
-        <Route path="note-edition" element={<EditeNote />} />
+        <Route path="note-edition" element={<EditNote />} />
       </Route>
 
       {/* <Route path="admin" element={<Album />}/> */}
