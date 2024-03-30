@@ -30,7 +30,7 @@ const HomePage = () => {
             </Link>
           </Grid>
           <Grid item xs={4} >
-            <Link to="note-creation">
+            <Link to="note-list">
               <div className={styles.card}>
                 <EditNoteOutlinedIcon fontSize="large" />
                 <strong><small>Gerenciar Anotações</small></strong>
