@@ -1,1 +1,0 @@
-User {userName = "everton", userEmail = "everton@admin.ufcg.edu.br", userPassword = "senhaSegura", userType = "Admin", userEnrollment = "1195010000", userUniversity = "UFCG"}

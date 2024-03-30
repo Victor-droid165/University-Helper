@@ -18,3 +18,4 @@ type NotesAPI = "notes" :> ReqBody '[JSON] MyData :> Post '[JSON] [Note]
            :<|> "registerNote" :> ReqBody '[JSON] Note :> Post '[JSON] String
            :<|> "updateANote" :> ReqBody '[JSON] Note :> Post '[JSON] String
            :<|> "getId" :> ReqBody '[JSON] MyData :> Post '[JSON] String
+           :<|> "listAllNotes" :> Get '[JSON] [Note]
