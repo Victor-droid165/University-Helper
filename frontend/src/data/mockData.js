@@ -73,6 +73,29 @@ export const mockDataTeam = [
   }
 ];
 
+export const mockAdminWarnings = [
+  {
+    id: 1,
+    title: 'Aviso pra tu',
+    content: 'Conteúdo do aviso.',
+    type: 'warning',
+    selectedUser: 2
+  },
+  {
+    id: 2,
+    title: 'Aviso pra tu',
+    content: 'Conteúdo do aviso.',
+    type: 'warning',
+    selectedUser: 3
+  },
+  {
+    id: 3,
+    title: 'Aviso pra tu',
+    content: 'Conteúdo do aviso.',
+    type: 'warning',
+    selectedUser: 4
+  },
+]
 
 export const mockDataNotes = [
   {
