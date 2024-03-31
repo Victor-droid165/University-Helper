@@ -2,15 +2,13 @@ import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import WarningIcon from '@mui/icons-material/Warning';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import TextNote from './textNote';
 import { blue, red } from "@mui/material/colors";
-import Notice from './notice';
 import Reminder from './reminder';
 
-export default function IconPositionTabs() {
+export default function NoteCreationPage() {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -20,10 +18,8 @@ export default function IconPositionTabs() {
   const getContent = (index) => {
     switch (index) {
       case 0:
-        return <Notice />;
-      case 1:
         return <TextNote />;
-      case 2:
+      case 1:
         return <Reminder />;
       default:
         return null;
@@ -55,9 +51,8 @@ export default function IconPositionTabs() {
             },
           }}
         >
-          <Tab icon={<WarningIcon />} label="Advertência" />
           <Tab icon={<DescriptionIcon />} label="Texto Corrido" />
-          <Tab icon={<LightbulbIcon />} label="Lembretes" />
+          <Tab icon={<LightbulbIcon />} label="Lembrete" />
         </Tabs>
         <Box sx={{ p: 5, borderRadius: '16px' }}>
           {getContent(value)}

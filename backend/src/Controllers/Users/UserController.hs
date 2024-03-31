@@ -1,3 +1,5 @@
+{-# LANGUAGE BinaryLiterals #-}
+
 module Controllers.Users.UserController
   ( userRegister,
     userLogin,
@@ -10,12 +12,17 @@ module Controllers.Users.UserController
     findUserByEmail,
     findUserByEnroll,
     registerUserAPI,
+    getDBUsers,
+    registerStudentAPI,
+    getUserById,
   )
 where
 
 import Data.Foldable (find)
 import Data.Maybe (fromJust, mapMaybe)
+import Database.PostgreSQL.Simple.Types (Only (..))
 import Lib (handleMaybe, joinStringArray, selectOption)
+import Models.DBUser (DBUser)
 import Models.User
   ( User (..),
     displayUser,
@@ -23,12 +30,14 @@ import Models.User
     stringToUser,
     writeUserOnFile,
   )
-import Repositories.UserRepository (createUserInDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB)
+import Repositories.UserRepository (createUserInDB, getDBusersFromDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB, getUserFromDBWhere)
 import System.Directory (removeFile)
 import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegisterUI)
 import TerminalUI.Users.Student (displayStudentOptions)
 import TerminalUI.Users.Teacher (displayTeacherOptions)
 import TerminalUI.Users.User (loginUI, registerUI, typeEnrollment, typeUserEmail, typeUserPassword)
+import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB)
+import Util.Database.Functions.ValidationDBFunctions (insertAllIntoValidationsAppDB)
 import Util.ScreenCleaner (forceQuit, quitIO, screenCleaner)
 
 userRegister :: IO ()
@@ -66,8 +75,14 @@ swapUser old new (u : userL)
   | old == u = new : swapUser old new userL
   | otherwise = u : swapUser old new userL
 
+getUserById :: Int -> IO User
+getUserById userId = getUserFromDBWhere [("id", "=", userId)]
+
 getUsers :: IO [User]
 getUsers = getUsersFromDB
+
+getDBUsers :: IO [DBUser]
+getDBUsers = getDBusersFromDB
 
 getLoggedUser :: IO (Maybe User)
 getLoggedUser = do
@@ -253,3 +268,10 @@ filterByUserEnroll enroll (u : userList)
 
 registerUserAPI :: User -> IO ()
 registerUserAPI = createUserInDB
+
+registerStudentAPI :: User -> IO ()
+registerStudentAPI user = do
+  createUserInDB user
+  [userId] <- selectFromUsersWhereAppDB ["id"] [("email", "=", userEmail user)]
+  let (Only userIdValue) = userId
+  insertAllIntoValidationsAppDB [1 :: Integer, userIdValue]

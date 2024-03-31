@@ -1,32 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Select, MenuItem } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { mockDataTeam } from "../../../data/mockData.js";
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+//import { mockDataTeam } from "../../../data/mockData.js";
+import { useAuth } from '../../../hooks/useAuth';
+import { useApi } from '../../../hooks/useApi';
 
-const Notice = () => {
+const Warning = () => {
+  const api = useApi();
   const [title, setTitle] = useState('');
-  const [notice, setNotice] = useState('');
+  const [warning, setWarning] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
-  const [rows] = useState(mockDataTeam);
+  const [dbUsersList, setDbUsersList] = useState([]);
 
-  const handleSave = () => {
+  useEffect(() => {
+    const fetchData = async () => {
+
+        const users = await api.getDBUsers();
+        const newU = users.filter(user => user.dbIsDeleted !== true)
+        setDbUsersList(newU);
+
+    };
+    fetchData();
+  }, [api]);
+
+  const handleSave = async () => {
     const now = new Date();
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Usuário Selecionado:", selectedUser);
     console.log("Título:", title);
-    console.log("Aviso:", notice);
-    // Aqui você pode adicionar lógica para salvar no backend, se necessário
+    console.log("Aviso:", warning);
+    const noteID = await api.getID("WAR");
+    const finalUser = dbUsersList.filter(user => user.dbUserEmail === selectedUser);
+
+
+    const user = {
+      userName: finalUser[0].dbUserName,
+      userEmail: finalUser[0].dbUserEmail,
+      userPassword: finalUser[0].dbUserPassword,
+      userType: finalUser[0].dbUserType,
+      userEnrollment: finalUser[0].dbUserEnrollment,
+      userUniversity: finalUser[0].dbUserUniversity,
+    }
+
+    await fetch('http://localhost:8081/api/notes/registerNote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        noteId: noteID,
+        noteType: "Warning",
+        visibility: "Private",
+        title: title,
+        subject: "",
+        content: warning,
+        creator: user,
+       }),
+    });
   };
 
   const handleClear = () => {
     setTitle('');
-    setNotice('');
+    setWarning('');
     setSelectedUser('');
   };
 
   return (
     <Container component="main" maxWidth='100%'>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ marginTop: "2%", display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5" style={{ marginBottom: '1rem' }}>
           Criar Aviso
         </Typography>
@@ -41,9 +82,9 @@ const Notice = () => {
             <MenuItem value="">
               <em>Selecione um usuário</em>
             </MenuItem>
-            {rows.map((user) => (
-              <MenuItem key={user.id} value={user.name}>
-                {user.name}
+            {dbUsersList.map((user) => (
+              <MenuItem key={user.dbUserName} value={user.dbUserEmail}>
+                {user.dbUserName}
               </MenuItem>
             ))}
           </Select>
@@ -67,11 +108,11 @@ const Notice = () => {
             fullWidth
             multiline
             rows={8}
-            id="notice"
+            id="warning"
             label="Aviso"
-            name="notice"
-            value={notice}
-            onChange={(e) => setNotice(e.target.value)}
+            name="warning"
+            value={warning}
+            onChange={(e) => setWarning(e.target.value)}
             style={{ marginBottom: '1rem' }}
           />
           <Grid container spacing={2}>
@@ -89,7 +130,7 @@ const Notice = () => {
                   marginTop: '1rem',
                 }}
               >
-                <DeleteIcon />
+                <CleaningServicesIcon />
               </IconButton>
               <Button
                 type="button"
@@ -108,4 +149,4 @@ const Notice = () => {
   );
 };
 
-export default Notice;
+export default Warning;

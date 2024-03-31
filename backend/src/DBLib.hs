@@ -98,6 +98,7 @@ populateDB :: Connection -> IO ()
 populateDB conn = do
   putStrLn "Initializing database..."
   executeSqlFile conn ("" </> "backend" </> "database" </> "init.sql")
+  executeSqlFile conn ("" </> "backend" </> "database" </> "seed.sql")
   putStrLn "Database all set up!"
 
 isDBCreated :: Connection -> String -> IO Bool

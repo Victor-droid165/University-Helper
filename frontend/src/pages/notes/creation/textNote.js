@@ -1,19 +1,55 @@
 import React, { useState } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Checkbox, FormControlLabel } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import { useAuth } from '../../../hooks/useAuth';
+import { useApi } from '../../../hooks/useApi';
 
 const TextNote = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isPublic, setIsPublic] = useState(false);
-
-  const handleSave = () => {
+  const api = useApi();
+  const session = useAuth().user.email;
+ 
+  const handleSave = async () => {
     const now = new Date();
     console.log("Data e Hora:", now.toLocaleString());
     console.log("Título:", title);
     console.log("Conteúdo:", content);
     console.log("É público:", isPublic);
-    // Aqui você pode adicionar lógica para salvar no backend, se necessário
+    // Aqui você pode adicionar lógica para salvar no backend
+    
+    const noteID = await api.getID("PLT");
+    const users = await api.getDBUsers();
+    const dbUserSession = users.filter(user => user.dbUserEmail === session);
+    console.log(dbUserSession[0]);
+
+    const user = {
+      userName: dbUserSession[0].dbUserName,
+      userEmail: dbUserSession[0].dbUserEmail,
+      userPassword: dbUserSession[0].dbUserPassword,
+      userType: dbUserSession[0].dbUserType,
+      userEnrollment: dbUserSession[0].dbUserEnrollment,
+      userUniversity: dbUserSession[0].dbUserUniversity,
+    }
+
+    // Aqui você pode adicionar lógica para salvar no backend
+    await fetch('http://localhost:8081/api/notes/registerNote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        noteId: noteID,
+        noteType: "PlainText",
+        visibility: title === "" ? "Private" : (isPublic ? "Public" : "Private"),
+        title: title,
+        subject: '',
+        content: content,
+        creator: user,
+       }),
+    });
+
   };
 
   const handleClear = () => {
@@ -84,7 +120,7 @@ const TextNote = () => {
                   marginTop: '1rem',
                 }}
               >
-                <DeleteIcon />
+                <CleaningServicesIcon />
               </IconButton>
               <Button
                 type="button"

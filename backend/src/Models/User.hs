@@ -16,7 +16,7 @@ module Models.User
 where
 
 import Data.Aeson.Types (FromJSON, ToJSON)
-import Database.PostgreSQL.Simple.FromRow (FromRow)
+import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToRow (ToRow)
 import GHC.Generics (Generic)
 import Lib
