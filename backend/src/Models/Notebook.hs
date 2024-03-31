@@ -28,17 +28,9 @@ data Notebook = Notebook
   }
   deriving (Show, Read, Eq, Generic)
 
-instance FromRow Notebook where
-  fromRow :: RowParser Notebook
-  fromRow = Notebook <$> field <*> field <*> fromRow
+instance FromRow Notebook
 
-instance ToRow Notebook where
-  toRow :: Notebook -> [Action]
-  toRow (Notebook id' typ name') =
-    [ toField id',
-      toField typ,
-      toField name'
-    ]
+instance ToRow Notebook
 
 instance ToJSON Notebook
 

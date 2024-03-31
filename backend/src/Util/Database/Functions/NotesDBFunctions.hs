@@ -10,13 +10,22 @@ module Util.Database.Functions.NotesDBFunctions
     deleteFromNotesAppDB,
     updateAllInNotesAppDB,
     updateAllInNotesWhereAppDB,
+    selectFromNoteIdsWhereAppDB,
+    selectAllFromNoteIdsWhereAppDB,
+    updateInNoteIdsWhereAppDB,
   )
 where
 
 import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToField (ToField)
 import Models.DBNote (DBNote)
-import Util.Database.DBFunctions (deleteFromTableAppDB, deleteFromTableWhereAppDB, insertAllIntoTableAppDB, selectFromTableAppDB, selectFromTableWhereAppDB, updateInTableAppDB, updateInTableWhereAppDB)
+import Util.Database.DBFunctions (deleteFromTableAppDB, deleteFromTableWhereAppDB, insertAllIntoTableAppDB, selectAllFromTableWhereAppDB, selectFromTableAppDB, selectFromTableWhereAppDB, updateInTableAppDB, updateInTableWhereAppDB)
+
+selectFromNoteIdsWhereAppDB :: (FromRow a, ToField b) => [String] -> [(String, String, b)] -> IO [a]
+selectFromNoteIdsWhereAppDB = selectFromTableWhereAppDB "note_ids"
+
+selectAllFromNoteIdsWhereAppDB :: (FromRow a, ToField b) => [(String, String, b)] -> IO [a]
+selectAllFromNoteIdsWhereAppDB = selectAllFromTableWhereAppDB "note_ids"
 
 selectFromNotesWhereAppDB :: (FromRow a, ToField b) => [String] -> [(String, String, b)] -> IO [a]
 selectFromNotesWhereAppDB = selectFromTableWhereAppDB "notes"
@@ -44,6 +53,9 @@ updateInNotesAppDB = updateInTableAppDB "notes"
 
 updateInNotesWhereAppDB :: [(String, String)] -> [(String, String, String)] -> IO ()
 updateInNotesWhereAppDB = updateInTableWhereAppDB "notes"
+
+updateInNoteIdsWhereAppDB :: [(String, String)] -> [(String, String, String)] -> IO ()
+updateInNoteIdsWhereAppDB = updateInTableWhereAppDB "note_ids"
 
 deleteFromNotesAppDB :: IO ()
 deleteFromNotesAppDB = deleteFromTableAppDB "notes"

@@ -38,6 +38,10 @@ CREATE TABLE notes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE TABLE note_ids(
+    prefix VARCHAR(3) PRIMARY KEY,
+    id_num INT NOT NULL DEFAULT 1
+);
 -- In our app, users can contest the note deletion during an interval of 3 days after the action.
 -- For this we created the following:
 CREATE TABLE notes_to_delete (

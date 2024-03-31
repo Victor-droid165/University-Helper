@@ -7,6 +7,7 @@ VALUES (
         '1195010000',
         'UFCG'
     );
+INSERT INTO note_ids (prefix) VALUES ('REM'), ('SNS'), ('PLT'), ('WAR');
 INSERT INTO labels
 VALUES ('IMPORTANTE', 'ff0000'),
     ('ARQUIVADO', '00ffff'),

@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-
 module Repositories.NoteRepository
   ( getNotesFromDB,
     removeNoteFromDBById,
@@ -10,18 +8,22 @@ module Repositories.NoteRepository
     countNotesPrefixesFromDB,
     getDBNotesFromDB,
     getNotesFromDBWhere,
+    getNoteIdFromDBWhere,
+    updateNoteIdInDB,
   )
 where
 
-import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToField (ToField)
-import GHC.Generics (Generic)
 import Models.DBCountResult (DBCountResult (DBCountResult))
-import Models.DBNote (DBNote)
+import Models.DBNote (DBNote (..))
+import Models.DBNoteId (DBNoteId (dbIdNum, dbPrefix))
 import Models.IntWrapper
 import Models.Note (Note (..), fromDBNote)
 import Repositories.UserRepository (getUserField)
-import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, insertAllIntoNotesAppDB, selectAllFromNotesAppDB, selectAllFromNotesWhereAppDB, selectFromNotesAppDB, selectFromNotesWhereAppDB, updateAllInNotesWhereAppDB)
+import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, insertAllIntoNotesAppDB, selectAllFromNoteIdsWhereAppDB, selectAllFromNotesAppDB, selectAllFromNotesWhereAppDB, selectFromNotesAppDB, selectFromNotesWhereAppDB, updateAllInNotesWhereAppDB, updateInNoteIdsWhereAppDB)
+
+getNoteIdFromDBWhere :: (ToField b) => [(String, String, b)] -> IO [DBNoteId]
+getNoteIdFromDBWhere = selectAllFromNoteIdsWhereAppDB
 
 getNotesFromDB :: IO [IO Note]
 getNotesFromDB = getNotesFromDBWhere ([] :: [(String, String, String)])
@@ -56,6 +58,10 @@ updateNoteInDB :: Note -> IO ()
 updateNoteInDB note = do
   let newValues = [noteId note, noteType note, visibility note, show $ title note, show $ subject note, content note]
   updateAllInNotesWhereAppDB newValues [("id", "=", noteId note)]
+
+updateNoteIdInDB :: DBNoteId -> IO ()
+updateNoteIdInDB dbNoteId' = do
+  updateInNoteIdsWhereAppDB [("id_num", (show . (+1) . dbIdNum) dbNoteId')] [("prefix", "=", dbPrefix dbNoteId')]
 
 removeNoteFromDB :: Note -> IO ()
 removeNoteFromDB = removeNoteFromDBById . noteId
