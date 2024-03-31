@@ -1,0 +1,7 @@
+.mainContent {
+    width: 100%;
+    height: 100vh;
+    background-color: #f0f4f9;
+    background-size: cover;
+    /* Outras propriedades de estilo para o conteúdo principal */
+}
