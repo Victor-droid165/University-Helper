@@ -6,8 +6,8 @@ where
 import Control.Monad.IO.Class (liftIO)
 import Controllers.Users.AdministratorController (getIds, validateUserAPI)
 import Controllers.Users.UserController
-  ( findUserByEmail,
-    getDBUsers,
+  ( getDBUsers,
+    getUserByEmail,
     getUsers,
     registerStudentAPI,
     registerUserAPI,
@@ -20,7 +20,7 @@ import Models.DB.DBUser (DBUser (..), UserLogInfo (..))
 import Models.User (User (..), showAll, showUserAPI)
 import Models.WrapperTypes.StringWrapper (StringWrapper (..), extractString)
 import Servant
-import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
+import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
 import Util.Server.Users.APIRoutes (UsersAPI)
 import Util.Validate
   ( handleValidationServer,
@@ -74,22 +74,30 @@ validateLogin :: UserLogInfo -> Handler Bool
 validateLogin logInfo = liftIO $ verifyLoginIO (email logInfo) (password logInfo)
 
 validateUser :: Int -> Handler NoContent
-validateUser userId' = liftIO (validateUserAPI userId') >> return NoContent
+validateUser userId' = do
+  liftIO (validateUserAPI userId')
+  return NoContent
 
 unvalidateUser :: String -> Handler NoContent
-unvalidateUser myData = deleteUser myData >> return NoContent
+unvalidateUser myData = do
+  deleteUser myData
+  return NoContent
 
 register :: User -> Handler String
 register user = do
   isUserRegistered <- isRegistered (userEmail user)
   if isUserRegistered
     then return "Failure"
-    else do
+    else
       liftIO $ registerIn user
   where
     registerIn user'
-      | userType user' == "Professor" = liftIO $ registerUserAPI user' >> return "Success"
-      | otherwise = liftIO $ registerStudentAPI user' >> return "Success"
+      | userType user' == "Professor" = do
+          liftIO $ registerUserAPI user'
+          return "Success"
+      | otherwise = do
+          liftIO $ registerStudentAPI user'
+          return "Success"
 
 isRegistered :: String -> Handler Bool
 isRegistered emailData = do
@@ -97,22 +105,20 @@ isRegistered emailData = do
   return $ emailData `elem` map userEmail allUsers
 
 showUser :: String -> Handler String
-showUser myData = do
-  allUsers <- liftIO getUsers
-  return $ (showUserAPI . fromJust) (findUserByEmail myData allUsers)
+showUser email' = do
+  user <- liftIO $ getUserByEmail email'
+  return $ showUserAPI user
 
 showAllUsers :: Handler String
-showAllUsers = do
-  allUsers <- liftIO getUsers
-  return $ showAll allUsers
+showAllUsers = liftIO $ showAll <$> getUsers
 
 deleteUser :: String -> Handler String
-deleteUser mydata = do
-  if mydata /= "1"
+deleteUser userId = do
+  if userId /= "1"
     then do
-      liftIO $ updateInUsersWhereAppDB [("is_deleted", "t")] [("id", "=", mydata)]
-      -- liftIO $ deleteFromValidationsWhereAppDB [("user_id", "=", stringValue mydata)]
-      -- liftIO $ deleteFromUsersWhereAppDB [("id", "=", stringValue mydata)]
+      -- For soft deletions
+      -- liftIO $ updateInUsersWhereAppDB [("is_deleted", "t")] [("id", "=", mydata)]
+      liftIO $ deleteFromUsersWhereAppDB [("id", "=", userId)]
       return "Success"
     else
       return "You can't delete yourself, cuz you're the ADMIN"

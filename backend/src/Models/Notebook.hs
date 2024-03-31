@@ -1,25 +1,20 @@
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE InstanceSigs #-}
 
 module Models.Notebook
   ( Notebook (..),
     fromDBNotebook,
+    notebookToString,
+    stringToNotebook,
+    writeNotebookOnFile,
   )
 where
 
 import Data.Aeson (FromJSON, ToJSON)
 import Data.Time.Clock ()
 import Database.PostgreSQL.Simple (FromRow, ToRow)
-import Database.PostgreSQL.Simple.FromRow (FromRow (fromRow), RowParser, field)
-import Database.PostgreSQL.Simple.ToField (Action (Plain), ToField (toField))
-import Database.PostgreSQL.Simple.ToRow (ToRow (toRow))
 import GHC.Generics (Generic)
 import Lib (stringToData, writeDataOnFile)
 import Models.DB.DBNotebook (DBNotebook (..))
-
-data NotebookType = Reminder | StickyNotebook | PlainText | Warning deriving (Show, Read, Eq)
-
-data Visibility = Private | Public deriving (Show, Read, Eq)
 
 data Notebook = Notebook
   { notebookId :: String,

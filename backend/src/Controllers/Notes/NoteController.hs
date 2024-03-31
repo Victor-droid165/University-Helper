@@ -7,14 +7,24 @@ module Controllers.Notes.NoteController
     updateNote,
     removeByNote,
     removeNoteById,
-    getNotesByUserId
+    getNotesByUserId,
   )
 where
 
 import Models.DB.DBNote (DBNote)
-import Models.Note ( Note )
-import Repositories.NoteRepository (createNoteInDB, getDBNotesFromDB, getNotesFromDB, getNotesFromDBWhere, removeNoteFromDB, removeNoteFromDBById, updateNoteInDB, getNoteIdFromDBWhere, updateNoteIdInDB)
-import Models.DB.DBNoteId (DBNoteId(..))
+import Models.DB.DBNoteId (DBNoteId (..))
+import Models.Note (Note)
+import Repositories.NoteRepository
+  ( createNoteInDB,
+    getDBNotesFromDB,
+    getNoteIdFromDBWhere,
+    getNotesFromDB,
+    getNotesFromDBWhere,
+    removeNoteFromDB,
+    removeNoteFromDBById,
+    updateNoteIdInDB,
+    updateNoteInDB,
+  )
 
 getNextNoteId :: String -> IO String
 getNextNoteId notePrefix = do
