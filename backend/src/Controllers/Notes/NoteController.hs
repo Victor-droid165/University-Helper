@@ -11,10 +11,10 @@ module Controllers.Notes.NoteController
   )
 where
 
-import Models.DBNote (DBNote)
+import Models.DB.DBNote (DBNote)
 import Models.Note ( Note )
 import Repositories.NoteRepository (createNoteInDB, getDBNotesFromDB, getNotesFromDB, getNotesFromDBWhere, removeNoteFromDB, removeNoteFromDBById, updateNoteInDB, getNoteIdFromDBWhere, updateNoteIdInDB)
-import Models.DBNoteId (DBNoteId(..))
+import Models.DB.DBNoteId (DBNoteId(..))
 
 getNextNoteId :: String -> IO String
 getNextNoteId notePrefix = do

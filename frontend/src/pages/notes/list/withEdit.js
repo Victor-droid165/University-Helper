@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2';
-import { mockDataNotes } from '../../../data/mockData';
 import NoteCardWithEdit from '../../../components/NoteCards/NoteCardWithEdit';
 import { useAuth } from '../../../hooks/useAuth';
 import { useApi } from '../../../hooks/useApi';
@@ -21,7 +20,7 @@ export default function ListNotesWithEdit() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ value: dbUserSession.dbUserId.toString() }),
+          body: JSON.stringify(dbUserSession.dbUserId.toString()),
         });
         const jsonData = await response.json();
         setData(jsonData);

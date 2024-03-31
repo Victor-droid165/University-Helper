@@ -8,12 +8,11 @@ module Util.Server.Notebooks.APIRoutes
   )
 where
 
-import Servant
 import Models.Notebook (Notebook)
-import Util.Server.Users.APIDatas (MyData)
+import Servant
 
-type NotebooksAPI = "notebooks" :> ReqBody '[JSON] MyData :> Post '[JSON] [Notebook] 
-           :<|> "removeNotebook" :> ReqBody '[JSON] Notebook :> Post '[JSON] String
-           :<|> "removeByID" :> ReqBody '[JSON] String :> Post '[JSON] String
-           :<|> "registerNotebook" :> ReqBody '[JSON] Notebook :> Post '[JSON] String
-
+type NotebooksAPI =
+  "notebooks" :> ReqBody '[JSON] String :> Post '[JSON] [Notebook]
+    :<|> "removeNotebook" :> ReqBody '[JSON] Notebook :> Post '[JSON] String
+    :<|> "removeByID" :> ReqBody '[JSON] String :> Post '[JSON] String
+    :<|> "registerNotebook" :> ReqBody '[JSON] Notebook :> Post '[JSON] String

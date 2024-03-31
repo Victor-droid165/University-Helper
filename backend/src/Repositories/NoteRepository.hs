@@ -14,11 +14,11 @@ module Repositories.NoteRepository
 where
 
 import Database.PostgreSQL.Simple.ToField (ToField)
-import Models.DBCountResult (DBCountResult (DBCountResult))
-import Models.DBNote (DBNote (..))
-import Models.DBNoteId (DBNoteId (dbIdNum, dbPrefix))
-import Models.IntWrapper
+import Models.DB.DBCountResult (DBCountResult (DBCountResult))
+import Models.DB.DBNote (DBNote (..))
+import Models.DB.DBNoteId (DBNoteId (dbIdNum, dbPrefix))
 import Models.Note (Note (..), fromDBNote)
+import Models.WrapperTypes.IntWrapper (IntWrapper, extractInt)
 import Repositories.UserRepository (getUserField)
 import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, insertAllIntoNotesAppDB, selectAllFromNoteIdsWhereAppDB, selectAllFromNotesAppDB, selectAllFromNotesWhereAppDB, selectFromNotesAppDB, selectFromNotesWhereAppDB, updateAllInNotesWhereAppDB, updateInNoteIdsWhereAppDB)
 
@@ -61,7 +61,7 @@ updateNoteInDB note = do
 
 updateNoteIdInDB :: DBNoteId -> IO ()
 updateNoteIdInDB dbNoteId' = do
-  updateInNoteIdsWhereAppDB [("id_num", (show . (+1) . dbIdNum) dbNoteId')] [("prefix", "=", dbPrefix dbNoteId')]
+  updateInNoteIdsWhereAppDB [("id_num", (show . (+ 1) . dbIdNum) dbNoteId')] [("prefix", "=", dbPrefix dbNoteId')]
 
 removeNoteFromDB :: Note -> IO ()
 removeNoteFromDB = removeNoteFromDBById . noteId

@@ -22,7 +22,7 @@ import Data.Foldable (find)
 import Data.Maybe (fromJust, mapMaybe)
 import Database.PostgreSQL.Simple.Types (Only (..))
 import Lib (handleMaybe, joinStringArray, selectOption)
-import Models.DBUser (DBUser)
+import Models.DB.DBUser (DBUser)
 import Models.User
   ( User (..),
     displayUser,
@@ -30,7 +30,7 @@ import Models.User
     stringToUser,
     writeUserOnFile,
   )
-import Repositories.UserRepository (createUserInDB, getDBusersFromDB, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB, getUserFromDBWhere)
+import Repositories.UserRepository (createUserInDB, getDBusersFromDB, getUserFromDBWhere, getUsersFromDB, removeUserFromDBByEnroll, updateUserInDB)
 import System.Directory (removeFile)
 import TerminalUI.Users.Administrator (displayAdministratorOptions, userRegisterUI)
 import TerminalUI.Users.Student (displayStudentOptions)
@@ -236,16 +236,14 @@ administratorOptions = displayAdministratorOptions [userRegisterADMIN, userRemov
 
 verifyLoginIO :: String -> String -> IO Bool
 verifyLoginIO email password = do
-  userL <- getUsers
-  let user = findUserByEmail email userL
-  tryToPerformLogin user
+  allUsers <- getUsers
+  let user = findUserByEmail email allUsers
+      userPassword' = handleMaybe user "" userPassword
+  tryToPerformLogin userPassword'
   where
-    tryToPerformLogin :: Maybe User -> IO Bool
-    tryToPerformLogin Nothing = return False
-    tryToPerformLogin (Just user)
-      | userPassword user == password = do
-          writeUserOnFile "backend/data/session.txt" user
-          return True
+    tryToPerformLogin :: String -> IO Bool
+    tryToPerformLogin userPassword'
+      | userPassword' == password = return True
       | otherwise = return False
 
 findUserByEmail :: String -> [User] -> Maybe User

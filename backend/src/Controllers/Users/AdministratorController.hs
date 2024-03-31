@@ -1,26 +1,19 @@
 module Controllers.Users.AdministratorController
   ( validateUserAPI,
     unvalidateUserAPI,
-    getIds
+    getIds,
   )
 where
 
-import Controllers.Users.UserController (getLoggedUser)
-import Data.Maybe (fromJust)
-import Models.DBUser (DBUser (dbUserId))
-import Models.User (User (userEnrollment))
-import Util.Database.Functions.UsersDBFunctions (selectAllFromUsersWhereAppDB)
-import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhereAppDB, insertAllIntoValidationsAppDB, selectAllFromValidationsAppDB)
 import Models.AdminValidate (AdminV)
+import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhereAppDB, insertAllIntoValidationsAppDB, selectAllFromValidationsAppDB)
 
--- Not working
-validateUserAPI :: Integer -> IO ()
-validateUserAPI uid = insertAllIntoValidationsAppDB [1 :: Integer, uid]
-
+validateUserAPI :: Int -> IO ()
+validateUserAPI uid = insertAllIntoValidationsAppDB [1, uid]
 
 unvalidateUserAPI :: String -> IO ()
 unvalidateUserAPI enrollment = do
   deleteFromValidationsWhereAppDB [("enrollment_number", "=", enrollment)]
 
 getIds :: IO [AdminV]
-getIds = selectAllFromValidationsAppDB 
+getIds = selectAllFromValidationsAppDB

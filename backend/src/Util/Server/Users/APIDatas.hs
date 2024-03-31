@@ -2,13 +2,10 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Util.Server.Users.APIDatas
-  ( IntegerData (..),
-    MyData (..),
-    LogInfo (..),
+  ( LogInfo (..),
     RegisterInfo (..),
     ChangeData (..),
     RandomData (..),
-    GetUserFieldData (..),
   )
 where
 
@@ -16,10 +13,6 @@ import Data.Aeson (FromJSON)
 import Database.PostgreSQL.Simple (FromRow, ToRow)
 import GHC.Generics (Generic)
 import Models.User (User (..))
-
-newtype IntegerData = IntegerData {integerValue :: Integer} deriving (Generic, FromJSON)
-
-newtype MyData = MyData {value :: String} deriving (Generic, FromJSON)
 
 data LogInfo = LogInfo {email :: String, password :: String} deriving (Eq, Show, Generic, FromJSON)
 
@@ -32,5 +25,3 @@ newtype RandomData = RandomData {userType' :: String} deriving (Show, Read, Eq, 
 instance FromRow RandomData
 
 instance ToRow RandomData
-
-data GetUserFieldData = GetUserFieldData {unique_key_name :: Maybe String, unique_key :: Maybe String, attribute :: Maybe String} deriving (Eq, Show, Generic, FromJSON)

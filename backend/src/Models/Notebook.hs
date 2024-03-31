@@ -15,7 +15,7 @@ import Database.PostgreSQL.Simple.ToField (Action (Plain), ToField (toField))
 import Database.PostgreSQL.Simple.ToRow (ToRow (toRow))
 import GHC.Generics (Generic)
 import Lib (stringToData, writeDataOnFile)
-import Models.DBNotebook (DBNotebook (..))
+import Models.DB.DBNotebook (DBNotebook (..))
 
 data NotebookType = Reminder | StickyNotebook | PlainText | Warning deriving (Show, Read, Eq)
 

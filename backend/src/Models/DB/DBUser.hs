@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-module Models.DBUser (DBUser (..), DBUserOnlyId (..)) where
+module Models.DB.DBUser (DBUser (..), DBUserOnlyId (..)) where
 
 import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Time (LocalTime)

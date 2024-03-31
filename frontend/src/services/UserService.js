@@ -16,7 +16,7 @@ export default class UserService {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ value: value })
+            body: JSON.stringify(value)
         });
 
         if (!response.ok) {
@@ -48,7 +48,7 @@ export default class UserService {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ value: user.email })
+            body: JSON.stringify(user.email)
         })
 
         if (!response.ok) {
@@ -124,7 +124,7 @@ export default class UserService {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ value: idType }),
+          body: JSON.stringify(idType),
         });
         const data = await response.json();
         console.log(data);

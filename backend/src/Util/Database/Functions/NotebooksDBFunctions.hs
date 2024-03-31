@@ -15,7 +15,7 @@ where
 
 import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToField (ToField)
-import Models.DBNotebook (DBNotebook)
+import Models.DB.DBNotebook (DBNotebook)
 import Util.Database.DBFunctions (deleteFromTableAppDB, deleteFromTableWhereAppDB, insertAllIntoTableAppDB, selectFromTableAppDB, selectFromTableWhereAppDB, updateInTableAppDB, updateInTableWhereAppDB)
 
 selectFromNotebooksWhereAppDB :: (FromRow a, ToField b) => [String] -> [(String, String, b)] -> IO [a]
