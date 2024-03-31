@@ -64,7 +64,7 @@ export default class UserService {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ u_type: user.userType, user: user }),
+            body: JSON.stringify(user),
         });
     }
 

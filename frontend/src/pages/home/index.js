@@ -9,7 +9,6 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import DisplaySettingsOutlinedIcon from '@mui/icons-material/DisplaySettingsOutlined';
 
 import { Link } from 'react-router-dom';
-import { permissao } from '../../data/mockData';
 
 const HomePage = () => {
   return (

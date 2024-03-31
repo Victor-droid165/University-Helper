@@ -15,16 +15,12 @@ import Controllers.Users.UserController
   )
 import Data.Maybe (fromJust)
 import Models.AdminValidate (AdminV)
-import Models.DB.DBUser (DBUser (..))
+import Models.DB.DBUpdateValue (DBUpdateValue (..))
+import Models.DB.DBUser (DBUser (..), UserLogInfo (..))
 import Models.User (User (..), showAll, showUserAPI)
+import Models.WrapperTypes.StringWrapper (StringWrapper (..), extractString)
 import Servant
 import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
-import Util.Server.Users.APIDatas
-  ( ChangeData (..),
-    LogInfo (..),
-    RandomData (..),
-    RegisterInfo (..),
-  )
 import Util.Server.Users.APIRoutes (UsersAPI)
 import Util.Validate
   ( handleValidationServer,
@@ -35,7 +31,7 @@ import Util.Validate
     userUniversityValidation,
   )
 
-usersAPIFunctions :: Server Util.Server.Users.APIRoutes.UsersAPI
+usersAPIFunctions :: Server UsersAPI
 usersAPIFunctions =
   users
     :<|> usersDB
@@ -74,7 +70,7 @@ validateEnrollment enrollment = return $ handleValidationServer (userEnrollmentV
 validatePassword :: String -> Handler String
 validatePassword password' = return $ handleValidationServer (userPasswordValidation password')
 
-validateLogin :: LogInfo -> Handler Bool
+validateLogin :: UserLogInfo -> Handler Bool
 validateLogin logInfo = liftIO $ verifyLoginIO (email logInfo) (password logInfo)
 
 validateUser :: Int -> Handler NoContent
@@ -83,17 +79,17 @@ validateUser userId' = liftIO (validateUserAPI userId') >> return NoContent
 unvalidateUser :: String -> Handler NoContent
 unvalidateUser myData = deleteUser myData >> return NoContent
 
-register :: RegisterInfo -> Handler String
-register registerInfo = do
-  isUserRegistered <- isRegistered (userEmail (user registerInfo))
+register :: User -> Handler String
+register user = do
+  isUserRegistered <- isRegistered (userEmail user)
   if isUserRegistered
     then return "Failure"
     else do
-      liftIO $ registerIn registerInfo
+      liftIO $ registerIn user
   where
-    registerIn registerInfo'
-      | u_type registerInfo' == "Professor" = liftIO $ registerUserAPI (user registerInfo') >> return "Success"
-      | otherwise = liftIO $ registerStudentAPI (user registerInfo') >> return "Success"
+    registerIn user'
+      | userType user' == "Professor" = liftIO $ registerUserAPI user' >> return "Success"
+      | otherwise = liftIO $ registerStudentAPI user' >> return "Success"
 
 isRegistered :: String -> Handler Bool
 isRegistered emailData = do
@@ -121,18 +117,15 @@ deleteUser mydata = do
     else
       return "You can't delete yourself, cuz you're the ADMIN"
 
-updateAny :: ChangeData -> Handler String
-updateAny changeData = do
-  liftIO $ updateInUsersWhereAppDB [(field changeData, newValue changeData)] [(match changeData, "=", matchValue changeData)]
-  showUser (matchValue changeData)
+updateAny :: DBUpdateValue -> Handler String
+updateAny updateData = do
+  liftIO $ updateInUsersWhereAppDB [(fieldToUpdate updateData, newValue updateData)] [(whereField updateData, "=", whereValue updateData)]
+  showUser (whereValue updateData)
 
 getAny :: Maybe String -> Maybe String -> Maybe String -> Handler String
 getAny mUniqueKeyName mUniqueKey mAttribute = do
-  liftIO $ print mUniqueKeyName
-  liftIO $ print mUniqueKey
-  liftIO $ print mAttribute
-  result <- liftIO (selectFromUsersWhereAppDB [fromJust mAttribute] [(fromJust mUniqueKeyName, "=", fromJust mUniqueKey)] :: IO [RandomData])
-  return $ (userType' . head) result
+  result <- liftIO (selectFromUsersWhereAppDB [fromJust mAttribute] [(fromJust mUniqueKeyName, "=", fromJust mUniqueKey)] :: IO [StringWrapper])
+  return $ (extractString . head) result
 
 -- LOGIN AND REGISTER
 

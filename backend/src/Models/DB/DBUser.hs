@@ -1,8 +1,9 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-module Models.DB.DBUser (DBUser (..), DBUserOnlyId (..)) where
+module Models.DB.DBUser (DBUser (..), DBUserOnlyId (..), UserLogInfo (..)) where
 
 import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Time (LocalTime)
@@ -39,3 +40,9 @@ newtype DBUserOnlyId = DBUserOnlyId
 instance FromRow DBUserOnlyId
 
 instance ToRow DBUserOnlyId
+
+data UserLogInfo = UserLogInfo
+  { email :: String,
+    password :: String
+  }
+  deriving (Eq, Show, Generic, FromJSON)

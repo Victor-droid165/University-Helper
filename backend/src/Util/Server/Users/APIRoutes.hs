@@ -6,12 +6,12 @@
 module Util.Server.Users.APIRoutes (UsersAPI) where
 
 import Models.AdminValidate (AdminV)
-import Models.DB.DBUser (DBUser (..))
+import Models.DB.DBUpdateValue (DBUpdateValue)
+import Models.DB.DBUser (DBUser (..), UserLogInfo)
 import Models.User
   ( User (..),
   )
 import Servant
-import Util.Server.Users.APIDatas
 
 type UsersAPI =
   "users" :> Get '[JSON] [User]
@@ -22,15 +22,15 @@ type UsersAPI =
     :<|> "validateEmail" :> ReqBody '[JSON] String :> Post '[JSON] String
     :<|> "validateEnrollment" :> ReqBody '[JSON] String :> Post '[JSON] String
     :<|> "validatePassword" :> ReqBody '[JSON] String :> Post '[JSON] String
-    :<|> "validateLogin" :> ReqBody '[JSON] LogInfo :> Post '[JSON] Bool
+    :<|> "validateLogin" :> ReqBody '[JSON] UserLogInfo :> Post '[JSON] Bool
     :<|> "validateUser" :> ReqBody '[JSON] Int :> Post '[JSON] NoContent
     :<|> "unvalidateUser" :> ReqBody '[JSON] String :> Post '[JSON] NoContent
-    :<|> "register" :> ReqBody '[JSON] RegisterInfo :> Post '[JSON] String
+    :<|> "register" :> ReqBody '[JSON] User :> Post '[JSON] String
     :<|> "isRegistered" :> ReqBody '[JSON] String :> Post '[JSON] Bool
     :<|> "showUser" :> ReqBody '[JSON] String :> Post '[JSON] String
     :<|> "showAllUsers" :> Get '[JSON] String
     :<|> "deleteUser" :> ReqBody '[JSON] String :> Post '[JSON] String
-    :<|> "updateAny" :> ReqBody '[JSON] ChangeData :> Post '[JSON] String
+    :<|> "updateAny" :> ReqBody '[JSON] DBUpdateValue :> Post '[JSON] String
     :<|> ( "getAny"
              :> QueryParam "unique_key_name" String
              :> QueryParam "unique_key" String
