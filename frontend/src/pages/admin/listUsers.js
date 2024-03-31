@@ -17,11 +17,14 @@ const ListUsers = () => {
   useEffect(() => {
     api.getDBUsers().then((dbUsers) => {
       const activeUsers = dbUsers.filter(user => user.dbIsDeleted !== true);
-      console.log(activeUsers);
       setRows(activeUsers);
     });
     setValidates();
-  }, [api]);
+  }, []);
+
+  useEffect(() => {
+    console.log("Rows state updated:", rows);
+  }, [rows]);
 
   const updateUser = async (field, newValue, match, matchValue) => {
     await api.updateUserField({ field, newValue, match, matchValue });
@@ -41,9 +44,9 @@ const ListUsers = () => {
         const hashSet = new Set(userIds);
         setRows(
           nRows => nRows.map(row => ({
-              ...row,
-              isValidated: hashSet.has(row.dbUserId), 
-            }))
+            ...row,
+            isValidated: hashSet.has(row.dbUserId),
+          }))
         );
         console.log(hashSet);
       })
@@ -105,15 +108,13 @@ const ListUsers = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ value: dbUserId.toString() }),
+      body: JSON.stringify(dbUserId.toString()),
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to delete user');
-        }
-        if (response === "Success") {
+      .then(response => response.json())
+      .then(result => {
+        if (result === "Success") {
           setRows(prevRows => prevRows.filter(row => row.dbUserId !== dbUserId));
-        } 
+        }
       })
       .catch(error => console.error('Error deleting user:', error));
   };
@@ -165,16 +166,16 @@ const ListUsers = () => {
             <Button
               onClick={() => {
                 fetch('http://localhost:8081/api/users/validateUser', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ integerValue: params.row.dbUserId }),
-                }           
-                )
-                console.log('Validar usuário', params.row.dbUserId) 
-                params.row.isValidated = true;
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(params.row.dbUserId),
                 }
+                )
+                console.log('Validar usuário', params.row.dbUserId)
+                params.row.isValidated = true;
+              }
               }
               style={{ color: 'white', backgroundColor: 'red', padding: '3px 10px', borderRadius: '4px' }}
             >
