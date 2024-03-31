@@ -14,6 +14,7 @@ module Repositories.NoteRepository
 where
 
 import Database.PostgreSQL.Simple.ToField (ToField)
+import Lib (handleMaybe)
 import Models.DB.DBCountResult (DBCountResult (DBCountResult))
 import Models.DB.DBNote (DBNote (..))
 import Models.DB.DBNoteId (DBNoteId (dbIdNum, dbPrefix))
@@ -51,7 +52,7 @@ countNotesPrefixesFromDB notePrefix = do
 createNoteInDB :: Note -> IO ()
 createNoteInDB note = do
   userId <- getUserField (creator note) "id" :: IO IntWrapper
-  let newNoteValues = [noteId note, noteType note, visibility note, show $ title note, show $ subject note, content note, show $ extractInt userId]
+  let newNoteValues = [noteId note, noteType note, visibility note, handleMaybe (title note) "" id, handleMaybe (subject note) "" id, content note, show $ extractInt userId]
   insertAllIntoNotesAppDB newNoteValues
 
 updateNoteInDB :: Note -> IO ()

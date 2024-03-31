@@ -23,13 +23,12 @@ export const RequireAuth = ({ allowedRoles }) => {
                 const authorized = isAuthenticated && allowedRoles.includes(response);
                 setIsAuthorized(authorized);
             } catch (error) {
-                console.error("Error fetching user field:", error);
                 setIsAuthorized(false);
             }
         };
 
         fetchUserField();
-    }, [api, auth.user.email, isAuthenticated, allowedRoles]);
+    }, [api, auth?.user?.email, isAuthenticated, allowedRoles]);
 
     if (isAuthorized === null) {
         return null;
@@ -38,6 +37,6 @@ export const RequireAuth = ({ allowedRoles }) => {
     return isAuthorized
         ? <Outlet />
         : isAuthenticated
-            ? <Navigate to='/home' state={{ path: location.pathname }} replace />
+            ? <Navigate to='/' state={{ path: location.pathname }} replace />
             : <Navigate to='/login' state={{ path: location.pathname }} replace />
 }

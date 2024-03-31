@@ -7,7 +7,7 @@ const LogoutPage = () => {
     const navigate = useNavigate();
     useEffect(() => {
         auth.logout();
-        navigate('/home', { replace: true });
+        navigate('/', { replace: true });
     }, [auth, navigate]);
 
     return <div>Logging out...</div>;
