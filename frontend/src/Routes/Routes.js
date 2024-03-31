@@ -33,7 +33,7 @@ const router = createBrowserRouter(
 
       {/* Please, remove the admin from the list! */}
       <Route element={<ProtectedRoutes allowedRoles={["Admin", "Professor", "Student"]} />}>
-        <Route path="warnings" element={<ListNotesReadOnly />} />
+        <Route path="Warnings" element={<ListNotesReadOnly />} />
       </Route>
 
       {/* <Route path="admin" element={<Album />}/> */}

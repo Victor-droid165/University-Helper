@@ -14,13 +14,11 @@ const Warning = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
+
         const users = await api.getDBUsers();
         const newU = users.filter(user => user.dbIsDeleted !== true)
         setDbUsersList(newU);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
+
     };
     fetchData();
   }, [api]);
@@ -32,14 +30,16 @@ const Warning = () => {
     console.log("Título:", title);
     console.log("Aviso:", warning);
     const noteID = await api.getID("WAR");
+    const finalUser = dbUsersList.filter(user => user.dbUserEmail === selectedUser);
+
 
     const user = {
-      userName: selectedUser.dbUserName,
-      userEmail: selectedUser.dbUserEmail,
-      userPassword: selectedUser.dbUserPassword,
-      userType: selectedUser.dbUserType,
-      userEnrollment: selectedUser.dbUserEnrollment,
-      userUniversity: selectedUser.dbUserUniversity,
+      userName: finalUser[0].dbUserName,
+      userEmail: finalUser[0].dbUserEmail,
+      userPassword: finalUser[0].dbUserPassword,
+      userType: finalUser[0].dbUserType,
+      userEnrollment: finalUser[0].dbUserEnrollment,
+      userUniversity: finalUser[0].dbUserUniversity,
     }
 
     await fetch('http://localhost:8081/api/notes/registerNote', {
@@ -83,7 +83,7 @@ const Warning = () => {
               <em>Selecione um usuário</em>
             </MenuItem>
             {dbUsersList.map((user) => (
-              <MenuItem key={user.dbUserName} value={user.dbUserName}>
+              <MenuItem key={user.dbUserName} value={user.dbUserEmail}>
                 {user.dbUserName}
               </MenuItem>
             ))}

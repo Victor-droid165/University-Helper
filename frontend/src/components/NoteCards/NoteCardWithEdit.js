@@ -12,22 +12,42 @@ import { IconButton, Grid } from '@mui/material';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from 'react-router-dom';
 
+
 export default function NoteCardWithEdit({ note }) {
+
   const navigate = useNavigate();
 
   const handleEditClick = () => {
     navigate('/note-edition', { state: { note } });
   };
 
+  const handleRemoveClick = async () => {
+    const url = 'http://localhost:8081/api/notes/removeNote';
+  
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(note),
+    })
+      .then(data => {
+        console.log('Response data:', data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
+  
   // Define os ícones e as cores para cada tipo de anotação
   const tagStyles = {
-    warning: { icon: <WarningIcon />, color: '#f32f2f' }, // Um tom mais escuro de vermelho
-    textNote: { icon: <DescriptionIcon />, color: '#40de00' }, // Um tom mais escuro de verde
-    reminder: { icon: <LightbulbIcon />, color: 'orange' }, // Um tom mais escuro de amarelo
+    Warning: { icon: <WarningIcon />, color: '#f32f2f' }, // Um tom mais escuro de vermelho
+    PlainText: { icon: <DescriptionIcon />, color: '#40de00' }, // Um tom mais escuro de verde
+    Reminder: { icon: <LightbulbIcon />, color: 'orange' }, // Um tom mais escuro de amarelo
   };
 
   // Escolhe o ícone e a cor com base no tipo de anotação
-  const { icon, color } = tagStyles[note.type] || { icon: null, color: 'grey' };
+  const { icon, color } = tagStyles[note.noteType] || { icon: null, color: 'grey' };
 
   return (
     <Box sx={{ minWidth: 275, position: 'relative', mb: 2 }}>
@@ -49,7 +69,7 @@ export default function NoteCardWithEdit({ note }) {
       >
         {icon}
         <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-          {(note.type).toUpperCase()}
+          {(note.noteType).toUpperCase()}
         </Typography>
       </Box>
       <Card variant="outlined" sx={{ pt: 7 }}>
@@ -65,14 +85,14 @@ export default function NoteCardWithEdit({ note }) {
               maxWidth: '100%',
             }}
           >
-            {note.type === 'reminder' ? note.content : note.title}
+            {note.noteType === 'Reminder' ? note.content : note.title}
           </Typography>
         </CardContent>
         <CardActions>
           <Grid container justifyContent="flex-end">
             <Grid item>
               {/* É aqui que vc vai adicionar o handleRemoveClick */}
-              <IconButton size="small">
+              <IconButton size="small" onClick={handleRemoveClick}>
                 <DeleteIcon color="error" />
               </IconButton>
             </Grid>

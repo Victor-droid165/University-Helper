@@ -24,7 +24,7 @@ getNotes :: IO [Note]
 getNotes = sequence =<< getNotesFromDB
 
 getNotesByUserId :: String -> IO [Note]
-getNotesByUserId id = sequence =<< getNotesFromDBWhere [("user_id", "=", id)]
+getNotesByUserId id = sequence =<< getNotesFromDBWhere [("creator_id", "=", id)]
 
 getDBNotes :: IO [DBNote]
 getDBNotes = getDBNotesFromDB

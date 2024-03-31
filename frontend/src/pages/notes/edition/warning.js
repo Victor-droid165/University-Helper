@@ -55,7 +55,7 @@ const Warning = ({ note }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        noteId: note.noteID,
+        noteId: note.noteId,
         noteType: "Warning",
         visibility: "Private",
         title: title,

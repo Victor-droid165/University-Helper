@@ -19,7 +19,7 @@ notesAPIFunctions =     notes
                   :<|>  registerNote
                   :<|>  updateANote
                   :<|>  getId
-                  :<|>  listNotes
+                  :<|>  listAllNotes
 
 notes :: MyData -> Handler [Note]
 notes id = liftIO $ getNotesByUserId (value id)
@@ -39,7 +39,7 @@ updateANote note = liftIO $ updateNote note >> return "Updated"
 getId :: MyData -> Handler String
 getId prefix = liftIO $ getNextNoteId (value prefix)
 
-listNotes :: Handler [Note]
-listNotes = do
+listAllNotes :: Handler [Note]
+listAllNotes = do
     dbNotes <- liftIO getDBNotes
     liftIO $ mapM fromDBNote dbNotes

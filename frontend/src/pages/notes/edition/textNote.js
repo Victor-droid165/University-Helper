@@ -30,7 +30,7 @@ const TextNote = ({ note }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        noteId: note.noteID,
+        noteId: note.noteId,
         noteType: "PlainText",
         visibility: title === "" ? "Private" : (isPublic ? "Public" : "Private"),
         title: title,

@@ -26,7 +26,7 @@ const Reminder = ({ note }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        noteId: note.noteID,
+        noteId: note.noteId,
         noteType: "Reminder",
         visibility: "Private",
         title: "",
@@ -35,8 +35,6 @@ const Reminder = ({ note }) => {
         creator: note.creator,
        }),
     });
-
-
   };
 
   const handleClear = () => {

@@ -22,12 +22,12 @@ export default function EditNote() {
   };
 
   const getContent = (index) => {
-    switch (noteEditingNow.type) {
-      case 'warning':
+    switch (noteEditingNow.noteType) {
+      case 'Warning':
         return <Warning note={noteEditingNow}/>;
-      case 'textNote':
+      case 'PlainText':
         return <TextNote note={noteEditingNow} />;
-      case 'reminder':
+      case 'Reminder':
         return <Reminder note={noteEditingNow} />;
       default:
         return null;
@@ -64,9 +64,9 @@ export default function EditNote() {
             },
           }}
         >
-          {isTabVisible('warning') && <Tab icon={<WarningIcon />} label="Advertência" />}
-          {isTabVisible('textNote') && <Tab icon={<DescriptionIcon />} label="Texto Corrido" />}
-          {isTabVisible('reminder') && <Tab icon={<LightbulbIcon />} label="Lembrete" />}
+          {isTabVisible('Warning') && <Tab icon={<WarningIcon />} label="Advertência" />}
+          {isTabVisible('PlainText') && <Tab icon={<DescriptionIcon />} label="Texto Corrido" />}
+          {isTabVisible('Reminder') && <Tab icon={<LightbulbIcon />} label="Lembrete" />}
         </Tabs>
         <Box sx={{ p: 5, borderRadius: '16px' }}>
           {getContent(value)}
