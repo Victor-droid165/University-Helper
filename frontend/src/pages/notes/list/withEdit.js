@@ -8,21 +8,14 @@ import { useApi } from '../../../hooks/useApi';
 export default function ListNotesWithEdit() {
   const [data, setData] = useState([]);
   const api = useApi();
-  const session = useAuth().user.email;
+  const auth = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const users = await api.getDBUsers();
-        const dbUserSession = users.find(user => user.dbUserEmail === session);
-        const response = await fetch('http://localhost:8081/api/notes/notes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dbUserSession.dbUserId.toString()),
-        });
-        const jsonData = await response.json();
+        const dbUserSession = users.find(user => user.dbUserEmail === auth.user.email);
+        const jsonData = await api.getNotesByCreatorId(dbUserSession.dbUserId);
         setData(jsonData);
       } catch (error) {
         console.error('Error fetching notes:', error);
@@ -31,12 +24,21 @@ export default function ListNotesWithEdit() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
+  const updateData = (noteToRemove) => {
+    const updatedData = data.filter(note => note.noteId !== noteToRemove.noteId);
+    setData(updatedData);
+  };
+
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
       <Grid container spacing={2}>
         {data.map((currentNote, i) => (
           <Grid key={i} xs={12} sm={6} md={4} lg={3} minHeight={160}>
-            <NoteCardWithEdit note={currentNote} />
+            <NoteCardWithEdit note={currentNote} updateData={updateData} />
           </Grid>
         ))}
       </Grid>

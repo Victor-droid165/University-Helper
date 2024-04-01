@@ -45,8 +45,8 @@ getDBNotes = getDBNotesFromDB
 
 getNoteById :: String -> IO Note
 getNoteById noteId' = do
-  notes <- sequence =<< getNotesFromDBWhere [("id", "=", noteId')]
-  return $ head notes
+  note <- sequence =<< getNotesFromDBWhere [("id", "=", noteId')]
+  return $ head note
 
 registerNote :: Note -> IO ()
 registerNote = createNoteInDB

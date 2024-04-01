@@ -12,6 +12,7 @@ import Models.User
   ( User (..),
   )
 import Servant
+import Models.DB.DBWarningNotification (DBWarningNotification)
 
 type UsersAPI =
   "users" :> Get '[JSON] [User]
@@ -36,4 +37,9 @@ type UsersAPI =
              :> QueryParam "unique_key" String
              :> QueryParam "attribute" String
              :> Get '[JSON] String
+         )
+    :<|> ( "user"
+             :> QueryParam "unique_key_name" String
+             :> QueryParam "unique_key" String
+             :> Get '[JSON] User
          )

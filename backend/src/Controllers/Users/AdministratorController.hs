@@ -2,18 +2,24 @@ module Controllers.Users.AdministratorController
   ( validateUserAPI,
     unvalidateUserAPI,
     getIds,
+    warnUser,
   )
 where
 
-import Models.AdminValidate (AdminV)
+import Models.AdminValidate (AdminV (userId))
+import Models.DB.DBWarningNotification (DBWarningNotification)
+import Repositories.NoteRepository (createWarningNotificationInDB)
+import Repositories.ValidationRepository (createAdminValidationInDB, getAdminValidationsFromDB, removeAdminValidationFromDBByUserId)
 import Util.Database.Functions.ValidationDBFunctions (deleteFromValidationsWhereAppDB, insertAllIntoValidationsAppDB, selectAllFromValidationsAppDB)
 
 validateUserAPI :: Int -> IO ()
-validateUserAPI uid = insertAllIntoValidationsAppDB [1, uid]
+validateUserAPI = createAdminValidationInDB
 
-unvalidateUserAPI :: String -> IO ()
-unvalidateUserAPI enrollment = do
-  deleteFromValidationsWhereAppDB [("enrollment_number", "=", enrollment)]
+unvalidateUserAPI :: Int -> IO ()
+unvalidateUserAPI = removeAdminValidationFromDBByUserId
 
 getIds :: IO [AdminV]
-getIds = selectAllFromValidationsAppDB
+getIds = getAdminValidationsFromDB
+
+warnUser :: DBWarningNotification -> IO ()
+warnUser = createWarningNotificationInDB

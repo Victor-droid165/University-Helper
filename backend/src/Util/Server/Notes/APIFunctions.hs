@@ -5,6 +5,8 @@ where
 
 import Control.Monad.IO.Class (liftIO)
 import Controllers.Notes.NoteController (getDBNotes, getNextNoteId, getNotesByUserId, removeByNote, removeNoteById, updateNote)
+import Controllers.Users.AdministratorController (warnUser)
+import Models.DB.DBWarningNotification (DBWarningNotification)
 import Models.Note (Note, fromDBNote)
 import Repositories.NoteRepository (createNoteInDB)
 import Servant
@@ -19,6 +21,7 @@ notesAPIFunctions =
     :<|> updateANote
     :<|> getId
     :<|> listAllNotes
+    :<|> notifyUser
 
 notes :: String -> Handler [Note]
 notes id' = liftIO $ getNotesByUserId id'
@@ -42,3 +45,9 @@ listAllNotes :: Handler [Note]
 listAllNotes = do
   dbNotes <- liftIO getDBNotes
   liftIO $ mapM fromDBNote dbNotes
+
+notifyUser :: DBWarningNotification -> Handler Bool
+notifyUser dbWarningNotification = do
+  liftIO $ print dbWarningNotification
+  liftIO $ warnUser dbWarningNotification
+  return True

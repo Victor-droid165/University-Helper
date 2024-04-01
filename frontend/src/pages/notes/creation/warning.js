@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Select, MenuItem } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-//import { mockDataTeam } from "../../../data/mockData.js";
-import { useAuth } from '../../../hooks/useAuth';
 import { useApi } from '../../../hooks/useApi';
+import { useAuth } from '../../../hooks/useAuth';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Warning = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const api = useApi();
+  const auth = useAuth();
   const [title, setTitle] = useState('');
   const [warning, setWarning] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
@@ -14,49 +17,37 @@ const Warning = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-
-        const users = await api.getDBUsers();
-        const newU = users.filter(user => user.dbIsDeleted !== true)
-        setDbUsersList(newU);
-
+      const users = await api.getDBUsers();
+      const newU = users.filter(user => user.dbIsDeleted !== true)
+      setDbUsersList(newU);
     };
     fetchData();
-  }, [api]);
+  }, []);
 
   const handleSave = async () => {
-    const now = new Date();
-    console.log("Data e Hora:", now.toLocaleString());
-    console.log("Usuário Selecionado:", selectedUser);
-    console.log("Título:", title);
-    console.log("Aviso:", warning);
-    const noteID = await api.getID("WAR");
-    const finalUser = dbUsersList.filter(user => user.dbUserEmail === selectedUser);
-
-
+    const noteID = await api.getNoteId("WAR");
+    const creator = await api.getUserByField({ unique_key_name: "email", unique_key: auth.user.email });
     const user = {
-      userName: finalUser[0].dbUserName,
-      userEmail: finalUser[0].dbUserEmail,
-      userPassword: finalUser[0].dbUserPassword,
-      userType: finalUser[0].dbUserType,
-      userEnrollment: finalUser[0].dbUserEnrollment,
-      userUniversity: finalUser[0].dbUserUniversity,
+      userName: selectedUser.dbUserName,
+      userEmail: selectedUser.dbUserEmail,
+      userPassword: selectedUser.dbUserPassword,
+      userType: selectedUser.dbUserType,
+      userEnrollment: selectedUser.dbUserEnrollment,
+      userUniversity: selectedUser.dbUserUniversity,
     }
 
-    await fetch('http://localhost:8081/api/notes/registerNote', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        noteId: noteID,
-        noteType: "Warning",
-        visibility: "Private",
-        title: title,
-        subject: "",
-        content: warning,
-        creator: user,
-       }),
-    });
+    await api.registerNote({
+      noteId: noteID,
+      noteType: "Warning",
+      visibility: "Private",
+      title: title,
+      subject: "",
+      content: warning,
+      creator: creator,
+      warnedUser: user
+    })
+    const prevPath = location.state?.prevPath;
+    prevPath ? navigate(prevPath) : navigate('/');
   };
 
   const handleClear = () => {
@@ -83,7 +74,7 @@ const Warning = () => {
               <em>Selecione um usuário</em>
             </MenuItem>
             {dbUsersList.map((user) => (
-              <MenuItem key={user.dbUserName} value={user.dbUserEmail}>
+              <MenuItem key={user.dbUserName} value={user}>
                 {user.dbUserName}
               </MenuItem>
             ))}

@@ -8,6 +8,7 @@ module Util.Server.Notes.APIRoutes
   )
 where
 
+import Models.DB.DBWarningNotification (DBWarningNotification)
 import Models.Note (Note)
 import Servant
 
@@ -19,3 +20,4 @@ type NotesAPI =
     :<|> "updateANote" :> ReqBody '[JSON] Note :> Post '[JSON] String
     :<|> "getId" :> ReqBody '[JSON] String :> Post '[JSON] String
     :<|> "listAllNotes" :> Get '[JSON] [Note]
+    :<|> "notifyUser" :> ReqBody '[JSON] DBWarningNotification :> Post '[JSON] Bool

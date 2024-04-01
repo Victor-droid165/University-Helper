@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -10,35 +9,25 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import { IconButton, Grid } from '@mui/material';
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useApi } from '../../hooks/useApi';
+import { useEffect } from 'react';
 
 
-export default function NoteCardWithEdit({ note }) {
-
+export default function NoteCardWithEdit({ note, updateData }) {
+  const location = useLocation();
   const navigate = useNavigate();
+  const api = useApi();
 
   const handleEditClick = () => {
-    navigate('/note-edition', { state: { note } });
+    navigate('/note-edition', { state: { note, prevPath: location.pathname} });
   };
 
   const handleRemoveClick = async () => {
-    const url = 'http://localhost:8081/api/notes/removeNote';
-  
-    await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(note),
-    })
-      .then(data => {
-        console.log('Response data:', data);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+    await api.removeNote(note);
+    updateData(note);
   };
-  
+
   // Define os ícones e as cores para cada tipo de anotação
   const tagStyles = {
     Warning: { icon: <WarningIcon />, color: '#f32f2f' }, // Um tom mais escuro de vermelho
@@ -91,7 +80,6 @@ export default function NoteCardWithEdit({ note }) {
         <CardActions>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              {/* É aqui que vc vai adicionar o handleRemoveClick */}
               <IconButton size="small" onClick={handleRemoveClick}>
                 <DeleteIcon color="error" />
               </IconButton>

@@ -4,7 +4,7 @@ module Util.Server.Users.APIFunctions
 where
 
 import Control.Monad.IO.Class (liftIO)
-import Controllers.Users.AdministratorController (getIds, validateUserAPI)
+import Controllers.Users.AdministratorController (getIds, validateUserAPI, warnUser)
 import Controllers.Users.UserController
   ( getDBUsers,
     getUserByEmail,
@@ -17,10 +17,10 @@ import Data.Maybe (fromJust)
 import Models.AdminValidate (AdminV)
 import Models.DB.DBUpdateValue (DBUpdateValue (..))
 import Models.DB.DBUser (DBUser (..), UserLogInfo (..))
-import Models.User (User (..), showAll, showUserAPI)
+import Models.User (User (..), fromDBUser, showAll, showUserAPI)
 import Models.WrapperTypes.StringWrapper (StringWrapper (..), extractString)
 import Servant
-import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
+import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersWhereAppDB, selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
 import Util.Server.Users.APIRoutes (UsersAPI)
 import Util.Validate
   ( handleValidationServer,
@@ -51,6 +51,7 @@ usersAPIFunctions =
     :<|> deleteUser
     :<|> updateAny
     :<|> getAny
+    :<|> getUser
 
 getIdsValidated :: Handler [AdminV]
 getIdsValidated = liftIO getIds
@@ -132,6 +133,11 @@ getAny :: Maybe String -> Maybe String -> Maybe String -> Handler String
 getAny mUniqueKeyName mUniqueKey mAttribute = do
   result <- liftIO (selectFromUsersWhereAppDB [fromJust mAttribute] [(fromJust mUniqueKeyName, "=", fromJust mUniqueKey)] :: IO [StringWrapper])
   return $ (extractString . head) result
+
+getUser :: Maybe String -> Maybe String -> Handler User
+getUser mUniqueKeyName mUniqueKey = do
+  [user] <- liftIO (selectAllFromUsersWhereAppDB [(fromJust mUniqueKeyName, "=", fromJust mUniqueKey)])
+  return $ fromDBUser (user :: DBUser)
 
 -- LOGIN AND REGISTER
 

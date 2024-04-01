@@ -13,6 +13,7 @@ module Util.Database.Functions.NotesDBFunctions
     selectFromNoteIdsWhereAppDB,
     selectAllFromNoteIdsWhereAppDB,
     updateInNoteIdsWhereAppDB,
+    insertAllIntoWarningNotificationsAppDB,
   )
 where
 
@@ -41,6 +42,9 @@ selectAllFromNotesAppDB = selectFromTableAppDB "notes" ["*"]
 
 insertAllIntoNotesAppDB :: (ToField a) => [a] -> IO ()
 insertAllIntoNotesAppDB = insertAllIntoTableAppDB "notes"
+
+insertAllIntoWarningNotificationsAppDB :: (ToField a) => [a] -> IO ()
+insertAllIntoWarningNotificationsAppDB = insertAllIntoTableAppDB "user_warnings"
 
 updateAllInNotesAppDB :: [String] -> IO ()
 updateAllInNotesAppDB newValues = updateAllInNotesWhereAppDB newValues ([] :: [(String, String, String)])

@@ -71,7 +71,6 @@ export default function NoteCardReadOnly({ note }) {
         <CardActions>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              {/* É aqui que vc vai adicionar o handleRemoveClick */}
               <IconButton size="small">
                 <DeleteIcon color="error" />
               </IconButton>

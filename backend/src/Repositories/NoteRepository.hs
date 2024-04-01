@@ -10,6 +10,7 @@ module Repositories.NoteRepository
     getNotesFromDBWhere,
     getNoteIdFromDBWhere,
     updateNoteIdInDB,
+    createWarningNotificationInDB,
   )
 where
 
@@ -18,10 +19,11 @@ import Lib (handleMaybe)
 import Models.DB.DBCountResult (DBCountResult (DBCountResult))
 import Models.DB.DBNote (DBNote (..))
 import Models.DB.DBNoteId (DBNoteId (dbIdNum, dbPrefix))
+import Models.DB.DBWarningNotification (DBWarningNotification (dbWarnedUserId, dbWarningId))
 import Models.Note (Note (..), fromDBNote)
 import Models.WrapperTypes.IntWrapper (IntWrapper, extractInt)
 import Repositories.UserRepository (getUserField)
-import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, insertAllIntoNotesAppDB, selectAllFromNoteIdsWhereAppDB, selectAllFromNotesAppDB, selectAllFromNotesWhereAppDB, selectFromNotesAppDB, selectFromNotesWhereAppDB, updateAllInNotesWhereAppDB, updateInNoteIdsWhereAppDB)
+import Util.Database.Functions.NotesDBFunctions (deleteFromNotesWhereAppDB, insertAllIntoNotesAppDB, insertAllIntoWarningNotificationsAppDB, selectAllFromNoteIdsWhereAppDB, selectAllFromNotesAppDB, selectAllFromNotesWhereAppDB, selectFromNotesAppDB, selectFromNotesWhereAppDB, updateAllInNotesWhereAppDB, updateInNoteIdsWhereAppDB)
 
 getNoteIdFromDBWhere :: (ToField b) => [(String, String, b)] -> IO [DBNoteId]
 getNoteIdFromDBWhere = selectAllFromNoteIdsWhereAppDB
@@ -57,7 +59,7 @@ createNoteInDB note = do
 
 updateNoteInDB :: Note -> IO ()
 updateNoteInDB note = do
-  let newValues = [noteId note, noteType note, visibility note, show $ title note, show $ subject note, content note]
+  let newValues = [noteId note, noteType note, visibility note, handleMaybe (title note) "" id, handleMaybe (subject note) "" id, content note]
   updateAllInNotesWhereAppDB newValues [("id", "=", noteId note)]
 
 updateNoteIdInDB :: DBNoteId -> IO ()
@@ -69,3 +71,8 @@ removeNoteFromDB = removeNoteFromDBById . noteId
 
 removeNoteFromDBById :: String -> IO ()
 removeNoteFromDBById noteId' = deleteFromNotesWhereAppDB [("id", "=", noteId')]
+
+createWarningNotificationInDB :: DBWarningNotification -> IO ()
+createWarningNotificationInDB newWarningNotification = do
+  let newValues = [dbWarningId newWarningNotification, show $ dbWarnedUserId newWarningNotification]
+  insertAllIntoWarningNotificationsAppDB newValues

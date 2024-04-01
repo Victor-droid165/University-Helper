@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton, Select, MenuItem } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import { useApi } from '../../../hooks/useApi';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Warning = ({ note }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const api = useApi();
   const [title, setTitle] = useState('');
   const [warning, setWarning] = useState('');
@@ -17,53 +20,31 @@ const Warning = ({ note }) => {
       setWarning(note.content); // Supondo que 'content' é a propriedade do aviso
     }
   }, [note]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const users = await api.getDBUsers();
         const newU = users.filter(user => user.dbIsDeleted !== true)
         setDbUsersList(newU);
-        const user = dbUsersList.find(u => u.dbUserName === note.selectedUser);
-        setSelectedUser(user ? user.name : '');
       } catch (error) {
         console.error('Error fetching users:', error);
       }
     };
     fetchData();
-  }, [api]);
+  }, []);
+
+  useEffect(() => {
+    // Deixar isso aqui para atualizar quando o dbUsersList modificar
+  }, [dbUsersList])
 
   const handleSave = async () => {
-    const now = new Date();
-    console.log("Título:", title);
-    console.log("Data e Hora:", now.toLocaleString());
-    console.log("Usuário Selecionado:", selectedUser);
-    console.log("Aviso:", warning);
-    // Aqui você pode adicionar lógica para editar no backend
-    const user = {
-      userName: selectedUser.dbUserName,
-      userEmail: selectedUser.dbUserEmail,
-      userPassword: selectedUser.dbUserPassword,
-      userType: selectedUser.dbUserType,
-      userEnrollment: selectedUser.dbUserEnrollment,
-      userUniversity: selectedUser.dbUserUniversity,
-    }
-
-    await fetch('http://localhost:8081/api/notes/registerNote', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        noteId: note.noteId,
-        noteType: "Warning",
-        visibility: "Private",
-        title: title,
-        subject: "",
-        content: warning,
-        creator: user,
-       }),
-    });
+    note.content = warning;
+    note.title = title;
+    note.warnedUser = selectedUser;
+    await api.updateNote(note);
+    const prevPath = location.state?.prevPath;
+    prevPath ? navigate(prevPath) : navigate('/');
   };
 
   const handleClear = () => {
@@ -89,9 +70,9 @@ const Warning = ({ note }) => {
             <MenuItem value="">
               <em>Selecione um usuário</em>
             </MenuItem>
-            {dbUsersList.map((user) => (
-              <MenuItem key={user.id} value={user.name}>
-                {user.name}
+            {dbUsersList.map((dbUser) => (
+              <MenuItem key={dbUser.dbUserId} value={dbUser}>
+                {dbUser.dbUserName}
               </MenuItem>
             ))}
           </Select>

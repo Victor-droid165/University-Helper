@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Grid, IconButton } from '@mui/material';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-
-
+import { useApi } from '../../../hooks/useApi';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Reminder = ({ note }) => {
   const [content, setContent] = useState('');
+  const api = useApi();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Atualiza os estados quando o componente recebe uma nova 'note'
   useEffect(() => {
@@ -15,30 +18,15 @@ const Reminder = ({ note }) => {
   }, [note]);
 
   const handleSave = async () => {
-    const now = new Date();
-    console.log("Data e Hora:", now.toLocaleString());
-    console.log("Conteúdo:", content);
-    // Aqui você pode adicionar lógica para atualizar no backend
-
-    await fetch('http://localhost:8081/api/notes/updateANote', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        noteId: note.noteId,
-        noteType: "Reminder",
-        visibility: "Private",
-        title: "",
-        subject: "",
-        content: content,
-        creator: note.creator,
-       }),
-    });
+    note.content = content;
+    await api.updateNote(note);
+    const prevPath = location.state?.prevPath;
+    prevPath ? navigate(prevPath) : navigate('/');
   };
 
   const handleClear = () => {
     setContent('');
+    note.content = '';
   };
 
   return (

@@ -15,8 +15,8 @@ where
 
 import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToField (ToField)
-import Models.DB.DBUser (DBUser)
 import Util.Database.DBFunctions (deleteFromTableAppDB, deleteFromTableWhereAppDB, insertAllIntoTableAppDB, selectFromTableAppDB, selectFromTableWhereAppDB, updateInTableAppDB, updateInTableWhereAppDB)
+import Models.AdminValidate (AdminV)
 
 selectFromValidationsWhereAppDB :: (FromRow a, ToField b) => [String] -> [(String, String, b)] -> IO [a]
 selectFromValidationsWhereAppDB = selectFromTableWhereAppDB "admin_user_validations"
@@ -24,7 +24,7 @@ selectFromValidationsWhereAppDB = selectFromTableWhereAppDB "admin_user_validati
 selectFromValidationsAppDB :: (FromRow a) => [String] -> IO [a]
 selectFromValidationsAppDB = selectFromTableAppDB "admin_user_validations"
 
-selectAllFromValidationsWhereAppDB :: (ToField b) => [(String, String, b)] -> IO [DBUser]
+selectAllFromValidationsWhereAppDB :: (ToField b) => [(String, String, b)] -> IO [AdminV]
 selectAllFromValidationsWhereAppDB = selectFromTableWhereAppDB "admin_user_validations" ["*"]
 
 selectAllFromValidationsAppDB :: (FromRow a) => IO [a]

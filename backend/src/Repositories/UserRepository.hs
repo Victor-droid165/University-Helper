@@ -16,7 +16,14 @@ import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToField (ToField)
 import Models.DB.DBUser (DBUser)
 import Models.User (User (..), fromDBUser)
-import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, insertAllIntoUsersAppDB, selectAllFromUsersAppDB, selectAllFromUsersWhereAppDB, selectFromUsersWhereAppDB, updateAllInUsersWhereAppDB)
+import Util.Database.Functions.UsersDBFunctions
+  ( deleteFromUsersWhereAppDB,
+    insertAllIntoUsersAppDB,
+    selectAllFromUsersAppDB,
+    selectAllFromUsersWhereAppDB,
+    selectFromUsersWhereAppDB,
+    updateAllInUsersWhereAppDB,
+  )
 
 getUsersFromDB :: IO [User]
 getUsersFromDB = map fromDBUser <$> selectAllFromUsersAppDB
