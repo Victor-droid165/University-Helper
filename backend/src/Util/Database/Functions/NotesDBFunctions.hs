@@ -13,12 +13,18 @@ module Util.Database.Functions.NotesDBFunctions
     selectFromNoteIdsWhereAppDB,
     selectAllFromNoteIdsWhereAppDB,
     updateInNoteIdsWhereAppDB,
+    insertAllIntoWarningNotificationsAppDB,
+    selectFromWarningNotificationsAppDB,
+    selectFromWarningNotificationsWhereAppDB,
+    selectAllFromWarningNotificationsWhereAppDB,
+    selectAllFromWarningNotificationsAppDB,
   )
 where
 
 import Database.PostgreSQL.Simple (FromRow)
 import Database.PostgreSQL.Simple.ToField (ToField)
-import Models.DBNote (DBNote)
+import Models.DB.DBNote (DBNote)
+import Models.DB.DBWarningNotification (DBWarningNotification)
 import Util.Database.DBFunctions (deleteFromTableAppDB, deleteFromTableWhereAppDB, insertAllIntoTableAppDB, selectAllFromTableWhereAppDB, selectFromTableAppDB, selectFromTableWhereAppDB, updateInTableAppDB, updateInTableWhereAppDB)
 
 selectFromNoteIdsWhereAppDB :: (FromRow a, ToField b) => [String] -> [(String, String, b)] -> IO [a]
@@ -39,8 +45,23 @@ selectAllFromNotesWhereAppDB = selectFromTableWhereAppDB "notes" ["*"]
 selectAllFromNotesAppDB :: IO [DBNote]
 selectAllFromNotesAppDB = selectFromTableAppDB "notes" ["*"]
 
+selectFromWarningNotificationsWhereAppDB :: (FromRow a, ToField b) => [String] -> [(String, String, b)] -> IO [a]
+selectFromWarningNotificationsWhereAppDB = selectFromTableWhereAppDB "user_warnings"
+
+selectFromWarningNotificationsAppDB :: (FromRow a) => [String] -> IO [a]
+selectFromWarningNotificationsAppDB = selectFromTableAppDB "user_warnings"
+
+selectAllFromWarningNotificationsWhereAppDB :: (ToField b) => [(String, String, b)] -> IO [DBWarningNotification]
+selectAllFromWarningNotificationsWhereAppDB = selectFromTableWhereAppDB "user_warnings" ["*"]
+
+selectAllFromWarningNotificationsAppDB :: IO [DBWarningNotification]
+selectAllFromWarningNotificationsAppDB = selectFromTableAppDB "user_warnings" ["*"]
+
 insertAllIntoNotesAppDB :: (ToField a) => [a] -> IO ()
 insertAllIntoNotesAppDB = insertAllIntoTableAppDB "notes"
+
+insertAllIntoWarningNotificationsAppDB :: (ToField a) => [a] -> IO ()
+insertAllIntoWarningNotificationsAppDB = insertAllIntoTableAppDB "user_warnings"
 
 updateAllInNotesAppDB :: [String] -> IO ()
 updateAllInNotesAppDB newValues = updateAllInNotesWhereAppDB newValues ([] :: [(String, String, String)])

@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-module Models.DBNote (DBNote (..), DBNoteOnlyId (..)) where
+module Models.DB.DBNote (DBNote (..), DBNoteOnlyId (..)) where
 
 import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Time (LocalTime)

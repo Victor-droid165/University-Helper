@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-module Models.DBNotebook (DBNotebook (..), DBNotebookOnlyId (..)) where
+module Models.DB.DBNotebook (DBNotebook (..), DBNotebookOnlyId (..)) where
 
 import Data.Aeson.Types (FromJSON, ToJSON)
 

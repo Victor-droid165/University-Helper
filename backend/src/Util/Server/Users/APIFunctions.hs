@@ -4,10 +4,10 @@ module Util.Server.Users.APIFunctions
 where
 
 import Control.Monad.IO.Class (liftIO)
-import Controllers.Users.AdministratorController (getIds, validateUserAPI)
+import Controllers.Users.AdministratorController (getIds, validateUserAPI, warnUser)
 import Controllers.Users.UserController
-  ( findUserByEmail,
-    getDBUsers,
+  ( getDBUsers,
+    getUserByEmail,
     getUsers,
     registerStudentAPI,
     registerUserAPI,
@@ -15,19 +15,13 @@ import Controllers.Users.UserController
   )
 import Data.Maybe (fromJust)
 import Models.AdminValidate (AdminV)
-import Models.DBUser (DBUser (..))
-import Models.User (User (..), showAll, showUserAPI)
+import Models.DB.DBUpdateValue (DBUpdateValue (..))
+import Models.DB.DBUser (DBUser (..), UserLogInfo (..))
+import Models.User (User (..), fromDBUser, showAll, showUserAPI)
+import Models.WrapperTypes.StringWrapper (StringWrapper (..), extractString)
 import Servant
-import Util.Database.Functions.UsersDBFunctions (selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
-import Util.Server.Users.APIDatas
-  ( ChangeData (..),
-    IntegerData (..),
-    LogInfo (..),
-    MyData (..),
-    RandomData (..),
-    RegisterInfo (..),
-  )
-import Util.Server.Users.APIRoutes (UsersAPI (..))
+import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersWhereAppDB, selectFromUsersWhereAppDB, updateInUsersWhereAppDB)
+import Util.Server.Users.APIRoutes (UsersAPI)
 import Util.Validate
   ( handleValidationServer,
     userEmailValidation,
@@ -37,7 +31,7 @@ import Util.Validate
     userUniversityValidation,
   )
 
-usersAPIFunctions :: Server Util.Server.Users.APIRoutes.UsersAPI
+usersAPIFunctions :: Server UsersAPI
 usersAPIFunctions =
   users
     :<|> usersDB
@@ -57,85 +51,93 @@ usersAPIFunctions =
     :<|> deleteUser
     :<|> updateAny
     :<|> getAny
+    :<|> getUser
 
 getIdsValidated :: Handler [AdminV]
 getIdsValidated = liftIO getIds
 
-validateName :: MyData -> Handler String
-validateName myData = return $ handleValidationServer (userNameValidation (value myData))
+validateName :: String -> Handler String
+validateName userName' = return $ handleValidationServer (userNameValidation userName')
 
-validateUniversity :: MyData -> Handler String
-validateUniversity myData = return $ handleValidationServer (userUniversityValidation (value myData))
+validateUniversity :: String -> Handler String
+validateUniversity universityName = return $ handleValidationServer (userUniversityValidation universityName)
 
-validateEmail :: MyData -> Handler String
-validateEmail myData = return $ handleValidationServer (userEmailValidation (value myData))
+validateEmail :: String -> Handler String
+validateEmail email' = return $ handleValidationServer (userEmailValidation email')
 
-validateEnrollment :: MyData -> Handler String
-validateEnrollment myData = return $ handleValidationServer (userEnrollmentValidation (value myData))
+validateEnrollment :: String -> Handler String
+validateEnrollment enrollment = return $ handleValidationServer (userEnrollmentValidation enrollment)
 
-validatePassword :: MyData -> Handler String
-validatePassword myData = return $ handleValidationServer (userPasswordValidation (value myData))
+validatePassword :: String -> Handler String
+validatePassword password' = return $ handleValidationServer (userPasswordValidation password')
 
-validateLogin :: LogInfo -> Handler Bool
+validateLogin :: UserLogInfo -> Handler Bool
 validateLogin logInfo = liftIO $ verifyLoginIO (email logInfo) (password logInfo)
 
-validateUser :: IntegerData -> Handler NoContent
-validateUser myData = liftIO (validateUserAPI (integerValue myData)) >> return NoContent
+validateUser :: Int -> Handler NoContent
+validateUser userId' = do
+  liftIO (validateUserAPI userId')
+  return NoContent
 
-unvalidateUser :: MyData -> Handler NoContent
-unvalidateUser myData = deleteUser myData >> return NoContent
+unvalidateUser :: String -> Handler NoContent
+unvalidateUser myData = do
+  deleteUser myData
+  return NoContent
 
-register :: RegisterInfo -> Handler String
-register registerInfo = do
-  isUserRegistered <- isRegistered (MyData {value = userEmail (user registerInfo)})
+register :: User -> Handler String
+register user = do
+  isUserRegistered <- isRegistered (userEmail user)
   if isUserRegistered
     then return "Failure"
-    else do
-      liftIO $ registerIn registerInfo
+    else
+      liftIO $ registerIn user
   where
-    registerIn registerInfo'
-      | u_type registerInfo' == "Professor" = liftIO $ registerUserAPI (user registerInfo') >> return "Success"
-      | otherwise = liftIO $ registerStudentAPI (user registerInfo') >> return "Success"
+    registerIn user'
+      | userType user' == "Professor" = do
+          liftIO $ registerUserAPI user'
+          return "Success"
+      | otherwise = do
+          liftIO $ registerStudentAPI user'
+          return "Success"
 
-isRegistered :: MyData -> Handler Bool
+isRegistered :: String -> Handler Bool
 isRegistered emailData = do
-  let email' = value emailData
   allUsers <- liftIO getUsers
-  return $ email' `elem` map userEmail allUsers
+  return $ emailData `elem` map userEmail allUsers
 
-showUser :: MyData -> Handler String
-showUser myData = do
-  users <- liftIO getUsers
-  return $ (showUserAPI . fromJust) (findUserByEmail (value myData) users)
+showUser :: String -> Handler String
+showUser email' = do
+  user <- liftIO $ getUserByEmail email'
+  return $ showUserAPI user
 
 showAllUsers :: Handler String
-showAllUsers = do
-  users <- liftIO getUsers
-  return $ showAll users
+showAllUsers = liftIO $ showAll <$> getUsers
 
-deleteUser :: MyData -> Handler String
-deleteUser mydata = do
-  if value mydata /= "1"
+deleteUser :: String -> Handler String
+deleteUser userId = do
+  if userId /= "1"
     then do
-      liftIO $ updateInUsersWhereAppDB [("is_deleted", "t")] [("id", "=", value mydata)]
-      -- liftIO $ deleteFromValidationsWhereAppDB [("user_id", "=", value mydata)]
-      -- liftIO $ deleteFromUsersWhereAppDB [("id", "=", value mydata)]
+      -- For soft deletions
+      -- liftIO $ updateInUsersWhereAppDB [("is_deleted", "t")] [("id", "=", mydata)]
+      liftIO $ deleteFromUsersWhereAppDB [("id", "=", userId)]
       return "Success"
     else
       return "You can't delete yourself, cuz you're the ADMIN"
 
-updateAny :: ChangeData -> Handler String
-updateAny mydata = do
-  liftIO $ updateInUsersWhereAppDB [(field mydata, newValue mydata)] [(match mydata, "=", matchValue mydata)]
-  showUser (MyData {value = matchValue mydata})
+updateAny :: DBUpdateValue -> Handler String
+updateAny updateData = do
+  liftIO $ updateInUsersWhereAppDB [(fieldToUpdate updateData, newValue updateData)] [(whereField updateData, "=", whereValue updateData)]
+  showUser (whereValue updateData)
 
 getAny :: Maybe String -> Maybe String -> Maybe String -> Handler String
 getAny mUniqueKeyName mUniqueKey mAttribute = do
-  liftIO $ print mUniqueKeyName
-  liftIO $ print mUniqueKey
-  liftIO $ print mAttribute
-  result <- liftIO (selectFromUsersWhereAppDB [fromJust mAttribute] [(fromJust mUniqueKeyName, "=", fromJust mUniqueKey)] :: IO [RandomData])
-  return $ (userType' . head) result
+  result <- liftIO (selectFromUsersWhereAppDB [fromJust mAttribute] [(fromJust mUniqueKeyName, "=", fromJust mUniqueKey)] :: IO [StringWrapper])
+  return $ (extractString . head) result
+
+getUser :: Maybe String -> Maybe String -> Handler User
+getUser mUniqueKeyName mUniqueKey = do
+  [user] <- liftIO (selectAllFromUsersWhereAppDB [(fromJust mUniqueKeyName, "=", fromJust mUniqueKey)])
+  return $ fromDBUser (user :: DBUser)
 
 -- LOGIN AND REGISTER
 

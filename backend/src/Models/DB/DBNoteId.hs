@@ -2,25 +2,23 @@
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-module Models.AdminValidate (AdminV (..)) where
+module Models.DB.DBNoteId (DBNoteId (..)) where
 
 import Data.Aeson.Types (FromJSON, ToJSON)
-import Data.Time (LocalTime)
 import Database.PostgreSQL.Simple.FromRow (FromRow)
 import Database.PostgreSQL.Simple.ToRow (ToRow)
 import GHC.Generics (Generic)
 
-data AdminV = AdminV
-  { adminId :: Integer,
-    userId :: Integer,
-    timeStamp :: LocalTime
+data DBNoteId = DBNoteId
+  { dbPrefix :: String,
+    dbIdNum :: Int
   }
   deriving (Show, Read, Eq, Generic)
 
-instance FromRow AdminV
+instance FromRow DBNoteId
 
-instance ToRow AdminV
+instance ToRow DBNoteId
 
-instance ToJSON AdminV
+instance ToJSON DBNoteId
 
-instance FromJSON AdminV
+instance FromJSON DBNoteId

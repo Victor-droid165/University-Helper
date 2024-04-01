@@ -7,14 +7,26 @@ module Controllers.Notes.NoteController
     updateNote,
     removeByNote,
     removeNoteById,
-    getNotesByUserId
+    getNotesByUserId,
+    getUserWarnings,
   )
 where
 
-import Models.DBNote (DBNote)
-import Models.Note ( Note )
-import Repositories.NoteRepository (createNoteInDB, getDBNotesFromDB, getNotesFromDB, getNotesFromDBWhere, removeNoteFromDB, removeNoteFromDBById, updateNoteInDB, getNoteIdFromDBWhere, updateNoteIdInDB)
-import Models.DBNoteId (DBNoteId(..))
+import Models.DB.DBNote (DBNote)
+import Models.DB.DBNoteId (DBNoteId (..))
+import Models.Note (Note)
+import Repositories.NoteRepository
+  ( createNoteInDB,
+    getDBNotesFromDB,
+    getNoteIdFromDBWhere,
+    getNotesFromDB,
+    getNotesFromDBWhere,
+    getUserWarningsByUserId,
+    removeNoteFromDB,
+    removeNoteFromDBById,
+    updateNoteIdInDB,
+    updateNoteInDB,
+  )
 
 getNextNoteId :: String -> IO String
 getNextNoteId notePrefix = do
@@ -30,13 +42,16 @@ getNotes = sequence =<< getNotesFromDB
 getNotesByUserId :: String -> IO [Note]
 getNotesByUserId id' = sequence =<< getNotesFromDBWhere [("creator_id", "=", id')]
 
+getUserWarnings :: Int -> IO [Note]
+getUserWarnings userId' = sequence =<< getUserWarningsByUserId userId'
+
 getDBNotes :: IO [DBNote]
 getDBNotes = getDBNotesFromDB
 
 getNoteById :: String -> IO Note
 getNoteById noteId' = do
-  notes <- sequence =<< getNotesFromDBWhere [("id", "=", noteId')]
-  return $ head notes
+  note <- sequence =<< getNotesFromDBWhere [("id", "=", noteId')]
+  return $ head note
 
 registerNote :: Note -> IO ()
 registerNote = createNoteInDB

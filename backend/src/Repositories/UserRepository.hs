@@ -12,11 +12,18 @@ module Repositories.UserRepository
   )
 where
 
-import Models.User (User (..), fromDBUser)
-import Util.Database.Functions.UsersDBFunctions (deleteFromUsersWhereAppDB, selectAllFromUsersAppDB, updateAllInUsersWhereAppDB, insertAllIntoUsersAppDB, selectAllFromUsersWhereAppDB, selectFromUsersWhereAppDB)
-import Models.DBUser (DBUser)
-import Database.PostgreSQL.Simple.ToField (ToField)
 import Database.PostgreSQL.Simple (FromRow)
+import Database.PostgreSQL.Simple.ToField (ToField)
+import Models.DB.DBUser (DBUser)
+import Models.User (User (..), fromDBUser)
+import Util.Database.Functions.UsersDBFunctions
+  ( deleteFromUsersWhereAppDB,
+    insertAllIntoUsersAppDB,
+    selectAllFromUsersAppDB,
+    selectAllFromUsersWhereAppDB,
+    selectFromUsersWhereAppDB,
+    updateAllInUsersWhereAppDB,
+  )
 
 getUsersFromDB :: IO [User]
 getUsersFromDB = map fromDBUser <$> selectAllFromUsersAppDB
@@ -24,11 +31,11 @@ getUsersFromDB = map fromDBUser <$> selectAllFromUsersAppDB
 getDBusersFromDB :: IO [DBUser]
 getDBusersFromDB = selectAllFromUsersAppDB
 
-getUserFromDBWhere :: ToField b => [(String, String, b)] -> IO User
+getUserFromDBWhere :: (ToField b) => [(String, String, b)] -> IO User
 getUserFromDBWhere conditions = fromDBUser . head <$> selectAllFromUsersWhereAppDB conditions
 
 getUserField :: (FromRow a) => User -> String -> IO a
-getUserField user field = do 
+getUserField user field = do
   result <- selectFromUsersWhereAppDB [field] [("email", "=", userEmail user)]
   return $ head result
 

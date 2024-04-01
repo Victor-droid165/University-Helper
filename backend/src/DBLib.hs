@@ -151,7 +151,6 @@ insertIntoTable conn tableName cols vals = do
       placeholders = BS.intercalate ", " (replicate (length vals) "?")
       tableName' = BS.pack tableName
       queryText = "INSERT INTO " <> tableName' <> colsBS <> " VALUES (" <> placeholders <> ")"
-  print queryText
   _ <- execute conn (Query queryText) vals
   putStrLn "Data inserted successfully."
 

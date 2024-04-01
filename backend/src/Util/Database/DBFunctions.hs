@@ -32,7 +32,7 @@ import DBLib
     isSchemaCreated,
     populateDB,
     selectFromTableWhere,
-    updateInTableWhere, AnyField,
+    updateInTableWhere,
   )
 import qualified Data.ByteString.Char8 as BS
 import Data.Yaml (FromJSON (..), decodeFileThrow)

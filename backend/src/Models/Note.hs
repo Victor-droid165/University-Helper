@@ -4,6 +4,10 @@
 module Models.Note
   ( Note (..),
     fromDBNote,
+    prefix,
+    noteToString,
+    stringToNote,
+    writeNoteOnFile,
   )
 where
 
@@ -17,12 +21,10 @@ import Database.PostgreSQL.Simple.ToField (Action (Plain), ToField (toField))
 import Database.PostgreSQL.Simple.ToRow (ToRow (toRow))
 import GHC.Generics (Generic)
 import Lib (stringToData, writeDataOnFile)
-import Models.DBNote (DBNote (..))
+import Models.DB.DBNote (DBNote (..))
 import Models.User (User (..))
 
 data NoteType = Reminder | StickyNote | PlainText | Warning deriving (Show, Read, Eq)
-
-data Visibility = Private | Public deriving (Show, Read, Eq)
 
 data Note = Note
   { noteId :: String,
@@ -59,7 +61,6 @@ instance ToJSON Note
 
 instance FromJSON Note
 
--- Função para retornar o prefixo de um dado tipo de anotação
 prefix :: NoteType -> String
 prefix Reminder = "REM"
 prefix StickyNote = "SNS"

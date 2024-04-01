@@ -16,7 +16,6 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<AppPageLayout />}>
       <Route index element={<HomePage />} />
-      <Route path="/home" element={<HomePage />} />
       <Route path="register" element={<RegisterPage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="logout" element={<LogoutPage />} />
@@ -27,7 +26,10 @@ const router = createBrowserRouter(
 
       <Route element={<ProtectedRoutes allowedRoles={["Admin", "Professor", "Student"]} />}>
         <Route path="note-creation" element={<NoteCreationPage />} />
-        <Route path="note-list" element={<ListNotesWithEdit />} />
+        <Route path="note-list">
+          <Route index element={<ListNotesWithEdit />} />
+          <Route path='user-warnings' element={<ListNotesReadOnly />} />
+        </Route>
         <Route path="note-edition" element={<EditNote />} />
       </Route>
 

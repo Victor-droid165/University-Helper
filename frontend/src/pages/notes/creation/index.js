@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -7,9 +6,10 @@ import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import TextNote from './textNote';
 import { blue, red } from "@mui/material/colors";
 import Reminder from './reminder';
+import { useState } from 'react';
 
 export default function NoteCreationPage() {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
