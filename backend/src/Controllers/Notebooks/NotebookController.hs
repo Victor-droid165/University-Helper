@@ -1,6 +1,5 @@
 module Controllers.Notebooks.NotebookController
-  ( getNextNotebookId,
-    registerNotebook,
+  ( registerNotebook,
     getNotebooks,
     getDBNotebooks,
     getNotebookById,
@@ -10,14 +9,17 @@ module Controllers.Notebooks.NotebookController
   )
 where
 
-import Models.DBNotebook (DBNotebook)
-import Models.Notebook
-import Repositories.NotebookRepository (countNotebooksPrefixesFromDB, createNotebookInDB, getDBNotebooksFromDB, getNotebooksFromDB, getNotebooksFromDBWhere, removeNotebookFromDB, removeNotebookFromDBById, updateNotebookInDB)
-
-getNextNotebookId :: String -> IO String
-getNextNotebookId notebookPrefix = do
-  maxCurId <- countNotebooksPrefixesFromDB notebookPrefix
-  return (notebookPrefix ++ "-" ++ show (maxCurId + 1))
+import Models.DB.DBNotebook (DBNotebook)
+import Models.Notebook (Notebook)
+import Repositories.NotebookRepository
+  ( createNotebookInDB,
+    getDBNotebooksFromDB,
+    getNotebooksFromDB,
+    getNotebooksFromDBWhere,
+    removeNotebookFromDB,
+    removeNotebookFromDBById,
+    updateNotebookInDB,
+  )
 
 getNotebooks :: IO [Notebook]
 getNotebooks = sequence =<< getNotebooksFromDB

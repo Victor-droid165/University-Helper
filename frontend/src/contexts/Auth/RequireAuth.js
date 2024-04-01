@@ -9,7 +9,7 @@ export const RequireAuth = ({ allowedRoles }) => {
     const api = useApi();
     const location = useLocation();
     const isAuthenticated = auth.isAuthenticated();
-    const [isAuthorized, setIsAuthorized] = useState(null); // Initialize as null while waiting for response
+    const [isAuthorized, setIsAuthorized] = useState(null);
 
     useEffect(() => {
         const fetchUserField = async () => {
@@ -19,28 +19,24 @@ export const RequireAuth = ({ allowedRoles }) => {
                     unique_key: auth.user.email,
                     attribute: "type"
                 });
-                // Check if the user's role is allowed
+
                 const authorized = isAuthenticated && allowedRoles.includes(response);
                 setIsAuthorized(authorized);
             } catch (error) {
-                console.error("Error fetching user field:", error);
-                // Handle error: Redirect to login page or display an error message
                 setIsAuthorized(false);
             }
         };
 
-        // Call fetchUserField when component mounts
         fetchUserField();
-    }, [api, auth.user.email, isAuthenticated, allowedRoles]);
+    }, [api, auth?.user?.email, isAuthenticated, allowedRoles]);
 
-    // During loading or while awaiting response, return null or a loading indicator
     if (isAuthorized === null) {
         return null;
     }
-    
+
     return isAuthorized
         ? <Outlet />
         : isAuthenticated
-            ? <Navigate to='/home' state={{ path: location.pathname }} replace />
+            ? <Navigate to='/' state={{ path: location.pathname }} replace />
             : <Navigate to='/login' state={{ path: location.pathname }} replace />
 }

@@ -8,6 +8,7 @@ const registerRoute = apiUsersURL + "/register";
 const dbUsersRoute = apiUsersURL + "/usersDB";
 const updateUserRoute = apiUsersURL + "/updateAny";
 const getUserFieldRoute = apiUsersURL + "/getAny";
+const getUserByFieldRoute = apiUsersURL + "/user";
 export default class UserService {
 
     async validateUserField(field, value) {
@@ -16,7 +17,7 @@ export default class UserService {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ value: value })
+            body: JSON.stringify(value)
         });
 
         if (!response.ok) {
@@ -48,7 +49,7 @@ export default class UserService {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ value: user.email })
+            body: JSON.stringify(user.email)
         })
 
         if (!response.ok) {
@@ -64,7 +65,7 @@ export default class UserService {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ u_type: user.userType, user: user }),
+            body: JSON.stringify(user),
         });
     }
 
@@ -102,6 +103,24 @@ export default class UserService {
     async getUserField(data) {
         const queryParams = new URLSearchParams(data).toString();
         const url = getUserFieldRoute + `?${queryParams}`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user field.');
+        }
+
+        return await response.json();
+    }
+
+    async getUserByField(data) {
+        const queryParams = new URLSearchParams(data).toString();
+        const url = getUserByFieldRoute + `?${queryParams}`;
         console.log(url);
 
         const response = await fetch(url, {
@@ -118,17 +137,4 @@ export default class UserService {
         return await response.json();
     }
 
-    async getID(idType) {
-        const response = await fetch('http://localhost:8081/api/notes/getId', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ value: idType }),
-        });
-        const data = await response.json();
-        console.log(data);
-        return data;
-    }
-      
 }

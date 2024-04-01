@@ -8,14 +8,21 @@ module Util.Server.Notes.APIRoutes
   )
 where
 
-import Servant
+import Models.DB.DBWarningNotification (DBWarningNotification)
 import Models.Note (Note)
-import Util.Server.Users.APIDatas (MyData)
+import Servant
 
-type NotesAPI = "notes" :> ReqBody '[JSON] MyData :> Post '[JSON] [Note] 
-           :<|> "removeNote" :> ReqBody '[JSON] Note :> Post '[JSON] String
-           :<|> "removeByID" :> ReqBody '[JSON] String :> Post '[JSON] String
-           :<|> "registerNote" :> ReqBody '[JSON] Note :> Post '[JSON] String
-           :<|> "updateANote" :> ReqBody '[JSON] Note :> Post '[JSON] String
-           :<|> "getId" :> ReqBody '[JSON] MyData :> Post '[JSON] String
-           :<|> "listAllNotes" :> Get '[JSON] [Note]
+type NotesAPI =
+  "notes" :> ReqBody '[JSON] String :> Post '[JSON] [Note]
+    :<|> "removeNote" :> ReqBody '[JSON] Note :> Post '[JSON] String
+    :<|> "removeByID" :> ReqBody '[JSON] String :> Post '[JSON] String
+    :<|> "registerNote" :> ReqBody '[JSON] Note :> Post '[JSON] String
+    :<|> "updateANote" :> ReqBody '[JSON] Note :> Post '[JSON] String
+    :<|> "getId" :> ReqBody '[JSON] String :> Post '[JSON] String
+    :<|> "listAllNotes" :> Get '[JSON] [Note]
+    :<|> "notifyUser" :> ReqBody '[JSON] DBWarningNotification :> Post '[JSON] Bool
+    :<|> ( "userNotifications"
+             :> QueryParam "dbUserId" Int
+             :> Get '[JSON] [Note]
+         )
+    

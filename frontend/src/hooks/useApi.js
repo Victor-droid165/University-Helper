@@ -1,6 +1,8 @@
 import UserService from "../services/UserService";
+import NoteService from "../services/NoteService";
 
 const userService = new UserService();
+const noteService = new NoteService();
 
 export const useApi = () => ({
   validateUserField: async (field, value) => {
@@ -24,7 +26,25 @@ export const useApi = () => ({
   getUserField: async (data) => {
     return await userService.getUserField(data);
   },
-  getID: async (data) => {
-    return await userService.getID(data);
+  getUserByField: async (data) => {
+    return await userService.getUserByField(data);
+  },
+  getNoteId: async (data) => {
+    return await noteService.getNoteId(data);
+  },
+  registerNote: async (note) => {
+    await noteService.registerNote(note);
+  },
+  removeNote: async (note) => {
+    await noteService.removeNote(note);
+  },
+  updateNote: async (note) => {
+    await noteService.updateNote(note);
+  },
+  getNotesByCreatorId: async (userId) => {
+    return await noteService.getNotesByCreatorId(userId);
+  },
+  getUserWarnings: async (userId) => {
+    return await noteService.getUserWarnings(userId);
   }
 });

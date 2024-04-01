@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Models.DBCountResult (DBCountResult (..)) where
+module Models.DB.DBCountResult (DBCountResult (..)) where
 
 import Database.PostgreSQL.Simple (FromRow)
 import GHC.Generics (Generic)

@@ -23,7 +23,7 @@ import Lib
   ( stringToData,
     writeDataOnFile,
   )
-import Models.DBUser (DBUser (..))
+import Models.DB.DBUser (DBUser (..))
 
 data User = User
   { userName :: String,
