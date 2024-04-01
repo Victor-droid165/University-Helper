@@ -17,20 +17,19 @@ const ListUsers = () => {
   useEffect(() => {
     api.getDBUsers().then((dbUsers) => {
       const activeUsers = dbUsers.filter(user => user.dbIsDeleted !== true);
-      setRows(activeUsers);
+      setValidates(activeUsers);
     });
-    setValidates();
   }, []);
 
   useEffect(() => {
-    console.log("Rows state updated:", rows);
+    console.log(rows);
   }, [rows]);
 
   const updateUser = async (field, newValue, match, matchValue) => {
     await api.updateUserField({ field, newValue, match, matchValue });
   };
 
-  const setValidates = () => {
+  const setValidates = (activeUsers) => {
     fetch('http://localhost:8081/api/users/getIdsValidated', {
       method: 'GET',
       headers: {
@@ -42,13 +41,11 @@ const ListUsers = () => {
       .then(data => {
         const userIds = data.map(item => item.userId);
         const hashSet = new Set(userIds);
-        setRows(
-          nRows => nRows.map(row => ({
-            ...row,
-            isValidated: hashSet.has(row.dbUserId),
-          }))
-        );
-        console.log(hashSet);
+        const nRows = activeUsers.map(activeUser => ({
+          ...activeUser,
+          isValidated: hashSet.has(activeUser.dbUserId) || activeUser.dbUserId === 1,
+        }))
+        setRows(nRows);
       })
       .catch(error => {
         console.error('Error updating user:', error);
@@ -173,7 +170,12 @@ const ListUsers = () => {
                   body: JSON.stringify(params.row.dbUserId),
                 }
                 )
-                console.log('Validar usuário', params.row.dbUserId)
+                const nRows = rows.map((row) => {
+                  if (row.dbUserId === params.row.dbUserId)
+                    row.isValidated = true;
+                  return { ...row }
+                })
+                setRows(nRows);
                 params.row.isValidated = true;
               }
               }

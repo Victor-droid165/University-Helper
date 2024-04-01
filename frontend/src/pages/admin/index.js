@@ -8,7 +8,6 @@ import ListUsers from './listUsers';
 import ListNotes from '../notes/list/withEdit';
 import { blue, red } from "@mui/material/colors";
 import Warning from '../notes/creation/warning';
-import { mockAdminWarnings } from '../../data/mockData';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import AddIcon from '@mui/icons-material/Add';
@@ -72,7 +71,7 @@ export default function IconPositionTabs() {
                 <Warning />
               </Box>
             </Modal>
-            <ListNotes data={mockAdminWarnings} />
+            <ListNotes />
           </>
         );
       default:
