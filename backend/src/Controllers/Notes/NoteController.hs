@@ -8,6 +8,7 @@ module Controllers.Notes.NoteController
     removeByNote,
     removeNoteById,
     getNotesByUserId,
+    getUserWarnings,
   )
 where
 
@@ -20,6 +21,7 @@ import Repositories.NoteRepository
     getNoteIdFromDBWhere,
     getNotesFromDB,
     getNotesFromDBWhere,
+    getUserWarningsByUserId,
     removeNoteFromDB,
     removeNoteFromDBById,
     updateNoteIdInDB,
@@ -39,6 +41,9 @@ getNotes = sequence =<< getNotesFromDB
 
 getNotesByUserId :: String -> IO [Note]
 getNotesByUserId id' = sequence =<< getNotesFromDBWhere [("creator_id", "=", id')]
+
+getUserWarnings :: Int -> IO [Note]
+getUserWarnings userId' = sequence =<< getUserWarningsByUserId userId'
 
 getDBNotes :: IO [DBNote]
 getDBNotes = getDBNotesFromDB

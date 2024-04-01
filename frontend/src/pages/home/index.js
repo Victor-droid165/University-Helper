@@ -21,7 +21,7 @@ const HomePage = () => {
       </Grid>
       <Grid container spacing={1} rowSpacing={1} >
         <Grid xs={4} >
-          <Link to="note-list">
+          <Link to="note-list/user-warnings">
             <div className={styles.card}>
               <CircleNotificationsOutlinedIcon fontSize="large" />
               <strong><small>Central de notifcações</small></strong>

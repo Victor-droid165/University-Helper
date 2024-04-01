@@ -4,13 +4,22 @@ module Util.Server.Notes.APIFunctions
 where
 
 import Control.Monad.IO.Class (liftIO)
-import Controllers.Notes.NoteController (getDBNotes, getNextNoteId, getNotesByUserId, removeByNote, removeNoteById, updateNote)
+import Controllers.Notes.NoteController
+  ( getDBNotes,
+    getNextNoteId,
+    getNotesByUserId,
+    getUserWarnings,
+    removeByNote,
+    removeNoteById,
+    updateNote,
+  )
 import Controllers.Users.AdministratorController (warnUser)
 import Models.DB.DBWarningNotification (DBWarningNotification)
 import Models.Note (Note, fromDBNote)
 import Repositories.NoteRepository (createNoteInDB)
 import Servant
 import Util.Server.Notes.APIRoutes (NotesAPI)
+import Data.Maybe (fromJust)
 
 notesAPIFunctions :: Server NotesAPI
 notesAPIFunctions =
@@ -22,6 +31,7 @@ notesAPIFunctions =
     :<|> getId
     :<|> listAllNotes
     :<|> notifyUser
+    :<|> getUserNotifications
 
 notes :: String -> Handler [Note]
 notes id' = liftIO $ getNotesByUserId id'
@@ -48,6 +58,8 @@ listAllNotes = do
 
 notifyUser :: DBWarningNotification -> Handler Bool
 notifyUser dbWarningNotification = do
-  liftIO $ print dbWarningNotification
   liftIO $ warnUser dbWarningNotification
   return True
+
+getUserNotifications :: Maybe Int -> Handler [Note]
+getUserNotifications userId' = liftIO $ getUserWarnings $ fromJust userId'

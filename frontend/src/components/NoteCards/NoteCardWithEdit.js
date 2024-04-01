@@ -11,7 +11,6 @@ import { IconButton, Grid } from '@mui/material';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApi } from '../../hooks/useApi';
-import { useEffect } from 'react';
 
 
 export default function NoteCardWithEdit({ note, updateData }) {

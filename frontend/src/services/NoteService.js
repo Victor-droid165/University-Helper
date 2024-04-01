@@ -4,6 +4,7 @@ const removeNoteRoute = apiNotesURL + "/removeNote"
 const registerNoteRoute = apiNotesURL + "/registerNote"
 const updateNoteRoute = apiNotesURL + "/updateANote"
 const notifyUserRoute = apiNotesURL + "/notifyUser"
+const userNotificationsRoute = apiNotesURL + "/userNotifications"
 
 export default class NoteService {
 
@@ -37,13 +38,13 @@ export default class NoteService {
       },
       body: JSON.stringify(note),
     });
+    console.log(warnedUser, note);
     if (note.noteType === 'Warning') {
       await this.warnUser({ dbWarningId: note.noteId, dbWarnedUserId: warnedUser.dbUserId });
     }
   }
 
   async warnUser(warningNotification) {
-    console.log(warningNotification);
     await fetch(notifyUserRoute, {
       method: 'POST',
       headers: {
@@ -73,6 +74,18 @@ export default class NoteService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(userId.toString()),
+    });
+    return await response.json();
+  }
+
+  async getUserWarnings(userId) {
+    const queryParams = new URLSearchParams({ dbUserId: userId }).toString();
+    const url = userNotificationsRoute + `?${queryParams}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
     return await response.json();
   }

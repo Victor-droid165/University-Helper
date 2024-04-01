@@ -12,6 +12,7 @@ const Warning = ({ note }) => {
   const [warning, setWarning] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
   const [dbUsersList, setDbUsersList] = useState([]);
+  const isReadOnly = location.state?.readOnly ?? false;
 
   // Atualiza os estados quando o componente recebe uma nova 'note'
   useEffect(() => {
@@ -57,10 +58,10 @@ const Warning = ({ note }) => {
     <Container component="main" maxWidth='100%'>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5" style={{ marginBottom: '1rem' }}>
-          Editar Aviso
+          {isReadOnly ? "Visualizar Aviso" : "Editar Aviso"}
         </Typography>
         <form noValidate style={{ width: '100%' }}>
-          <Select
+          {!isReadOnly && <Select
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
             displayEmpty
@@ -76,6 +77,7 @@ const Warning = ({ note }) => {
               </MenuItem>
             ))}
           </Select>
+          }
           <TextField
             variant="outlined"
             margin="normal"
@@ -88,6 +90,7 @@ const Warning = ({ note }) => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={{ marginBottom: '1rem' }}
+            disabled={isReadOnly}
           />
           <TextField
             variant="outlined"
@@ -102,35 +105,38 @@ const Warning = ({ note }) => {
             value={warning}
             onChange={(e) => setWarning(e.target.value)}
             style={{ marginBottom: '1rem' }}
+            disabled={isReadOnly}
           />
-          <Grid container spacing={2}>
-            <Grid item xs={12} container justifyContent="flex-end">
-              <IconButton
-                type="button"
-                onClick={handleClear}
-                sx={{
-                  color: 'white',
-                  backgroundColor: 'error.main',
-                  '&:hover': {
-                    backgroundColor: 'error.dark',
-                  },
-                  borderRadius: '15%',
-                  marginTop: '1rem',
-                }}
-              >
-                <CleaningServicesIcon />
-              </IconButton>
-              <Button
-                type="button"
-                variant="contained"
-                color="primary"
-                onClick={handleSave}
-                sx={{ marginTop: '1rem', marginLeft: '1rem' }}
-              >
-                Salvar
-              </Button>
+          {!isReadOnly &&
+            <Grid container spacing={2}>
+              <Grid item xs={12} container justifyContent="flex-end">
+                <IconButton
+                  type="button"
+                  onClick={handleClear}
+                  sx={{
+                    color: 'white',
+                    backgroundColor: 'error.main',
+                    '&:hover': {
+                      backgroundColor: 'error.dark',
+                    },
+                    borderRadius: '15%',
+                    marginTop: '1rem',
+                  }}
+                >
+                  <CleaningServicesIcon />
+                </IconButton>
+                <Button
+                  type="button"
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSave}
+                  sx={{ marginTop: '1rem', marginLeft: '1rem' }}
+                >
+                  Salvar
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
+          }
         </form>
       </div>
     </Container>

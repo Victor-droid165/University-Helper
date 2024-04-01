@@ -25,7 +25,7 @@ export default function ListNotesWithEdit() {
   }, []);
 
   useEffect(() => {
-    console.log(data);
+
   }, [data]);
 
   const updateData = (noteToRemove) => {

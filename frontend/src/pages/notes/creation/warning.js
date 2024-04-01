@@ -27,14 +27,6 @@ const Warning = () => {
   const handleSave = async () => {
     const noteID = await api.getNoteId("WAR");
     const creator = await api.getUserByField({ unique_key_name: "email", unique_key: auth.user.email });
-    const user = {
-      userName: selectedUser.dbUserName,
-      userEmail: selectedUser.dbUserEmail,
-      userPassword: selectedUser.dbUserPassword,
-      userType: selectedUser.dbUserType,
-      userEnrollment: selectedUser.dbUserEnrollment,
-      userUniversity: selectedUser.dbUserUniversity,
-    }
 
     await api.registerNote({
       noteId: noteID,
@@ -44,7 +36,7 @@ const Warning = () => {
       subject: "",
       content: warning,
       creator: creator,
-      warnedUser: user
+      warnedUser: selectedUser
     })
     const prevPath = location.state?.prevPath;
     prevPath ? navigate(prevPath) : navigate('/');

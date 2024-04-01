@@ -8,26 +8,26 @@ import Typography from '@mui/material/Typography';
 import WarningIcon from '@mui/icons-material/Warning';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import { IconButton, Grid } from '@mui/material';
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 export default function NoteCardReadOnly({ note }) {
   const navigate = useNavigate();
 
   const handleEditClick = () => {
-    navigate('/note-edition', { state: { note } });
+    navigate('/note-edition', { state: { note, readOnly: true }});
   };
+
 
   // Define os ícones e as cores para cada tipo de anotação
   const tagStyles = {
-    warning: { icon: <WarningIcon />, color: '#f32f2f' }, // Um tom mais escuro de vermelho
-    textNote: { icon: <DescriptionIcon />, color: '#40de00' }, // Um tom mais escuro de verde
-    reminder: { icon: <LightbulbIcon />, color: 'orange' }, // Um tom mais escuro de amarelo
+    Warning: { icon: <WarningIcon />, color: '#f32f2f' }, // Um tom mais escuro de vermelho
+    PlainText: { icon: <DescriptionIcon />, color: '#40de00' }, // Um tom mais escuro de verde
+    Reminder: { icon: <LightbulbIcon />, color: 'orange' }, // Um tom mais escuro de amarelo
   };
 
   // Escolhe o ícone e a cor com base no tipo de anotação
-  const { icon, color } = tagStyles[note.type] || { icon: null, color: 'grey' };
+  const { icon, color } = tagStyles[note.noteType] || { icon: null, color: 'grey' };
 
   return (
     <Box sx={{ minWidth: 275, position: 'relative', mb: 2 }}>
@@ -49,7 +49,7 @@ export default function NoteCardReadOnly({ note }) {
       >
         {icon}
         <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-          {(note.type).toUpperCase()}
+          {(note.noteType).toUpperCase()}
         </Typography>
       </Box>
       <Card variant="outlined" sx={{ pt: 7 }}>
@@ -65,18 +65,13 @@ export default function NoteCardReadOnly({ note }) {
               maxWidth: '100%',
             }}
           >
-            {note.type === 'reminder' ? note.content : note.title}
+            {note.noteType === 'Reminder' ? note.content : note.title}
           </Typography>
         </CardContent>
         <CardActions>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <IconButton size="small">
-                <DeleteIcon color="error" />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <Button size="small" onClick={handleEditClick}>Visualizar</Button>
+              <Button size="small" onClick={handleEditClick}>VISUALIZAR</Button>
             </Grid>
           </Grid>
         </CardActions>

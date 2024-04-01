@@ -21,3 +21,8 @@ type NotesAPI =
     :<|> "getId" :> ReqBody '[JSON] String :> Post '[JSON] String
     :<|> "listAllNotes" :> Get '[JSON] [Note]
     :<|> "notifyUser" :> ReqBody '[JSON] DBWarningNotification :> Post '[JSON] Bool
+    :<|> ( "userNotifications"
+             :> QueryParam "dbUserId" Int
+             :> Get '[JSON] [Note]
+         )
+    

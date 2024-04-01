@@ -43,5 +43,8 @@ export const useApi = () => ({
   },
   getNotesByCreatorId: async (userId) => {
     return await noteService.getNotesByCreatorId(userId);
+  },
+  getUserWarnings: async (userId) => {
+    return await noteService.getUserWarnings(userId);
   }
 });
