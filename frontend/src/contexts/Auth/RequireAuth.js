@@ -31,7 +31,7 @@ export const RequireAuth = ({ allowedRoles }) => {
 
         // Call fetchUserField when component mounts
         fetchUserField();
-    }, [api, auth.user.email, isAuthenticated, allowedRoles]);
+    }, [api, auth?.user?.email, isAuthenticated, allowedRoles]);
 
     // During loading or while awaiting response, return null or a loading indicator
     if (isAuthorized === null) {
