@@ -12,7 +12,6 @@ import Models.User
   ( User (..),
   )
 import Servant
-import Models.DB.DBWarningNotification (DBWarningNotification)
 
 type UsersAPI =
   "users" :> Get '[JSON] [User]
