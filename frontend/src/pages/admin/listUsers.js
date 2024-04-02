@@ -26,7 +26,7 @@ const ListUsers = () => {
   }, [rows]);
 
   const updateUser = async (field, newValue, match, matchValue) => {
-    await api.updateUserField({ field, newValue, match, matchValue });
+    await api.updateUserField({ fieldToUpdate: field, newValue, whereField: match, whereValue: matchValue });
   };
 
   const setValidates = (activeUsers) => {

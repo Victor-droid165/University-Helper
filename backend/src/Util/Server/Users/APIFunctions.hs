@@ -4,7 +4,7 @@ module Util.Server.Users.APIFunctions
 where
 
 import Control.Monad.IO.Class (liftIO)
-import Controllers.Users.AdministratorController (getIds, validateUserAPI, warnUser)
+import Controllers.Users.AdministratorController (getIds, validateUserAPI)
 import Controllers.Users.UserController
   ( getDBUsers,
     getUserByEmail,
