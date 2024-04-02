@@ -1,0 +1,124 @@
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  libllvm14 libpq5 postgresql-14 postgresql-client-14 postgresql-client-common postgresql-common sysstat
+Suggested packages:
+  postgresql-doc postgresql-doc-14 isag
+The following NEW packages will be installed:
+  libllvm14 libpq5 postgresql postgresql-14 postgresql-client-14 postgresql-client-common postgresql-common postgresql-contrib sysstat
+0 upgraded, 9 newly installed, 0 to remove and 348 not upgraded.
+Need to get 42,2 MB of archives.
+After this operation, 161 MB of additional disk space will be used.
+Do you want to continue? [Y/n] y
+Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libllvm14 amd64 1:14.0.0-1ubuntu1.1 [24,0 MB]
+Get:2 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpq5 amd64 14.11-0ubuntu0.22.04.1 [144 kB]
+Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 postgresql-client-common all 238 [29,6 kB]
+Get:4 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 postgresql-client-14 amd64 14.11-0ubuntu0.22.04.1 [1.222 kB]
+Get:5 http://archive.ubuntu.com/ubuntu jammy/main amd64 postgresql-common all 238 [169 kB]
+Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 postgresql-14 amd64 14.11-0ubuntu0.22.04.1 [16,2 MB]
+Get:7 http://archive.ubuntu.com/ubuntu jammy/main amd64 postgresql all 14+238 [3.288 B]                                                                                                                                                      
+Get:8 http://archive.ubuntu.com/ubuntu jammy/main amd64 postgresql-contrib all 14+238 [3.292 B]                                                                                                                                              
+Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 sysstat amd64 12.5.2-2ubuntu0.2 [487 kB]                                                                                                                                     
+Fetched 42,2 MB in 6s (6.845 kB/s)                                                                                                                                                                                                           
+Preconfiguring packages ...
+Selecting previously unselected package libllvm14:amd64.
+(Reading database ... 659187 files and directories currently installed.)
+Preparing to unpack .../0-libllvm14_1%3a14.0.0-1ubuntu1.1_amd64.deb ...
+Unpacking libllvm14:amd64 (1:14.0.0-1ubuntu1.1) ...
+Selecting previously unselected package libpq5:amd64.
+Preparing to unpack .../1-libpq5_14.11-0ubuntu0.22.04.1_amd64.deb ...
+Unpacking libpq5:amd64 (14.11-0ubuntu0.22.04.1) ...
+Selecting previously unselected package postgresql-client-common.
+Preparing to unpack .../2-postgresql-client-common_238_all.deb ...
+Unpacking postgresql-client-common (238) ...
+Selecting previously unselected package postgresql-client-14.
+Preparing to unpack .../3-postgresql-client-14_14.11-0ubuntu0.22.04.1_amd64.deb ...
+Unpacking postgresql-client-14 (14.11-0ubuntu0.22.04.1) ...
+Selecting previously unselected package postgresql-common.
+Preparing to unpack .../4-postgresql-common_238_all.deb ...
+Adding 'diversion of /usr/bin/pg_config to /usr/bin/pg_config.libpq-dev by postgresql-common'
+Unpacking postgresql-common (238) ...
+Selecting previously unselected package postgresql-14.
+Preparing to unpack .../5-postgresql-14_14.11-0ubuntu0.22.04.1_amd64.deb ...
+Unpacking postgresql-14 (14.11-0ubuntu0.22.04.1) ...
+Selecting previously unselected package postgresql.
+Preparing to unpack .../6-postgresql_14+238_all.deb ...
+Unpacking postgresql (14+238) ...
+Selecting previously unselected package postgresql-contrib.
+Preparing to unpack .../7-postgresql-contrib_14+238_all.deb ...
+Unpacking postgresql-contrib (14+238) ...
+Selecting previously unselected package sysstat.
+Preparing to unpack .../8-sysstat_12.5.2-2ubuntu0.2_amd64.deb ...
+Unpacking sysstat (12.5.2-2ubuntu0.2) ...
+Setting up postgresql-client-common (238) ...
+Setting up libpq5:amd64 (14.11-0ubuntu0.22.04.1) ...
+Setting up postgresql-client-14 (14.11-0ubuntu0.22.04.1) ...
+update-alternatives: using /usr/share/postgresql/14/man/man1/psql.1.gz to provide /usr/share/man/man1/psql.1.gz (psql.1.gz) in auto mode
+Setting up postgresql-common (238) ...
+supported-versions: WARNING! Unknown distribution: linuxmint
+ubuntu found in ID_LIKE, treating as Ubuntu
+supported-versions: WARNING: Unknown Ubuntu release: 21.1
+Adding user postgres to group ssl-cert
+
+Creating config file /etc/postgresql-common/createcluster.conf with new version
+Building PostgreSQL dictionaries from installed myspell/hunspell packages...
+  de_at_frami
+  de_ch_frami
+  de_de_frami
+  en_au
+  en_ca
+  en_gb
+  en_us
+  en_za
+  es_es
+  fr
+  it_it
+  pt_br
+  pt_pt
+  ru_ru
+Removing obsolete dictionary files:
+Created symlink /etc/systemd/system/multi-user.target.wants/postgresql.service → /lib/systemd/system/postgresql.service.
+Setting up libllvm14:amd64 (1:14.0.0-1ubuntu1.1) ...
+Setting up sysstat (12.5.2-2ubuntu0.2) ...
+
+Creating config file /etc/default/sysstat with new version
+update-alternatives: using /usr/bin/sar.sysstat to provide /usr/bin/sar (sar) in auto mode
+Created symlink /etc/systemd/system/sysstat.service.wants/sysstat-collect.timer → /lib/systemd/system/sysstat-collect.timer.
+Created symlink /etc/systemd/system/sysstat.service.wants/sysstat-summary.timer → /lib/systemd/system/sysstat-summary.timer.
+Created symlink /etc/systemd/system/multi-user.target.wants/sysstat.service → /lib/systemd/system/sysstat.service.
+Setting up postgresql-14 (14.11-0ubuntu0.22.04.1) ...
+Creating new PostgreSQL cluster 14/main ...
+/usr/lib/postgresql/14/bin/initdb -D /var/lib/postgresql/14/main --auth-local peer --auth-host scram-sha-256 --no-instructions
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locales
+  COLLATE:  en_US.UTF-8
+  CTYPE:    en_US.UTF-8
+  MESSAGES: en_US.UTF-8
+  MONETARY: pt_BR.UTF-8
+  NUMERIC:  pt_BR.UTF-8
+  TIME:     en_US.UTF-8
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/14/main ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... America/Recife
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+update-alternatives: using /usr/share/postgresql/14/man/man1/postmaster.1.gz to provide /usr/share/man/man1/postmaster.1.gz (postmaster.1.gz) in auto mode
+Setting up postgresql-contrib (14+238) ...
+Setting up postgresql (14+238) ...
+Processing triggers for libc-bin (2.35-0ubuntu3.1) ...
+Processing triggers for man-db (2.10.2-1) ...
+Processing triggers for doc-base (0.11.1) ...
+Processing 1 added doc-base file...
